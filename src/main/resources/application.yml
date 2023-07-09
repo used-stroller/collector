@@ -24,3 +24,13 @@ spring:
     multipart:
       max-file-size: -1
       max-request-size: -1
+
+collector:
+  crawler:
+    web-driver-id: webdriver.chrome.driver
+    # window
+    win-web-driver-path: C:\\chromedriver\\chromedriver.exe
+    win-download-path: C:\\chromedriver\\downloads
+    # mac
+    mac-web-driver-path: /usr/local/bin/chromedriver
+    mac-download-path: /Users/yd/Downloads
