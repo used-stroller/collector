@@ -55,11 +55,16 @@ public class ChromiumDriver extends BrowserDriver<ChromeDriver> {
 		}
 
 		String os = System.getProperty("os.name").toLowerCase();
+		String chromeDriverPath = "";
+		String downloadPath = "";
 		if (os.contains("win")) {
-			System.setProperty(myCollector.getWebDriverId(), myCollector.getWinWebDriverPath());
+			chromeDriverPath = myCollector.getWinWebDriverPath();
+			downloadPath = myCollector.getWinDownloadPath();
 		} else {
-			System.setProperty(myCollector.getWebDriverId(), myCollector.getMacWebDriverPath());
+			chromeDriverPath = myCollector.getMacWebDriverPath();
+			downloadPath = myCollector.getMacDownloadPath();
 		}
+		System.setProperty(myCollector.getWebDriverId(), chromeDriverPath);
 
 		options = new ChromeOptions();
 		// headless(백그라운드 동작) 옵션 설정
@@ -78,15 +83,12 @@ public class ChromiumDriver extends BrowserDriver<ChromeDriver> {
 		options.addArguments("--disable-dev-shm-usage");
 		options.addArguments("--single-process");
 		options.addArguments("--remote-allow-origins=*");
+		options.addArguments("--disable-gpu");
 
 		// 웹 브라우저 프로필 설정
 		Map<String, Object> prefs = new HashMap<String, Object>();
 		prefs.put("profile.default_content_settings.popups", 0); // 팝업차단
-		if (os.contains("win")) {
-			prefs.put("download.default_directory", myCollector.getWinDownloadPath());
-		} else {
-			prefs.put("download.default_directory", myCollector.getMacDownloadPath());
-		}
+		prefs.put("download.default_directory", downloadPath);
 		prefs.put("download.prompt_for_download", false); // 다운로드 경로 묻지 않기
 		options.setExperimentalOption("prefs", prefs);
 
