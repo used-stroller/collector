@@ -25,4 +25,12 @@ public class CollectorController {
 		collectorService.collectingNaver(url);
 	}
 
+	@GetMapping("/coopang-test")
+	@ResponseStatus(HttpStatus.OK)
+	public void coopang() {
+		log.info("coopang test");
+		String url = "https://www.daum.net/";
+		collectorService.collectingCoopang(url);
+	}
+
 }

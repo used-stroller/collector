@@ -2,6 +2,7 @@ package team.three.usedstroller.collector.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -19,6 +20,8 @@ public abstract class BrowserDriver <T extends RemoteWebDriver> {
 	public WebDriverWait driverWait;
 	public ChromeOptions options;
 	protected boolean isWait;
+	public WebDriver webDriver;
+
 
 	/**
 	 * 페이지 열기
@@ -66,6 +69,12 @@ public abstract class BrowserDriver <T extends RemoteWebDriver> {
 	public void close() {
 		if (driver != null) {
 			driver.close();
+		}
+	}
+
+	public void quit(){
+		if(driver !=null){
+			driver.quit();
 		}
 	}
 
