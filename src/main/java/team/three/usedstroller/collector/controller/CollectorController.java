@@ -25,11 +25,11 @@ public class CollectorController {
 		collectorService.collectingNaver(url);
 	}
 
-	@GetMapping("/coopang-test")
+	@GetMapping("/bunjang-test")
 	@ResponseStatus(HttpStatus.OK)
-	public void coopang() {
-		log.info("coopang test");
-		String url = "https://www.daum.net/";
+	public void bunjang() {
+		log.info("bunjang test");
+		String url = "https://m.bunjang.co.kr//";
 		collectorService.collectingCoopang(url);
 	}
 

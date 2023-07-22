@@ -39,7 +39,7 @@ public class CollectorService {
 
 		driver.close();
 	}
-	public void collectingCoopang(String url) {
+	public void collectingBunJang(String url) {
 		ChromeOptions options = new ChromeOptions();
 		options.addArguments("--remote-allow-origins=*");
 
