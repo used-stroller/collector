@@ -17,6 +17,14 @@ public class CollectorController {
 
 	private final CollectorService collectorService;
 
+	@GetMapping("/naver-shopping")
+	@ResponseStatus(HttpStatus.OK)
+	public void naverShopping() {
+		log.info("naver shopping");
+		String url = "https://search.shopping.naver.com/search/all?where=all&frm=NVSCTAB&query=%EC%9C%A0%EB%AA%A8%EC%B0%A8";
+		collectorService.collectingNaverShopping(url);
+	}
+
 	@GetMapping("/naver-test")
 	@ResponseStatus(HttpStatus.OK)
 	public void test() {
