@@ -3,11 +3,11 @@ package team.three.usedstroller.collector.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import team.three.usedstroller.collector.domain.BunJang;
 import team.three.usedstroller.collector.service.CollectorService;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,13 +32,14 @@ public class CollectorController {
 		String url = "https://finance.naver.com/world/";
 		collectorService.collectingNaver(url);
 	}
-
 	@GetMapping("/bunjang-test")
 	@ResponseStatus(HttpStatus.OK)
-	public void bunjang() {
+	@ResponseBody
+	public List<BunJang> bunjang() {
 		log.info("bunjang test");
-		String url = "https://m.bunjang.co.kr//";
-		collectorService.collectingCoopang(url);
+		String url = "https://m.bunjang.co.kr/search/products?q=%EC%9C%A0%EB%AA%A8%EC%B0%A8";
+		List<BunJang> bunJang = collectorService.collectingBunJang(url);
+		return bunJang;
 	}
 
 }
