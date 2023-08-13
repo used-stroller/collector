@@ -9,8 +9,8 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public abstract class BrowserDriver <T extends RemoteWebDriver> {
@@ -27,10 +27,11 @@ public abstract class BrowserDriver <T extends RemoteWebDriver> {
 	public void open(String url) {
 		try {
 			log.info("Chrome Open URL : {}", url);
-			this.driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+			this.driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
 			this.driver.get(url);
 			this.driver.manage().window().maximize();
 		} catch (Exception e) {
+			log.error("Chrome Open Error : {}", url);
 			e.printStackTrace();
 		}
 	}
@@ -74,6 +75,16 @@ public abstract class BrowserDriver <T extends RemoteWebDriver> {
 		return element;
 	}
 
+	public List<WebElement> getListXpath(String selector) {
+		List<WebElement> element = null;
+		try {
+			element = driverWait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.xpath(selector)));
+		} catch (WebDriverException e) {
+			log.error("{} 오브젝트를 불러오는데 실패했습니다.", selector);
+		}
+		return element;
+	}
+
 	/**
 	 * Xpath가 로드 됐을 때 리스트로 불러오기
 	 */
@@ -108,6 +119,14 @@ public abstract class BrowserDriver <T extends RemoteWebDriver> {
 			log.error(e.getMessage());
 		} finally {
 			isWait = false;
+		}
+	}
+
+	public void scrollY(int y) {
+		try {
+			driver.executeScript("window.scrollTo(0, "+y+")");
+		} catch (Exception e) {
+			log.error(e.getMessage());
 		}
 	}
 }

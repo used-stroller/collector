@@ -37,7 +37,7 @@ dependencies {
     runtimeOnly 'com.h2database:h2'
 
     //TODO 배포시 제거 필요(jpa sql 보는 용도. 개발시에만 사용)
-    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.8.0'
+//    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.8.0'
 
     //swagger
     implementation 'io.springfox:springfox-boot-starter:3.0.0'

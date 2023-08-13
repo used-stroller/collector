@@ -29,8 +29,12 @@ collector:
   crawler:
     web-driver-id: webdriver.chrome.driver
     # window
-    win-web-driver-path: C:\\chromedriver\\chromedriver.exe
+    win-web-driver-path: libs\chromedriver.exe
     win-download-path: C:\\chromedriver\\downloads
     # mac
-    mac-web-driver-path: /usr/local/bin/chromedriver
+    mac-arm-web-driver-path: libs/chromedriver_mac_arm64
+    mac-intel-web-driver-path: libs/chromedriver_mac64
     mac-download-path: /Users/yd/Downloads
+    # linux
+    linux-web-driver-path: libs/chromedriver_linux64
+    linux-download-path: /home/yd/Downloads

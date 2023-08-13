@@ -21,46 +21,41 @@ public class CollectorService {
 	private final ChromiumDriver driver;
 	private final NaverShoppingRepository naverShoppingRepository;
 
-	@Transactional
 	public void collectingNaverShopping(String url) {
 		driver.open(url);
 		driver.wait(1);
+		driver.scrollY(1500);
+		driver.wait(1);
+		driver.scrollY(1500);
+		driver.wait(1);
+		driver.scrollY(1500);
+		driver.wait(1);
+		driver.scrollY(1500);
+		driver.wait(1);
+		driver.scrollY(1500);
+		driver.wait(3);
+
 
 		try {
-			WebElement prodList = driver.get("#content > div.style_content__xWg5l > div.basicList_list_basis__uNBZx > div");
-			List<WebElement> list = prodList.findElements(By.cssSelector("div"));
 			String title = "";
 			String link = "";
 			String price = "";
-			String brand = "";
+			String imgSrc = "";
 
-			for (int i = 1; i < list.size(); i++) {
-				String aClass = list.get(i).getDomAttribute("class");
-				if (aClass == null) continue;
-				if (aClass.contains("product_title") || aClass.contains("adProduct_title")) {
-					title = list.get(i).findElement(By.cssSelector("a")).getText();
-					link = list.get(i).findElement(By.cssSelector("a")).getAttribute("href");
-				}
-				if (aClass.contains("product_price_area") || aClass.contains("adProduct_price_area")) {
-					String priceClass = list.get(i).findElement(By.cssSelector("strong > span > span")).getDomAttribute("class");
-					if (priceClass == null) continue;
-					if (priceClass.contains("num")) {
-						price = list.get(i).findElement(By.cssSelector("strong > span > span")).getText();
-					}
-				}
-				if (aClass.contains("product_mall_area") || aClass.contains("adProduct_mall_area")) {
-					brand = list.get(i).findElement(By.cssSelector("a")).getText();
-				}
+			WebElement prodList = driver.get("#content > div.style_content__xWg5l > div.basicList_list_basis__uNBZx");
+			List<WebElement> list = prodList.findElements(
+					By.xpath(".//div[@class='adProduct_item__1zC9h' or @class='product_item__MDtDF']"));
+//			List<WebElement> list = prodList.findElements(By.cssSelector("div.basicList_item__2XT81"));
 
-				NaverShopping result = NaverShopping.builder()
-						.title(title)
-						.link(link)
-						.price(price)
-						.brand(brand)
-						.build();
-				naverShoppingRepository.save(result);
-				log.info("result = {}", result);
+			for (int i = 0; i < list.size(); i++) {
+				//*[@id=\"content\"]/div[1]/div[3]/div/div[1]/div
+				link = list.get(i).findElement(By.xpath(".//a[contains(@class, 'thumbnail')]")).getAttribute("href");
+				imgSrc = list.get(i).findElement(By.xpath(".//a[contains(@class, 'thumbnail')]/img")).getAttribute("src");
+				title = list.get(i).findElement(By.xpath(".//a[@title]")).getText();
+				price = list.get(i).findElement(By.xpath(".//span[contains(@class, 'price')]")).getText().replace("최저", "");
+				saveNaverShopping(title, link, price, imgSrc);
 			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -69,19 +64,16 @@ public class CollectorService {
 
 	}
 
-	public void collectingNaver(String url) {
-		driver.open(url);
-		driver.wait(1);
-
-		WebElement americaIndex = driver.get("#americaIndex");
-		List<WebElement> list = americaIndex.findElements(By.className("point_up"));
-		for (WebElement webElement : list) {
-			log.info("title = {}", webElement.findElement(By.cssSelector(".tb_td2")).getText());
-			log.info("price = {}", webElement.findElement(By.cssSelector(".tb_td3")).getText());
-			log.info("rate = {}", webElement.findElement(By.cssSelector(".tb_td5")).getText());
-		}
-
-		driver.close();
+	@Transactional
+	public void saveNaverShopping(String title, String link, String price, String imgSrc) {
+		NaverShopping result = NaverShopping.builder()
+				.title(title)
+				.link(link)
+				.price(price)
+				.imgSrc(imgSrc)
+				.build();
+		NaverShopping save = naverShoppingRepository.save(result);
+		log.info("saved item = {}", save);
 	}
 
 }
