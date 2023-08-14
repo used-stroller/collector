@@ -25,6 +25,10 @@ import java.util.logging.Level;
 public class ChromiumDriver extends BrowserDriver<ChromeDriver> {
 	private final MyCollector myCollector;
 
+	public ChromeDriver getDriver() {
+		return driver;
+	}
+
 	private String[] userAgents = {
 			// IE
 			"Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)",

@@ -11,6 +11,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public abstract class BrowserDriver <T extends RemoteWebDriver> {
@@ -107,6 +108,14 @@ public abstract class BrowserDriver <T extends RemoteWebDriver> {
 			driver.quit();
 		}
 	}
+
+	/**
+	 * 암묵적 대기 설정: 지정 시간동안 대기하며, 요소가 나타나면 즉시 진행
+	 */
+	public void implicitWait(int second) {
+		driver.manage().timeouts().implicitlyWait(second, TimeUnit.SECONDS);
+	}
+
 
 	/**
 	 * 일정 시간 대기
