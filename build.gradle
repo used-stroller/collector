@@ -48,6 +48,9 @@ dependencies {
 
     //test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    //jpa-mariadb연동
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client' // MariaDB
 }
 
 tasks.named('test') {

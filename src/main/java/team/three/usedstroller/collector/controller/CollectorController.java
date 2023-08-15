@@ -4,9 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import team.three.usedstroller.collector.domain.BunJang;
+import team.three.usedstroller.collector.domain.ProductDto;
 import team.three.usedstroller.collector.service.CollectorService;
 
+import javax.annotation.PostConstruct;
+import javax.script.ScriptException;
 import java.util.List;
 
 @RestController
@@ -35,11 +37,27 @@ public class CollectorController {
 	@GetMapping("/bunjang-test")
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
-	public List<BunJang> bunjang() {
+	public int bunjang() throws InterruptedException {
 		log.info("bunjang test");
-		String url = "https://m.bunjang.co.kr/search/products?q=%EC%9C%A0%EB%AA%A8%EC%B0%A8";
-		List<BunJang> bunJang = collectorService.collectingBunJang(url);
-		return bunJang;
+		int complete = collectorService.collectingBunJang();
+		return complete;
+	}
+
+	@GetMapping("/junggo-test")
+	@ResponseStatus(HttpStatus.OK)
+	@ResponseBody
+	public int junggo() throws InterruptedException {
+		int completeCount = collectorService.collectingJunggonara();
+		return completeCount;
+	}
+
+	@GetMapping("/hello-test")
+	@ResponseStatus(HttpStatus.OK)
+	@ResponseBody
+	@PostConstruct
+	public int hello() throws InterruptedException, ScriptException {
+		collectorService.collectingHelloMarket();
+		return 1;
 	}
 
 }

@@ -11,7 +11,7 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class BunJang {
+public class HelloMarket {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -25,7 +25,7 @@ public class BunJang {
 	private String imgSrc;
 
 	@Builder
-	public BunJang(String title, String link, String price, String imgSrc) {
+	public HelloMarket(String title, String link, String price, String imgSrc) {
 		this.title = title;
 		this.link = link;
 		this.price = price;

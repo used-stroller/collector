@@ -1,6 +1,7 @@
 package team.three.usedstroller.collector.config;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -31,6 +32,10 @@ public class CustomWebDriver {
         element.sendKeys(text);
     }
 
+    public void scrollDown(WebElement element){
+        ((JavascriptExecutor)driver).executeScript("window.scrollTo(0, document.body.scrollHeight)", element);
+    }
+
     public WebElement findElement(By by){
         WebElement element = driver.findElement(by);
         return element;
@@ -41,7 +46,8 @@ public class CustomWebDriver {
         return element;
     }
     public void closeBrower(){
-        driver.quit();
+        driver.close();//한개 탭만 종료
+        driver.quit(); //webdriver 종료
     }
 
 }
