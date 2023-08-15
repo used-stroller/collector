@@ -10,16 +10,21 @@ import javax.persistence.*;
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "naver_shopping")
-public class NaverShopping {
+public class NaverShopping extends BaseTimeEntity {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
 	@Column(length = 1000)
 	private String title;
+
 	private String price;
+
 	@Lob
 	@Type(type = "org.hibernate.type.TextType")
 	private String link;
+
 	@Lob
 	@Type(type = "org.hibernate.type.TextType")
 	private String imgSrc;

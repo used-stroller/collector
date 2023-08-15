@@ -4,8 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -14,13 +14,10 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
-public abstract class BrowserDriver <T extends RemoteWebDriver> {
-
-	protected T driver;
-	protected int port;
+public abstract class BrowserDriver<T extends ChromeDriver> {
+	public T driver;
 	public WebDriverWait driverWait;
 	public ChromeOptions options;
-	protected boolean isWait;
 
 	/**
 	 * 페이지 열기
@@ -32,8 +29,7 @@ public abstract class BrowserDriver <T extends RemoteWebDriver> {
 			this.driver.get(url);
 			this.driver.manage().window().maximize();
 		} catch (Exception e) {
-			log.error("Chrome Open Error : {}", url);
-			e.printStackTrace();
+			throw new RuntimeException("Chrome Open Error", e);
 		}
 	}
 
@@ -105,6 +101,14 @@ public abstract class BrowserDriver <T extends RemoteWebDriver> {
 	public void close() {
 		if (driver != null) {
 			driver.close();
+		}
+	}
+
+	/**
+	 * driver quit
+	 */
+	public void quit() {
+		if (driver != null) {
 			driver.quit();
 		}
 	}
@@ -122,12 +126,9 @@ public abstract class BrowserDriver <T extends RemoteWebDriver> {
 	 */
 	public void wait(int second) {
 		try {
-			isWait = true;
 			Thread.sleep(second * 1000L);
 		} catch (InterruptedException e) {
 			log.error(e.getMessage());
-		} finally {
-			isWait = false;
 		}
 	}
 

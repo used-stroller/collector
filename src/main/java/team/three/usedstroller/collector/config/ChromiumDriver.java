@@ -3,7 +3,6 @@ package team.three.usedstroller.collector.config;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.logging.LoggingPreferences;
@@ -23,24 +22,10 @@ import java.util.logging.Level;
 @Configuration
 @RequiredArgsConstructor
 public class ChromiumDriver extends BrowserDriver<ChromeDriver> {
+
 	private final MyCollector myCollector;
 
-	public ChromeDriver getDriver() {
-		return driver;
-	}
-
 	private String[] userAgents = {
-			// IE
-			"Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)",
-			"Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)",
-			"Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/5.0)",
-			"Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/4.0; InfoPath.2; SV1; .NET CLR 2.0.50727; WOW64)",
-			"Mozilla/4.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/5.0)",
-			"Mozilla/5.0 (Windows; U; MSIE 9.0; WIndows NT 9.0; en-US))",
-			"Mozilla/5.0 (Windows; U; MSIE 9.0; Windows NT 9.0; en-US)",
-			"Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 7.1; Trident/5.0)",
-			"Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0; WOW64; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; .NET CLR 1.0.3705; .NET CLR 1.1.4322)",
-			"Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0; InfoPath.1; SV1; .NET CLR 3.8.36217; WOW64; en-US)",
 			// Firefox
 			"Mozilla/5.0 (Windows; U; Windows NT 5.1; ro; rv:1.9.2.8) Gecko/20100722 Firefox/3.6.8",
 			"Mozilla/5.0 (Windows NT 6.1; WOW64; rv:15.0) Gecko/20120427 Firefox/15.0a1",
@@ -50,7 +35,18 @@ public class ChromiumDriver extends BrowserDriver<ChromeDriver> {
 			"Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.1.16) Gecko/20120421 Gecko Firefox/11.0",
 			"Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.1.16) Gecko/20120421 Firefox/11.0",
 			"Mozilla/5.0 (Windows NT 6.1; WOW64; rv:11.0) Gecko Firefox/11.0",
-			"Mozilla/5.0 (Windows NT 6.1; U;WOW64; de;rv:11.0) Gecko Firefox/11.0" };
+			"Mozilla/5.0 (Windows NT 6.1; U;WOW64; de;rv:11.0) Gecko Firefox/11.0"
+	};
+
+	/**
+	 * headless(백그라운드 동작) 옵션 설정
+	 */
+	private void setHeadless() {
+		options.addArguments("--headless");
+		options.addArguments("--no-sandbox");
+		options.addArguments("--disable-dev-shm-usage");
+		options.addArguments("--disable-gpu");
+	}
 
 	/**
 	 * 사람처럼 보이게 하는 옵션들
@@ -63,15 +59,12 @@ public class ChromiumDriver extends BrowserDriver<ChromeDriver> {
 			secureRandom = new SecureRandom();
 		}
 		options.addArguments("user-agent="+userAgents[secureRandom.nextInt(userAgents.length)]); // 사용자 에이전트 랜덤 설정
-		options.setHeadless(true); //백그라운드 동작 설정
-		options.addArguments("no-sandbox");
+
 		options.addArguments("lang=ko_KR");
 		options.addArguments("--disable-notifications"); // 알림 비활성
 		options.addArguments("--disable-extensions"); // 확장 프로그램 비활성
 		options.addArguments("--disable-setuid-sandbox"); // root 권한 무시
-		options.addArguments("--disable-dev-shm-usage");  // overcome limited resource problems
 		options.addArguments("--single-process");
-		options.addArguments("--disable-gpu");  // GPU 사용 안함
 		options.addArguments("--remote-allow-origins=*"); // 크로스 도메인 허용
 	}
 
@@ -101,11 +94,10 @@ public class ChromiumDriver extends BrowserDriver<ChromeDriver> {
 	@PostConstruct
 	public void initChromeDriver() {
 		setByOs();
+		setHeadless();
 		setCustomOption();
 		chromeDriverLogging();
-		ChromeDriverService chromeDriverService = ChromeDriverService.createDefaultService();
-		this.port = chromeDriverService.getUrl().getPort();
-		this.driver = new ChromeDriver(chromeDriverService, options);
+		this.driver = new ChromeDriver(options);
 		this.driverWait = new WebDriverWait(this.driver, Duration.ofSeconds(5));
 	}
 }
