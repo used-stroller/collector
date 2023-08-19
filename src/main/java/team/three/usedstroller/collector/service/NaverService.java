@@ -8,23 +8,28 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import team.three.usedstroller.collector.config.ChromiumDriver;
 import team.three.usedstroller.collector.domain.NaverShopping;
 import team.three.usedstroller.collector.repository.NaverShoppingRepository;
 
+import java.time.Duration;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static io.netty.util.internal.StringUtil.EMPTY_STRING;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class CollectorService {
+public class NaverService {
 
 	private final ChromiumDriver driver;
 	private final NaverShoppingRepository naverShoppingRepository;
 
 	public String collectingNaverShopping(String url, int startPage, int endPage) {
 		driver.open(url + startPage);
-		driver.implicitWait(10);
+		driver.implicitWait(Duration.ofMillis(100));
 		int page = startPage;
 
 		try {
@@ -39,7 +44,7 @@ public class CollectorService {
 						break;
 					}
 					page++;
-					driver.wait(5);
+					driver.wait(3);
 				}
 			}
 
@@ -62,6 +67,9 @@ public class CollectorService {
 		String link = "";
 		String price = "";
 		String imgSrc = "";
+		String uploadDate = "";
+		String releaseYear = "";
+		String etc = "";
 
 		for (WebElement el : list) {
 			link = el.findElement(By.xpath(".//a[contains(@class, 'thumbnail')]")).getAttribute("href");
@@ -81,7 +89,37 @@ public class CollectorService {
 				price = el.findElement(By.xpath(".//div[contains(@class, 'price')]")).getText(); // 가격 없는 경우(예: 판매중단)
 			}
 
-			saveNaverShopping(title, link, price, imgSrc);
+			uploadDate = el.findElements(By.xpath(".//span[contains(@class, 'roduct_etc')]"))
+					.stream()
+					.filter(e -> e.getText() != null && e.getText().contains("등록일"))
+					.findFirst()
+					.map(e -> e.getText().split("등록일")[1].trim())
+					.orElseGet(() -> EMPTY_STRING);
+
+			releaseYear = el.findElements(By.xpath(".//a[contains(@class, 'roduct_detail')]"))
+					.stream()
+					.filter(e -> e.getText() != null && e.getText().contains("출시년도"))
+					.findFirst()
+					.map(e -> e.getText().split("출시년도 :")[1].trim())
+					.orElseGet(() -> EMPTY_STRING);
+
+			etc = el.findElements(By.xpath(".//a[contains(@class, 'roduct_detail')]"))
+					.stream()
+					.map(WebElement::getText)
+					.filter(e -> !ObjectUtils.isEmpty(e))
+					.collect(Collectors.joining(" | "));
+
+			NaverShopping result = NaverShopping.builder()
+					.title(title)
+					.link(link)
+					.price(price)
+					.imgSrc(imgSrc)
+					.uploadDate(uploadDate)
+					.releaseYear(releaseYear)
+					.etc(etc)
+					.build();
+
+			saveNaverShopping(result);
 		}
 
 		driver.wait(2);
@@ -117,15 +155,9 @@ public class CollectorService {
 		}
 	}
 
-	private void saveNaverShopping(String title, String link, String price, String imgSrc) {
-		NaverShopping result = NaverShopping.builder()
-				.title(title)
-				.link(link)
-				.price(price)
-				.imgSrc(imgSrc)
-				.build();
+	private void saveNaverShopping(NaverShopping result) {
 		NaverShopping save = naverShoppingRepository.save(result);
-		log.info("saved item = {}", save);
+		log.info("saved id: [{}] {}", save.getId(), save.getTitle());
 	}
 
 }
