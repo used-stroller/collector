@@ -12,6 +12,7 @@ import team.three.usedstroller.collector.config.ChromiumDriver;
 import team.three.usedstroller.collector.config.CustomWebDriver;
 import team.three.usedstroller.collector.domain.*;
 import team.three.usedstroller.collector.repository.BunJangRepository;
+import team.three.usedstroller.collector.repository.HelloMarketRepository;
 import team.three.usedstroller.collector.repository.JunggonaraRepository;
 import team.three.usedstroller.collector.repository.NaverShoppingRepository;
 
@@ -35,9 +36,8 @@ public class CollectorService {
     private final NaverShoppingRepository naverShoppingRepository;
     private final JunggonaraRepository junggonaraRepository;
     private final BunJangRepository bunJangRepository;
+    private final HelloMarketRepository helloMarketRepository;
     private final CustomWebDriver customWebDriver;
-
-
 
 
     @Transactional
@@ -105,8 +105,8 @@ public class CollectorService {
 
     public int collectingJunggonara() throws InterruptedException {
         int complete = 0;
-        for(int i=1; i<200; i++) {
-            String url = "https://web.joongna.com/search/%EC%9C%A0%EB%AA%A8%EC%B0%A8?page="+i;
+        for (int i = 1; i < 200; i++) {
+            String url = "https://web.joongna.com/search/%EC%9C%A0%EB%AA%A8%EC%B0%A8?page=" + i;
             customWebDriver.openURL(url);
             Thread.sleep(1000);
             try {
@@ -119,47 +119,53 @@ public class CollectorService {
                     junggonaraRepository.save(item);
                     complete++;
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 break;
             }
             customWebDriver.closeBrower();
         }
         return complete;
     }
+
     public int collectingBunJang() throws InterruptedException {
         int complete = 0;
-        for(int i=1; i<50; i++) {
-            String url = "https://m.bunjang.co.kr/search/products?order=score&page="+i+"&q=%EC%9C%A0%EB%AA%A8%EC%B0%A8";
+        for (int i = 1; i < 50; i++) {
+            String url = "https://m.bunjang.co.kr/search/products?order=score&page=" + i + "&q=%EC%9C%A0%EB%AA%A8%EC%B0%A8";
             customWebDriver.openURL(url);
             Thread.sleep(1000);
 
-                WebElement content = customWebDriver.findElement(By.cssSelector("#root"));
-                List<WebElement> list = content.findElements(By.xpath("div/div/div[4]/div/div[4]/div/div"));
+            WebElement content = customWebDriver.findElement(By.cssSelector("#root"));
+            List<WebElement> list = content.findElements(By.xpath("div/div/div[4]/div/div[4]/div/div"));
 
-                List<BunJang> itemList = getItemListBunJang(list);
-                for (BunJang item : itemList) {
-                    bunJangRepository.save(item);
-                    complete++;
-                }
+            List<BunJang> itemList = getItemListBunJang(list);
+            for (BunJang item : itemList) {
+                bunJangRepository.save(item);
+                complete++;
+            }
 
             customWebDriver.closeBrower();
         }
         return complete;
     }
 
-    public void collectingHelloMarket() throws InterruptedException, ScriptException {
-            String url = "https://www.hellomarket.com/search?q=%EC%9C%A0%EB%AA%A8%EC%B0%A8";
-            customWebDriver.openURL(url);
-            WebElement body = customWebDriver.findElement(By.tagName("body"));
-            WebElement contents = customWebDriver.findElement(By.xpath("//*[@id=\"__next\"]/div[3]/div[3]/div[2]/div"));
-            //boolean bottom = (boolean)isBottom();
-            long time = new Date().getTime();
-            while(new Date().getTime() < time + 20000) {
-                Thread.sleep(1000);
-                body.sendKeys(Keys.END);
-            }
-            //customWebDriver.closeBrower();
+    public int collectingHelloMarket() throws InterruptedException, ScriptException {
+        int complete = 0;
+        String url = "https://www.hellomarket.com/search?q=%EC%9C%A0%EB%AA%A8%EC%B0%A8";
+        customWebDriver.openURL(url);
+        scrollToBottom(2000);
+
+        WebElement content = customWebDriver.findElement(By.xpath("//*[@id=\"__next\"]"));
+        System.out.println("content = " + content);
+        List<WebElement> list = content.findElements(By.xpath("div[3]/div[3]/div[2]/div/div/div"));
+        List<HelloMarket> itemList = getItemListHelloMarket(list);
+        for (HelloMarket item : itemList) {
+            helloMarketRepository.save(item);
+            complete++;
         }
+
+        //customWebDriver.closeBrower();
+        return complete;
+    }
 
 
     //============================================메서드=====================================================
@@ -171,23 +177,24 @@ public class CollectorService {
         String link;
         for (WebElement element : list) {
             try {
-                if (element.findElement(By.xpath("a/div[2]/h2")).getText()== null){}
-            }catch (Exception e){
+                if (element.findElement(By.xpath("a/div[2]/h2")).getText() == null) {
+                }
+            } catch (Exception e) {
                 continue;
             }
-                title = element.findElement(By.xpath("a/div[2]/h2")).getText();
-                link = element.findElement(By.xpath("a")).getAttribute("href");
-                price = element.findElement(By.xpath("a/div[2]/div[1]")).getText();
-                img = element.findElement(By.xpath("a/div[1]/img")).getAttribute("src");
+            title = element.findElement(By.xpath("a/div[2]/h2")).getText();
+            link = element.findElement(By.xpath("a")).getAttribute("href");
+            price = element.findElement(By.xpath("a/div[2]/div[1]")).getText();
+            img = element.findElement(By.xpath("a/div[1]/img")).getAttribute("src");
 
-                Junggo junggo = Junggo.builder()
-                        .title(title)
-                        .link(link)
-                        .price(price)
-                        .imgSrc(img)
-                        .build();
-                junggoList.add(junggo);
-            }
+            Junggo junggo = Junggo.builder()
+                    .title(title)
+                    .link(link)
+                    .price(price)
+                    .imgSrc(img)
+                    .build();
+            junggoList.add(junggo);
+        }
         return junggoList;
     }
 
@@ -199,8 +206,9 @@ public class CollectorService {
         String link;
         for (WebElement element : list) {
             try {
-                if (element.findElement(By.xpath("a")).getText()== null){}
-            }catch (Exception e){
+                if (element.findElement(By.xpath("a")).getText() == null) {
+                }
+            } catch (Exception e) {
                 continue;
             }
             title = element.findElement(By.xpath("a/div[2]/div[1]")).getText();
@@ -218,6 +226,7 @@ public class CollectorService {
         }
         return bunJangList;
     }
+
     private static List<HelloMarket> getItemListHelloMarket(List<WebElement> list) {
         List<HelloMarket> helloMarketListList = new ArrayList<>();
         String img;
@@ -226,14 +235,15 @@ public class CollectorService {
         String link;
         for (WebElement element : list) {
             try {
-                if (element.findElement(By.xpath("a")).getText()== null){}
-            }catch (Exception e){
+                if (element.findElement(By.xpath("div")).getText() == null) {
+                }
+            } catch (Exception e) {
                 continue;
             }
-            title = element.findElement(By.xpath("a/div[2]/div[1]")).getText();
-            link = element.findElement(By.xpath("a")).getAttribute("href");
-            price = element.findElement(By.xpath("a/div[2]/div[2]/div[1]")).getText();
-            img = element.findElement(By.xpath("a/div[1]/img")).getAttribute("src");
+            title = element.findElement(By.xpath("div/div[2]/a[2]/div")).getText();
+            link = element.findElement(By.xpath("div/div[1]/a")).getAttribute("href");
+            price = element.findElement(By.xpath("div/div[2]/a[1]/div")).getText();
+            img = element.findElement(By.xpath("div/div[1]/a/img")).getAttribute("src");
 
             HelloMarket helloMarket = HelloMarket.builder()
                     .title(title)
@@ -245,10 +255,15 @@ public class CollectorService {
         }
         return helloMarketListList;
     }
-    private static Object isBottom() throws ScriptException {
 
-
-        return null;
+    private void scrollToBottom(int ms) throws InterruptedException {
+        WebElement body = customWebDriver.findElement(By.tagName("body"));
+        //boolean bottom = (boolean)isBottom();
+        long time = new Date().getTime();
+        while (new Date().getTime() < time + ms) {
+            Thread.sleep(1000);
+            body.sendKeys(Keys.END);
+        }
     }
 
 

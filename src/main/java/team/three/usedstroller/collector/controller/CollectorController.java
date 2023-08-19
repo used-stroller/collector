@@ -54,10 +54,9 @@ public class CollectorController {
 	@GetMapping("/hello-test")
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
-	@PostConstruct
 	public int hello() throws InterruptedException, ScriptException {
-		collectorService.collectingHelloMarket();
-		return 1;
+		int completeCnt = collectorService.collectingHelloMarket();
+		return completeCnt;
 	}
 
 }
