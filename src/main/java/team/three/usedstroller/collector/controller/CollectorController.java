@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.*;
+import team.three.usedstroller.collector.service.CarrotService;
 import team.three.usedstroller.collector.service.NaverService;
 
 @RestController
@@ -14,8 +15,35 @@ import team.three.usedstroller.collector.service.NaverService;
 public class CollectorController {
 
 	private final NaverService naverService;
+	private final CarrotService carrotService;
 
-	@PostMapping("/naver-shopping")
+	/**
+	 * 당근마켓 '유모차' 검색 결과를 수집한다.
+	 * 더보기 검색 수집은 100 페이지까지만 가능하다. 101 페이지부터 빈 페이지를 응답받는다.
+	 * @param startPage 시작 페이지
+	 */
+	@PostMapping("/carrot-market")
+	@ResponseStatus(HttpStatus.CREATED)
+	public void carrotMarket(@RequestParam(required = true) Integer startPage) {
+
+		log.info("carrot market collector start");
+		StopWatch stopWatch = new StopWatch();
+		stopWatch.start();
+		String pagesUrl = "https://www.daangn.com/search/%EC%9C%A0%EB%AA%A8%EC%B0%A8/";
+		int endPage = carrotService.getTotalPages(pagesUrl);
+		String url = "https://www.daangn.com/search/%EC%9C%A0%EB%AA%A8%EC%B0%A8/more/flea_market?page=";
+		String result = carrotService.collectingCarrotMarket(url, startPage, endPage);
+		stopWatch.stop();
+		log.info(result);
+		log.info("total running time: {} s", stopWatch.getTotalTimeSeconds());
+	}
+
+	/**
+	 * 네이버쇼핑 '유모차' 메이저 브랜드로 필터링 된 검색 결과를 수집한다.
+	 * @param startPage 시작 페이지
+	 * @param endPage 끝 페이지
+	 */
+	@PostMapping("/naver-shop2ping")
 	@ResponseStatus(HttpStatus.CREATED)
 	public void naverShopping(@RequestParam(required = true) Integer startPage,
 													  @RequestParam(required = true) Integer endPage) {
@@ -31,7 +59,9 @@ public class CollectorController {
 		String result = naverService.collectingNaverShopping(url, startPage, endPage);
 		stopWatch.stop();
 		log.info(result);
-		log.info("total time: {} s", stopWatch.getTotalTimeSeconds());
+		log.info("total running time: {} s", stopWatch.getTotalTimeSeconds());
 	}
+
+
 
 }
