@@ -35,7 +35,7 @@ public class SecondhandService {
 
     public int collectingJunggonara() throws InterruptedException {
         int complete = 0;
-        for (int i = 1; i < 200; i++) {
+        for (int i = 1; i < 2; i++) {
             String url = "https://web.joongna.com/search/%EC%9C%A0%EB%AA%A8%EC%B0%A8?page=" + i;
             customWebDriver.openURL(url);
             Thread.sleep(1000);
@@ -51,14 +51,14 @@ public class SecondhandService {
             } catch (Exception e) {
                 break;
             }
-            customWebDriver.closeBrower();
         }
+        customWebDriver.closeBrower();
         return complete;
     }
 
     public int collectingBunJang() throws InterruptedException {
         int complete = 0;
-        for (int i = 1; i < 50; i++) {
+        for (int i = 1; i < 2; i++) {
             String url = "https://m.bunjang.co.kr/search/products?order=score&page=" + i + "&q=%EC%9C%A0%EB%AA%A8%EC%B0%A8";
             customWebDriver.openURL(url);
             Thread.sleep(1000);
@@ -71,9 +71,8 @@ public class SecondhandService {
                 bunJangRepository.save(item);
                 complete++;
             }
-
-            customWebDriver.closeBrower();
         }
+        customWebDriver.closeBrower();
         return complete;
     }
 
@@ -102,6 +101,8 @@ public class SecondhandService {
         String price;
         String title;
         String link;
+        String address="";
+        String uploadTime;
         for (WebElement element : list) {
             try {
                 if (element.findElement(By.xpath("a/div[2]/h2")).getText() == null) {
@@ -113,12 +114,17 @@ public class SecondhandService {
             link = element.findElement(By.xpath("a")).getAttribute("href");
             price = element.findElement(By.xpath("a/div[2]/div[1]")).getText();
             img = element.findElement(By.xpath("a/div[1]/img")).getAttribute("src");
+            address = element.findElement(By.xpath("a/div[2]/div[2]/span[1]")).getText();
+            String time = element.findElement(By.xpath("a/div[2]/div[2]/span[3]")).getText();
+            uploadTime = convertToTimeFormat(time);
 
             Junggo junggo = Junggo.builder()
                     .title(title)
                     .link(link)
                     .price(price)
                     .imgSrc(img)
+                    .address(address)
+                    .uploadTime(uploadTime)
                     .build();
             junggoList.add(junggo);
         }
@@ -131,6 +137,8 @@ public class SecondhandService {
         String price;
         String title;
         String link;
+        String address;
+        String uploadTime;
         for (WebElement element : list) {
             try {
                 if (element.findElement(By.xpath("a")).getText() == null) {
@@ -142,12 +150,17 @@ public class SecondhandService {
             link = element.findElement(By.xpath("a")).getAttribute("href");
             price = element.findElement(By.xpath("a/div[2]/div[2]/div[1]")).getText();
             img = element.findElement(By.xpath("a/div[1]/img")).getAttribute("src");
+            address = element.findElement(By.xpath("a/div[3]")).getText();
+            String time = element.findElement(By.xpath("a/div[2]/div[2]/div[2]/span")).getText();
+            uploadTime = convertToTimeFormat(time);
 
             BunJang bunJang = BunJang.builder()
                     .title(title)
                     .link(link)
                     .price(price)
                     .imgSrc(img)
+                    .address(address)
+                    .uploadTime(uploadTime)
                     .build();
             bunJangList.add(bunJang);
         }
@@ -242,7 +255,6 @@ public class SecondhandService {
         return exactTime;
     }
 
-
     private void scrollToTheBottom() throws InterruptedException {
         JavascriptExecutor js = (JavascriptExecutor) customWebDriver.getDriver();
 
@@ -257,6 +269,4 @@ public class SecondhandService {
             afterHeight=(long) js.executeScript("return document.body.scrollHeight");; //스크롤한 뒤 페이지 높이
         }
     }
-
-
 }

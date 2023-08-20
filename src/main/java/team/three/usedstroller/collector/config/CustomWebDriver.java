@@ -34,10 +34,6 @@ public class CustomWebDriver {
         element.sendKeys(text);
     }
 
-    public void scrollDown(WebElement element){
-        ((JavascriptExecutor)driver).executeScript("window.scrollTo(0, document.body.scrollHeight)", element);
-    }
-
     public WebElement findElement(By by){
         WebElement element = driver.findElement(by);
         return element;
@@ -51,6 +47,4 @@ public class CustomWebDriver {
         driver.close();//한개 탭만 종료
         driver.quit(); //webdriver 종료
     }
-
-
 }

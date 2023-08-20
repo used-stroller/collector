@@ -23,12 +23,16 @@ public class Junggo {
 	@Lob
 	@Type(type = "org.hibernate.type.TextType")
 	private String imgSrc;
+	private String address;
+	private String uploadTime;
 
 	@Builder
-	public Junggo(String title, String link, String price, String imgSrc) {
+	public Junggo(String title, String link, String price, String imgSrc,String address,String uploadTime) {
 		this.title = title;
 		this.link = link;
 		this.price = price;
 		this.imgSrc = imgSrc;
+		this.address = address;
+		this.uploadTime = uploadTime;
 	}
 }
