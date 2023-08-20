@@ -4,12 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import team.three.usedstroller.collector.domain.ProductDto;
 import team.three.usedstroller.collector.service.CollectorService;
+import team.three.usedstroller.collector.service.SecondhandService;
 
 import javax.annotation.PostConstruct;
 import javax.script.ScriptException;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,6 +17,7 @@ import java.util.List;
 public class CollectorController {
 
 	private final CollectorService collectorService;
+	private final SecondhandService secondhandService;
 
 	@GetMapping("/naver-shopping")
 	@ResponseStatus(HttpStatus.OK)
@@ -39,7 +39,7 @@ public class CollectorController {
 	@ResponseBody
 	public int bunjang() throws InterruptedException {
 		log.info("bunjang test");
-		int complete = collectorService.collectingBunJang();
+		int complete = secondhandService.collectingBunJang();
 		return complete;
 	}
 
@@ -47,15 +47,16 @@ public class CollectorController {
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
 	public int junggo() throws InterruptedException {
-		int completeCount = collectorService.collectingJunggonara();
+		int completeCount = secondhandService.collectingJunggonara();
 		return completeCount;
 	}
 
+	@PostConstruct
 	@GetMapping("/hello-test")
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
 	public int hello() throws InterruptedException, ScriptException {
-		int completeCnt = collectorService.collectingHelloMarket();
+		int completeCnt = secondhandService.collectingHelloMarket();
 		return completeCnt;
 	}
 

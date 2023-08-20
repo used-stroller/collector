@@ -1,5 +1,6 @@
 package team.three.usedstroller.collector.config;
 
+import lombok.Data;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
+@Data
 public class CustomWebDriver {
     private WebDriver driver;
 
@@ -49,5 +51,6 @@ public class CustomWebDriver {
         driver.close();//한개 탭만 종료
         driver.quit(); //webdriver 종료
     }
+
 
 }

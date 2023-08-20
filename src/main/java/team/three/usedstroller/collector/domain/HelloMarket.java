@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -24,11 +25,14 @@ public class HelloMarket {
 	@Type(type = "org.hibernate.type.TextType")
 	private String imgSrc;
 
+	private String uploadTime;
+
 	@Builder
-	public HelloMarket(String title, String link, String price, String imgSrc) {
+	public HelloMarket(String title, String link, String price, String imgSrc, String uploadTime) {
 		this.title = title;
 		this.link = link;
 		this.price = price;
 		this.imgSrc = imgSrc;
+		this.uploadTime =uploadTime;
 	}
 }
