@@ -19,7 +19,6 @@ public class MyCollector {
 	private String winWebDriverPath;
 	private String winDownloadPath;
 	private String macArmWebDriverPath;
-	private String macIntelWebDriverPath;
 	private String macDownloadPath;
 	private String linuxWebDriverPath;
 	private String linuxDownloadPath;
@@ -39,8 +38,6 @@ public class MyCollector {
 		} else if (osName.contains("Mac")) {
 			if (osArch.contains("aarch64")) { // M1
 				webDriverPath = getResourcePath(macArmWebDriverPath);
-			} else {
-				webDriverPath = getResourcePath(macIntelWebDriverPath);
 			}
 			webDownloadPath = macDownloadPath;
 		} else if (osName.contains("Linux")) {

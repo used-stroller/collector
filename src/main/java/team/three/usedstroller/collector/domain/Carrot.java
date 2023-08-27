@@ -5,6 +5,8 @@ import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 
+import static team.three.usedstroller.collector.util.UnitConversionUtils.changeCarrotPrice;
+
 @Entity
 @Getter
 @ToString
@@ -19,7 +21,7 @@ public class Carrot extends BaseTimeEntity {
 	@Column(length = 1000, nullable = false)
 	private String title;
 
-	private String price;
+	private Long price;
 	private String region;
 
 	@Lob
@@ -39,7 +41,7 @@ public class Carrot extends BaseTimeEntity {
 	@Builder
 	public Carrot(String title, String price, String region, String link, String imgSrc, String content) {
 		this.title = title;
-		this.price = price;
+		this.price = changeCarrotPrice(price);
 		this.region = region;
 		this.link = link;
 		this.imgSrc = imgSrc;

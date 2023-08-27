@@ -43,7 +43,7 @@ public class CollectorController {
 	 * @param startPage 시작 페이지
 	 * @param endPage 끝 페이지
 	 */
-	@PostMapping("/naver-shop2ping")
+	@PostMapping("/naver-shopping")
 	@ResponseStatus(HttpStatus.CREATED)
 	public void naverShopping(@RequestParam(required = true) Integer startPage,
 													  @RequestParam(required = true) Integer endPage) {

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import team.three.usedstroller.collector.config.ChromiumDriver;
-import team.three.usedstroller.collector.domain.NaverShopping;
+import team.three.usedstroller.collector.domain.Naver;
 import team.three.usedstroller.collector.repository.NaverShoppingRepository;
 
 import java.time.Duration;
@@ -109,7 +109,7 @@ public class NaverService {
 					.filter(e -> !ObjectUtils.isEmpty(e))
 					.collect(Collectors.joining(" | "));
 
-			NaverShopping result = NaverShopping.builder()
+			Naver result = Naver.builder()
 					.title(title)
 					.link(link)
 					.price(price)
@@ -155,8 +155,8 @@ public class NaverService {
 		}
 	}
 
-	private void saveNaverShopping(NaverShopping result) {
-		NaverShopping save = naverShoppingRepository.save(result);
+	private void saveNaverShopping(Naver result) {
+		Naver save = naverShoppingRepository.save(result);
 		log.info("saved id: [{}] {}", save.getId(), save.getTitle());
 	}
 

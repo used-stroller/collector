@@ -24,6 +24,7 @@ import java.util.logging.Level;
 public class ChromiumDriver extends BrowserDriver<ChromeDriver> {
 
 	private final MyCollector myCollector;
+	private final ChromeDriverDownloader chromeDriverDownloader;
 
 	private String[] userAgents = {
 		"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246", //Windows 10-based PC using Edge browser
@@ -86,8 +87,10 @@ public class ChromiumDriver extends BrowserDriver<ChromeDriver> {
 		options.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
 	}
 
+
 	@PostConstruct
 	public void initChromeDriver() {
+		chromeDriverDownloader.updateLatestDriver();
 		setByOs();
 		setHeadless();
 		setCustomOption();
