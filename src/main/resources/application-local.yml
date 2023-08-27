@@ -1,13 +1,13 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:testdb
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
-#    type: com.zaxxer.hikari.HikariDataSource
-#    url: jdbc:postgresql://localhost:5432/postgres
-#    username: postgres
-#    password: postgres
+#    url: jdbc:h2:mem:testdb
+#    username: sa
+#    password:
+#    driver-class-name: org.h2.Driver
+    url: jdbc:postgresql://localhost:5432/
+    username: postgres
+    password: stroller
+    driver-class-name: org.postgresql.Driver
 
 logging:
   level:
