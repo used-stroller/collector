@@ -14,6 +14,7 @@ import team.three.usedstroller.collector.repository.BunJangRepository;
 import team.three.usedstroller.collector.repository.HelloMarketRepository;
 import team.three.usedstroller.collector.repository.JunggonaraRepository;
 
+import javax.annotation.PostConstruct;
 import javax.script.ScriptException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -25,17 +26,18 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
-
+@Transactional
 public class SecondhandService {
     private final JunggonaraRepository junggonaraRepository;
     private final BunJangRepository bunJangRepository;
     private final HelloMarketRepository helloMarketRepository;
     private final CustomWebDriver customWebDriver;
 
+
     public int collectingJunggonara() throws InterruptedException {
         int complete = 0;
-        for (int i = 1; i < 2; i++) {
+        int pageTotal=getTotalPageJungGo();
+        for (int i = 1; i < pageTotal; i++) {
             String url = "https://web.joongna.com/search/%EC%9C%A0%EB%AA%A8%EC%B0%A8?page=" + i;
             customWebDriver.openURL(url);
             Thread.sleep(1000);
@@ -49,16 +51,16 @@ public class SecondhandService {
                     complete++;
                 }
             } catch (Exception e) {
-                break;
+                continue;
             }
         }
         customWebDriver.closeBrower();
         return complete;
     }
-
     public int collectingBunJang() throws InterruptedException {
         int complete = 0;
-        for (int i = 1; i < 2; i++) {
+        int pageTotal=getTotalPageBunJang();
+        for (int i = 1; i < pageTotal; i++) {
             String url = "https://m.bunjang.co.kr/search/products?order=score&page=" + i + "&q=%EC%9C%A0%EB%AA%A8%EC%B0%A8";
             customWebDriver.openURL(url);
             Thread.sleep(1000);
@@ -101,7 +103,7 @@ public class SecondhandService {
         String price;
         String title;
         String link;
-        String address="";
+        String address = "";
         String uploadTime;
         for (WebElement element : list) {
             try {
@@ -190,7 +192,7 @@ public class SecondhandService {
                 img = element.findElement(By.xpath("div/div[1]/a/img")).getAttribute("src");
                 String time = getTime(element); //element(무료배송)가 임의로 추가되는 경우 처리
                 uploadTime = convertToTimeFormat(time);
-            }catch (Exception e){
+            } catch (Exception e) {
                 continue;
             }
             HelloMarket helloMarket = HelloMarket.builder()
@@ -210,47 +212,47 @@ public class SecondhandService {
         try {
             element.findElement(By.xpath("div/div[2]/div[2]/div")).getText();
             time = element.findElement(By.xpath("div/div[2]/div[3]")).getText();
-        }catch (Exception e) {
+        } catch (Exception e) {
             time = element.findElement(By.xpath("div/div[2]/div[2]")).getText();
         }
         return time;
     }
 
-    private static String convertToTimeFormat(String time){
-        String exactTime="";
+    private static String convertToTimeFormat(String time) {
+        String exactTime = "";
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Calendar cal = Calendar.getInstance();
 
-        if(time.contains("분")){
-            String intStr = time.replaceAll("[^0-9]","");
+        if (time.contains("분")) {
+            String intStr = time.replaceAll("[^0-9]", "");
             int i = Integer.parseInt(intStr);
             cal.add(Calendar.MINUTE, -i);
-            exactTime= simpleDateFormat.format(cal.getTime());
+            exactTime = simpleDateFormat.format(cal.getTime());
         }
-        if(time.contains("시간")){
-            String intStr = time.replaceAll("[^0-9]","");
+        if (time.contains("시간")) {
+            String intStr = time.replaceAll("[^0-9]", "");
             int i = Integer.parseInt(intStr);
             cal.add(Calendar.HOUR, -i);
-             exactTime= simpleDateFormat.format(cal.getTime());
+            exactTime = simpleDateFormat.format(cal.getTime());
         }
-        if(time.contains("일")){
-            String intStr = time.replaceAll("[^0-9]","");
+        if (time.contains("일")) {
+            String intStr = time.replaceAll("[^0-9]", "");
             int i = Integer.parseInt(intStr);
             cal.add(Calendar.DATE, -i);
-             exactTime= simpleDateFormat.format(cal.getTime());
+            exactTime = simpleDateFormat.format(cal.getTime());
         }
-        if(time.contains("개월")){
-            String intStr = time.replaceAll("[^0-9]","");
+        if (time.contains("개월")) {
+            String intStr = time.replaceAll("[^0-9]", "");
             int i = Integer.parseInt(intStr);
             cal.add(Calendar.MONTH, -i);
-             exactTime= simpleDateFormat.format(cal.getTime());
+            exactTime = simpleDateFormat.format(cal.getTime());
         }
-        if(time.contains("년")){
-            String intStr = time.replaceAll("[^0-9]","");
+        if (time.contains("년")) {
+            String intStr = time.replaceAll("[^0-9]", "");
             int i = Integer.parseInt(intStr);
             cal.add(Calendar.YEAR, -i);
-             exactTime= simpleDateFormat.format(cal.getTime());
+            exactTime = simpleDateFormat.format(cal.getTime());
         }
         return exactTime;
     }
@@ -258,15 +260,41 @@ public class SecondhandService {
     private void scrollToTheBottom() throws InterruptedException {
         JavascriptExecutor js = (JavascriptExecutor) customWebDriver.getDriver();
 
-        long scrollHeight=0;
-        long afterHeight=1;
+        long scrollHeight = 0;
+        long afterHeight = 1;
 
-        while(scrollHeight!=afterHeight) {
+        while (scrollHeight != afterHeight) {
             scrollHeight = (long) js.executeScript("return document.body.scrollHeight"); //현재높이
             WebElement body = customWebDriver.findElement(By.tagName("body"));
             body.sendKeys(Keys.END);
             Thread.sleep(2000);
-            afterHeight=(long) js.executeScript("return document.body.scrollHeight");; //스크롤한 뒤 페이지 높이
+            afterHeight = (long) js.executeScript("return document.body.scrollHeight");
         }
+    }
+
+    private int getTotalPageJungGo() {
+        int totalPage=0;
+        int qtyPerPage=100;
+        String url = "https://web.joongna.com/search/%EC%9C%A0%EB%AA%A8%EC%B0%A8?page=1";
+        customWebDriver.openURL(url);
+        WebElement content = customWebDriver.findElement(By.xpath("//*[@id=\"__next\"]"));
+        String totalQty = content.findElement(By.xpath("//*[@id=\"__next\"]/div/main/div[1]/div[2]/div[2]/div/div/div[1]")).getText();
+        String intStr = totalQty.replaceAll("[^0-9]", "");
+        int totalQtyInt = Integer.parseInt(intStr);
+        totalPage= totalQtyInt / qtyPerPage;
+        return totalPage;
+    }
+
+    private int getTotalPageBunJang() {
+        int totalPage=0;
+        int qtyPerPage=100;
+        String url = "https://m.bunjang.co.kr/search/products?order=score&page=1&q=%EC%9C%A0%EB%AA%A8%EC%B0%A8";
+        customWebDriver.openURL(url);
+        WebElement content = customWebDriver.findElement(By.xpath("//*[@id=\"root\"]"));
+        String totalQty = content.findElement(By.xpath("//*[@id=\"root\"]/div/div/div[4]/div/div[3]/div/div[1]/span[2]")).getText();
+        String intStr = totalQty.replaceAll("[^0-9]", "");
+        int totalQtyInt = Integer.parseInt(intStr);
+        totalPage= totalQtyInt / qtyPerPage;
+        return totalPage;
     }
 }

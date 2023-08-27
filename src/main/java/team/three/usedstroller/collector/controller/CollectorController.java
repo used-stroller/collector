@@ -51,7 +51,6 @@ public class CollectorController {
 		return completeCount;
 	}
 
-	@PostConstruct
 	@GetMapping("/hello-test")
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
