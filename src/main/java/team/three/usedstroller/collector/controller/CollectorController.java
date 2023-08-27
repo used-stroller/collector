@@ -5,8 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.*;
-import team.three.usedstroller.collector.service.CarrotService;
-import team.three.usedstroller.collector.service.NaverService;
+import team.three.usedstroller.collector.service.*;
+
+import javax.script.ScriptException;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,6 +17,40 @@ public class CollectorController {
 
 	private final NaverService naverService;
 	private final CarrotService carrotService;
+	private final HelloMarketService helloMarketService;
+	private final BunJangService bunJangService;
+	private final JunggonaraService junggonaraService;
+
+	/**
+	 * 번개장터 '유모차' 검색 결과를 수집한다.
+	 */
+	@GetMapping("/bunjang-test")
+	@ResponseStatus(HttpStatus.OK)
+	@ResponseBody
+	public int bunjang() throws InterruptedException {
+		log.info("bunjang test");
+		return bunJangService.collectingBunJang();
+	}
+
+	/**
+	 * 중고나라 '유모차' 검색 결과를 수집한다.
+	 */
+	@GetMapping("/junggo-test")
+	@ResponseStatus(HttpStatus.OK)
+	@ResponseBody
+	public int junggo() throws InterruptedException {
+		return junggonaraService.collectingJunggonara();
+	}
+
+	/**
+	 * 헬로마켓 '유모차' 검색 결과를 수집한다.
+	 */
+	@GetMapping("/hello-test")
+	@ResponseStatus(HttpStatus.OK)
+	@ResponseBody
+	public int hello() throws InterruptedException, ScriptException {
+		return helloMarketService.collectingHelloMarket();
+	}
 
 	/**
 	 * 당근마켓 '유모차' 검색 결과를 수집한다.
@@ -61,7 +96,5 @@ public class CollectorController {
 		log.info(result);
 		log.info("total running time: {} s", stopWatch.getTotalTimeSeconds());
 	}
-
-
 
 }
