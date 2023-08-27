@@ -35,7 +35,7 @@ public abstract class BrowserDriver<T extends ChromeDriver> {
 	/**
 	 * Selector가 로드 됐을 때 불러오기
 	 */
-	public WebElement get(String selector) {
+	public WebElement getSelector(String selector) {
 		WebElement element = null;
 		try {
 			element = driverWait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(selector)));
@@ -48,7 +48,7 @@ public abstract class BrowserDriver<T extends ChromeDriver> {
 	/**
 	 * Selector가 로드 됐을 때 리스트로 불러오기
 	 */
-	public List<WebElement> getList(String selector) {
+	public List<WebElement> getListSelector(String selector) {
 		List<WebElement> elements = null;
 		try {
 			elements = driverWait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector(selector)));
@@ -71,6 +71,9 @@ public abstract class BrowserDriver<T extends ChromeDriver> {
 		return element;
 	}
 
+	/**
+	 * Xpath가 로드 됐을 때 리스트로 불러오기
+	 */
 	public List<WebElement> getListXpath(String selector) {
 		List<WebElement> element = null;
 		try {
@@ -82,20 +85,20 @@ public abstract class BrowserDriver<T extends ChromeDriver> {
 	}
 
 	/**
-	 * Xpath가 로드 됐을 때 리스트로 불러오기
+	 * Tag가 로드 됐을 때 불러오기
 	 */
-	public List<WebElement> getListXpath(String parent, String child) {
-		List<WebElement> elements = null;
+	public WebElement getTag(String tagName) {
+		WebElement element = null;
 		try {
-			elements = driverWait.until(ExpectedConditions.presenceOfNestedElementsLocatedBy(By.xpath(parent), By.xpath(child)));
+			element = driverWait.until(ExpectedConditions.presenceOfElementLocated(By.tagName(tagName)));
 		} catch (WebDriverException e) {
-			log.error("{} > {} 오브젝트를 불러오는데 실패했습니다.", parent, child);
+			log.error("{} 오브젝트를 불러오는데 실패했습니다.", tagName);
 		}
-		return elements;
+		return element;
 	}
 
 	/**
-	 * driver close
+	 * 탭 닫기
 	 */
 	public void close() {
 		if (driver != null) {
@@ -104,7 +107,7 @@ public abstract class BrowserDriver<T extends ChromeDriver> {
 	}
 
 	/**
-	 * driver quit
+	 * 브라우저 종료
 	 */
 	public void quit() {
 		if (driver != null) {
@@ -131,11 +134,4 @@ public abstract class BrowserDriver<T extends ChromeDriver> {
 		}
 	}
 
-	public void scrollY(int y) {
-		try {
-			driver.executeScript("window.scrollTo(0, "+y+")");
-		} catch (Exception e) {
-			log.error(e.getMessage());
-		}
-	}
 }

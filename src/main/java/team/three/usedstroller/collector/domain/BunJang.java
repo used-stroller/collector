@@ -11,7 +11,7 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class BunJang {
+public class BunJang extends BaseTimeEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -24,7 +24,6 @@ public class BunJang {
 	@Type(type = "org.hibernate.type.TextType")
 	private String imgSrc;
 	private String address;
-	private String uploadTime;
 
 	@Builder
 	public BunJang(String title, String link, String price, String imgSrc,String address,String uploadTime) {
@@ -33,6 +32,5 @@ public class BunJang {
 		this.price = price;
 		this.imgSrc = imgSrc;
 		this.address = address;
-		this.uploadTime = uploadTime;
 	}
 }

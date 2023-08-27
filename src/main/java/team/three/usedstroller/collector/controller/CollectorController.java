@@ -5,10 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.*;
-import team.three.usedstroller.collector.service.CarrotService;
-import team.three.usedstroller.collector.service.NaverService;
-import team.three.usedstroller.collector.service.CollectorService;
-import team.three.usedstroller.collector.service.SecondhandService;
+import team.three.usedstroller.collector.service.*;
 
 import javax.script.ScriptException;
 
@@ -20,8 +17,9 @@ public class CollectorController {
 
 	private final NaverService naverService;
 	private final CarrotService carrotService;
-	private final CollectorService collectorService;
-	private final SecondhandService secondhandService;
+	private final HelloMarketService helloMarketService;
+	private final BunJangService bunJangService;
+	private final JunggonaraService junggonaraService;
 
 	/**
 	 * 번개장터 '유모차' 검색 결과를 수집한다.
@@ -31,8 +29,7 @@ public class CollectorController {
 	@ResponseBody
 	public int bunjang() throws InterruptedException {
 		log.info("bunjang test");
-		int complete = secondhandService.collectingBunJang();
-		return complete;
+		return bunJangService.collectingBunJang();
 	}
 
 	/**
@@ -42,8 +39,7 @@ public class CollectorController {
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
 	public int junggo() throws InterruptedException {
-		int completeCount = secondhandService.collectingJunggonara();
-		return completeCount;
+		return junggonaraService.collectingJunggonara();
 	}
 
 	/**
@@ -53,8 +49,7 @@ public class CollectorController {
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
 	public int hello() throws InterruptedException, ScriptException {
-		int completeCnt = secondhandService.collectingHelloMarket();
-		return completeCnt;
+		return helloMarketService.collectingHelloMarket();
 	}
 
 	/**
