@@ -1,14 +1,18 @@
 package team.three.usedstroller.collector.controller;
 
+import javax.script.ScriptException;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
 import team.three.usedstroller.collector.service.CollectorService;
 import team.three.usedstroller.collector.service.SecondhandService;
-
-import javax.annotation.PostConstruct;
-import javax.script.ScriptException;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,6 +38,7 @@ public class CollectorController {
 		String url = "https://finance.naver.com/world/";
 		collectorService.collectingNaver(url);
 	}
+
 	@GetMapping("/bunjang-test")
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
