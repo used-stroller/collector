@@ -22,20 +22,10 @@ public class CarrotService {
 
 	private final CarrotRepository carrotRepository;
 
-	public int getTotalPages(String url) {
-
-		Document document = null;
-		try {
-			document = Jsoup.connect(url).get();
-		} catch (IOException e) {
-			throw new RuntimeException("carrot market connect error", e);
-		}
-		Element more = document.select("div.more-btn").stream().findFirst().orElseGet(() -> null);
-		return ObjectUtils.isEmpty(more) ? 0 : Integer.parseInt(more.attr("data-total-pages"));
-	}
-
-	public String collectingCarrotMarket(String url, Integer startPage, Integer endPage) {
-		log.info("carrot market end page: {}", endPage);
+	@Transactional
+	public String collectingCarrotMarket(String url, Integer startPage) {
+		int endPage = getTotalPages();
+		log.info("carrot market total page: {}", endPage);
 
 		for (int page = startPage; page <= endPage; page++) {
 			try {
@@ -51,13 +41,12 @@ public class CarrotService {
 				throw new RuntimeException("carrot market connect error", e);
 			}
 		}
-
 		return "carrot market collector complete. total page: " + endPage;
 	}
 
 	@Transactional
-	public void saveCarrots(List<Carrot> carrots) {
-		List<Carrot> result = carrotRepository.saveAll(carrots);
+	public void saveCarrots(List<Carrot> items) {
+		List<Carrot> result = carrotRepository.saveAll(items);
 		log.info("save complete. saved size: {}", result.size());
 	}
 
@@ -83,5 +72,17 @@ public class CarrotService {
 					list.add(carrot);
 				});
 		return list;
+	}
+
+	private int getTotalPages() {
+		String url = "https://www.daangn.com/search/%EC%9C%A0%EB%AA%A8%EC%B0%A8/";
+		Document document = null;
+		try {
+			document = Jsoup.connect(url).get();
+		} catch (IOException e) {
+			throw new RuntimeException("carrot market connect error", e);
+		}
+		Element more = document.select("div.more-btn").stream().findFirst().orElseGet(() -> null);
+		return ObjectUtils.isEmpty(more) ? 0 : Integer.parseInt(more.attr("data-total-pages"));
 	}
 }

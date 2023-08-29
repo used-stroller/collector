@@ -61,12 +61,12 @@ public abstract class BrowserDriver<T extends ChromeDriver> {
 	/**
 	 * Xpath가 로드 됐을 때 불러오기
 	 */
-	public WebElement getXpath(String selector) {
+	public WebElement getXpath(String xPath) {
 		WebElement element = null;
 		try {
-			element = driverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(selector)));
+			element = driverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(xPath)));
 		} catch (WebDriverException e) {
-			log.error("{} 오브젝트를 불러오는데 실패했습니다.", selector);
+			log.error("{} 오브젝트를 불러오는데 실패했습니다.", xPath);
 		}
 		return element;
 	}
@@ -74,12 +74,12 @@ public abstract class BrowserDriver<T extends ChromeDriver> {
 	/**
 	 * Xpath가 로드 됐을 때 리스트로 불러오기
 	 */
-	public List<WebElement> getListXpath(String selector) {
+	public List<WebElement> getListXpath(String xPath) {
 		List<WebElement> element = null;
 		try {
-			element = driverWait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.xpath(selector)));
+			element = driverWait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.xpath(xPath)));
 		} catch (WebDriverException e) {
-			log.error("{} 오브젝트를 불러오는데 실패했습니다.", selector);
+			log.error("{} 오브젝트를 불러오는데 실패했습니다.", xPath);
 		}
 		return element;
 	}

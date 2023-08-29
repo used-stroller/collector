@@ -5,7 +5,7 @@ import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 
-import static team.three.usedstroller.collector.util.UnitConversionUtils.changeCarrotPrice;
+import static team.three.usedstroller.collector.util.UnitConversionUtils.convertPrice;
 
 @Entity
 @Getter
@@ -41,7 +41,7 @@ public class Carrot extends BaseTimeEntity {
 	@Builder
 	public Carrot(String title, String price, String region, String link, String imgSrc, String content) {
 		this.title = title;
-		this.price = changeCarrotPrice(price);
+		this.price = convertPrice(price);
 		this.region = region;
 		this.link = link;
 		this.imgSrc = imgSrc;

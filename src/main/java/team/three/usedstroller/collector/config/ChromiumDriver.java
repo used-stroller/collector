@@ -90,7 +90,7 @@ public class ChromiumDriver extends BrowserDriver<ChromeDriver> {
 
 	@PostConstruct
 	public void initChromeDriver() {
-		chromeDriverDownloader.updateLatestDriver();
+//		chromeDriverDownloader.updateLatestDriver();
 		setByOs();
 		setHeadless();
 		setCustomOption();

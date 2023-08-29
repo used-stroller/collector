@@ -8,12 +8,15 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
+import java.util.regex.Pattern;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UnitConversionUtils {
 
-	public static Long changeCarrotPrice(String price) {
-		if (ObjectUtils.isEmpty(price) || price.contains("나눔") || price.contains("가격없음")) {
+	public static Long convertPrice(String price) {
+		String regex = "나눔|가격|연락|없음|중단";
+		Pattern pattern = Pattern.compile(regex);
+		if (ObjectUtils.isEmpty(price) || pattern.matcher(price).find()) {
 			return 0L;
 		} else {
 			price = price.replaceAll("[,원]", "");
@@ -22,11 +25,6 @@ public class UnitConversionUtils {
 			}
 			return Long.parseLong(price);
 		}
-	}
-
-	public static Long changeNaverPrice(String price) {
-		return ObjectUtils.isEmpty(price) || price.contains("판매중단") ? 0L :
-				Long.parseLong(price.replaceAll("[,원]", ""));
 	}
 
 	public static int changeInt(String releaseYear) {

@@ -1,10 +1,15 @@
 package team.three.usedstroller.collector.util;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 import java.io.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ZipUtils {
+
 	public static void unzipFile(File zipFile, String targetDir) throws IOException {
 		InputStream inputStream = new FileInputStream(zipFile);
 		ZipInputStream zipInputStream = new ZipInputStream(inputStream);
@@ -34,4 +39,5 @@ public class ZipUtils {
 			zipEntry = zipInputStream.getNextEntry();
 		}
 	}
+
 }

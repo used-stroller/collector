@@ -27,6 +27,7 @@ public class NaverService {
 	private final ChromiumDriver driver;
 	private final NaverShoppingRepository naverShoppingRepository;
 
+	@Transactional
 	public String collectingNaverShopping(String url, int startPage, int endPage) {
 		driver.open(url + startPage);
 		driver.implicitWait(Duration.ofMillis(100));
@@ -57,7 +58,7 @@ public class NaverService {
 
 	private List<WebElement> getProducts() {
 		scrollToTheBottomToSeeAllProducts();
-		WebElement prodList = driver.getSelector("#content > div.style_content__xWg5l > div.basicList_list_basis__uNBZx");
+		WebElement prodList = driver.getXpath("//*[@id=\"content\"]/div[contains(@class, 'content')]/div[contains(@class, 'basicList')]");
 		return prodList.findElements(By.xpath(".//div[contains(@class, 'item')]"));
 	}
 

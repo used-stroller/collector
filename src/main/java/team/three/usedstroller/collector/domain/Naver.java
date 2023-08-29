@@ -44,7 +44,7 @@ public class Naver extends BaseTimeEntity {
 	             String uploadDate, String releaseYear, String etc) {
 		this.title = title;
 		this.link = link;
-		this.price = changeNaverPrice(price);
+		this.price = convertPrice(price);
 		this.imgSrc = imgSrc;
 		this.uploadDate = changeLocalDate(uploadDate);
 		this.releaseYear = changeInt(releaseYear);

@@ -1,15 +1,16 @@
 package team.three.usedstroller.collector.domain;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 
+import static team.three.usedstroller.collector.util.UnitConversionUtils.convertPrice;
+import static team.three.usedstroller.collector.util.UnitConversionUtils.convertToTimeFormat;
+
 @Entity
 @Getter
+@ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class HelloMarket extends BaseTimeEntity {
 	@Id
@@ -19,7 +20,7 @@ public class HelloMarket extends BaseTimeEntity {
 	@Lob
 	@Type(type = "org.hibernate.type.TextType")
 	private String link;
-	private String price;
+	private Long price;
 	@Lob
 	@Type(type = "org.hibernate.type.TextType")
 	private String imgSrc;
@@ -30,8 +31,8 @@ public class HelloMarket extends BaseTimeEntity {
 	public HelloMarket(String title, String link, String price, String imgSrc, String uploadTime) {
 		this.title = title;
 		this.link = link;
-		this.price = price;
+		this.price = convertPrice(price);
 		this.imgSrc = imgSrc;
-		this.uploadTime =uploadTime;
+		this.uploadTime = convertToTimeFormat(uploadTime);
 	}
 }
