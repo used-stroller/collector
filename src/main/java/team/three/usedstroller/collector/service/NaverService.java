@@ -27,7 +27,6 @@ public class NaverService {
 	private final ChromiumDriver driver;
 	private final NaverShoppingRepository naverShoppingRepository;
 
-	@Transactional
 	public String collectingNaverShopping(String url, int startPage, int endPage) {
 		driver.open(url + startPage);
 		driver.implicitWait(Duration.ofMillis(100));

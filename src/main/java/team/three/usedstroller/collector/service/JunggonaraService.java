@@ -24,13 +24,12 @@ public class JunggonaraService {
 	private final ChromiumDriver driver;
 	private final JunggonaraRepository junggonaraRepository;
 
-	@Transactional
 	public int collectingJunggonara(int startPage, int endPage) {
 		int complete = 0;
-		int pageTotal = getTotalPageJungGo();
-		log.info("junggonara total page: {}", pageTotal);
+//		int pageTotal = getTotalPageJungGo();
+//		log.info("junggonara total page: {}", pageTotal);
 
-		for (int i = startPage; i < endPage; i++) {
+		for (int i = startPage; i <= endPage; i++) {
 			String url = "https://web.joongna.com/search/%EC%9C%A0%EB%AA%A8%EC%B0%A8?page=" + i;
 			driver.open(url);
 			driver.wait(1);

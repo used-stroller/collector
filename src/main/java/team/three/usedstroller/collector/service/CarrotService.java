@@ -22,7 +22,6 @@ public class CarrotService {
 
 	private final CarrotRepository carrotRepository;
 
-	@Transactional
 	public String collectingCarrotMarket(String url, Integer startPage) {
 		int endPage = getTotalPages();
 		log.info("carrot market total page: {}", endPage);

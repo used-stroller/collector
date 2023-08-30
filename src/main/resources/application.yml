@@ -30,12 +30,9 @@ spring:
 collector:
   crawler:
     web-driver-id: webdriver.chrome.driver
-    # window
     win-web-driver-path: libs\chromedriver-win64\chromedriver.exe
     win-download-path: C:\\chromedriver\\downloads
-    # mac(arm)
     mac-arm-web-driver-path: libs/chromedriver-mac-arm64/chromedriver
     mac-download-path: /Users/yd/Downloads
-    # linux
     linux-web-driver-path: libs/chromedriver-linux64/chromedriver
     linux-download-path: /home/yd/Downloads

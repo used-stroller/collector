@@ -22,7 +22,6 @@ public class BunJangService {
 	private final ChromiumDriver driver;
 	private final BunJangRepository bunJangRepository;
 
-	@Transactional
 	public int collectingBunJang() {
 		int complete = 0;
 		int pageTotal = getTotalPageBunJang();
@@ -47,7 +46,8 @@ public class BunJangService {
 		return complete;
 	}
 
-	private int saveItemList(List<WebElement> list) {
+	@Transactional
+	public int saveItemList(List<WebElement> list) {
 		List<BunJang> items = new ArrayList<>();
 		String img;
 		String price;

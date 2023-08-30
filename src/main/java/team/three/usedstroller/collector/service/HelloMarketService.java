@@ -24,7 +24,6 @@ public class HelloMarketService {
 	private final ChromiumDriver driver;
 	private final HelloMarketRepository helloMarketRepository;
 
-	@Transactional
 	public int collectingHelloMarket() {
 		int complete = 0;
 		String url = "https://www.hellomarket.com/search?q=%EC%9C%A0%EB%AA%A8%EC%B0%A8";
@@ -43,7 +42,8 @@ public class HelloMarketService {
 		return complete;
 	}
 
-	private int saveItems(List<WebElement> list) {
+	@Transactional
+	public int saveItems(List<WebElement> list) {
 		List<HelloMarket> items = new ArrayList<>();
 		String img;
 		String price;
