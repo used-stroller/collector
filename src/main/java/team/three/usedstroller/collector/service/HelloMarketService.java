@@ -30,14 +30,14 @@ public class HelloMarketService {
 		driver.open(url);
 		scrollToTheBottom();
 
-		List<WebElement> list = driver.getListXpath("//*[@id=\"__next\"]/div[3]/div[3]/div[2]/div/div/div");
+		List<WebElement> list = driver.findAllByXpath("//*[@id=\"__next\"]/div[3]/div[3]/div[2]/div/div/div");
 		if (ObjectUtils.isEmpty(list)) {
 			return complete;
 		}
 
 		int size = saveItems(list);
 		complete += size;
-		log.info("saved item: {}", complete);
+		log.info("hello market saved item: {}", complete);
 
 		return complete;
 	}
@@ -86,9 +86,9 @@ public class HelloMarketService {
 
 		while (scrollHeight != afterHeight) {
 			scrollHeight = (long) js.executeScript("return document.body.scrollHeight"); //현재높이
-			WebElement body = driver.getTag("body");
+			WebElement body = driver.findOneByTag("body");
 			body.sendKeys(Keys.END);
-			driver.wait(2);
+			driver.wait(2000);
 			afterHeight = (long) js.executeScript("return document.body.scrollHeight");
 		}
 	}

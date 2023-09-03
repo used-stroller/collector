@@ -13,7 +13,7 @@ import team.three.usedstroller.collector.config.ChromiumDriver;
 import team.three.usedstroller.collector.domain.Naver;
 import team.three.usedstroller.collector.repository.NaverShoppingRepository;
 
-import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,22 +29,21 @@ public class NaverService {
 
 	public String collectingNaverShopping(String url, int startPage, int endPage) {
 		driver.open(url + startPage);
-		driver.implicitWait(Duration.ofMillis(100));
 		int page = startPage;
 
 		try {
 			while (true) {
 				scrollToTheBottomToSeeAllProducts();
-				driver.wait(1);
+				driver.wait(1000);
 				List<WebElement> products = getProducts();
-				boolean result = crawlingProducts(products);
-				log.info("page = {}, save result = {}", page, result);
-				if (result) {
+				int size = saveNaverShopping(products);
+				log.info("naver shopping page: [{}], saved item: [{}]", page, size);
+				if (size != 0) {
 					if (page == endPage || !getNextPage()) {
 						break;
 					}
 					page++;
-					driver.wait(3);
+					driver.wait(2000);
 				}
 			}
 
@@ -57,12 +56,14 @@ public class NaverService {
 
 	private List<WebElement> getProducts() {
 		scrollToTheBottomToSeeAllProducts();
-		WebElement prodList = driver.getXpath("//*[@id=\"content\"]/div[contains(@class, 'content')]/div[contains(@class, 'basicList')]");
+		WebElement prodList = driver.findOneByXpath("//*[@id=\"content\"]/div[contains(@class, 'content')]/div[contains(@class, 'basicList')]");
 		return prodList.findElements(By.xpath(".//div[contains(@class, 'item')]"));
 	}
 
 	@Transactional
-	public boolean crawlingProducts(List<WebElement> list) {
+	public int saveNaverShopping(List<WebElement> list) {
+		List<Naver> items = new ArrayList<>();
+		String pid = "";
 		String title = "";
 		String link = "";
 		String price = "";
@@ -72,6 +73,7 @@ public class NaverService {
 		String etc = "";
 
 		for (WebElement el : list) {
+			pid = el.findElement(By.xpath(".//a[contains(@class, 'thumbnail')]")).getAttribute("data-i");
 			link = el.findElement(By.xpath(".//a[contains(@class, 'thumbnail')]")).getAttribute("href");
 
 			try {
@@ -110,6 +112,7 @@ public class NaverService {
 					.collect(Collectors.joining(" | "));
 
 			Naver result = Naver.builder()
+					.pid(pid)
 					.title(title)
 					.link(link)
 					.price(price)
@@ -119,15 +122,15 @@ public class NaverService {
 					.etc(etc)
 					.build();
 
-			saveNaverShopping(result);
+			items.add(result);
 		}
 
-		driver.wait(2);
-		return true;
+		List<Naver> result = naverShoppingRepository.saveAll(items);
+		return result.size();
 	}
 
 	private boolean getNextPage() {
-		WebElement next = driver.getXpath("//a[contains(@class, 'pagination_next')]");
+		WebElement next = driver.findOneByXpath("//a[contains(@class, 'pagination_next')]");
 		if (next == null) {
 			return false;
 		}
@@ -141,23 +144,13 @@ public class NaverService {
 
 		while (true) {
 			js.executeScript("window.scrollTo({top:document.body.scrollHeight, behavior:'smooth'})");
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				throw new RuntimeException(e);
-			}
-
+			driver.wait(1000);
 			long currentLength = (long) js.executeScript("return document.body.scrollHeight");
 			if(intialLength == currentLength) {
 				break;
 			}
 			intialLength = currentLength;
 		}
-	}
-
-	private void saveNaverShopping(Naver result) {
-		Naver save = naverShoppingRepository.save(result);
-		log.info("saved id: [{}] {}", save.getId(), save.getTitle());
 	}
 
 }

@@ -6,6 +6,7 @@ import org.hibernate.annotations.Type;
 import javax.persistence.*;
 
 import static team.three.usedstroller.collector.util.UnitConversionUtils.convertPrice;
+import static team.three.usedstroller.collector.util.UnitConversionUtils.convertSimplePid;
 
 @Entity
 @Getter
@@ -17,6 +18,8 @@ public class Carrot extends BaseTimeEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
+	private String pid;
 
 	@Column(length = 1000, nullable = false)
 	private String title;
@@ -40,6 +43,7 @@ public class Carrot extends BaseTimeEntity {
 
 	@Builder
 	public Carrot(String title, String price, String region, String link, String imgSrc, String content) {
+		this.pid = convertSimplePid(link, "/");
 		this.title = title;
 		this.price = convertPrice(price);
 		this.region = region;

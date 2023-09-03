@@ -27,7 +27,11 @@ public class CollectorController {
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
 	public int bunjang() {
+		StopWatch stopWatch = new StopWatch();
+		stopWatch.start();
 		int count = bunJangService.collectingBunJang();
+		stopWatch.stop();
+		log.info("total running time: {} s", stopWatch.getTotalTimeSeconds());
 		log.info("bunjang test complete : [{}]", count);
 		return count;
 	}
@@ -43,8 +47,12 @@ public class CollectorController {
 	@ResponseBody
 	public int junggonara(@RequestParam(required = true) Integer startPage,
 	                      @RequestParam(required = true) Integer endPage) {
+		StopWatch stopWatch = new StopWatch();
+		stopWatch.start();
 		int count = junggonaraService.collectingJunggonara(startPage, endPage);
 		log.info("junggonara complete : [{}]", count);
+		stopWatch.stop();
+		log.info("total running time: {} s", stopWatch.getTotalTimeSeconds());
 		return count;
 	}
 
@@ -55,7 +63,11 @@ public class CollectorController {
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
 	public int hello() {
+		StopWatch stopWatch = new StopWatch();
+		stopWatch.start();
 		int count = helloMarketService.collectingHelloMarket();
+		stopWatch.stop();
+		log.info("total running time: {} s", stopWatch.getTotalTimeSeconds());
 		log.info("hello market complete : [{}]", count);
 		return count;
 	}

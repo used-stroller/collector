@@ -5,8 +5,7 @@ import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 
-import static team.three.usedstroller.collector.util.UnitConversionUtils.convertPrice;
-import static team.three.usedstroller.collector.util.UnitConversionUtils.convertToTimeFormat;
+import static team.three.usedstroller.collector.util.UnitConversionUtils.*;
 
 @Entity
 @Getter
@@ -15,6 +14,8 @@ public class Junggo extends BaseTimeEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	private String pid;
+	@Column(length = 1000, nullable = false)
 	private String title;
 	@Lob
 	@Type(type = "org.hibernate.type.TextType")
@@ -28,6 +29,7 @@ public class Junggo extends BaseTimeEntity {
 
 	@Builder
 	public Junggo(String title, String link, String price, String imgSrc,String address,String uploadTime) {
+		this.pid = convertSimplePid(link, "product/");
 		this.title = title;
 		this.link = link;
 		this.price = convertPrice(price);

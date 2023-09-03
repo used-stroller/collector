@@ -24,7 +24,7 @@ public abstract class BrowserDriver<T extends ChromeDriver> {
 	public void open(String url) {
 		try {
 			log.info("Chrome Open URL : {}", url);
-			this.driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+			this.driver.manage().timeouts().implicitlyWait(Duration.ofMillis(100));
 			this.driver.get(url);
 			this.driver.manage().window().maximize();
 		} catch (Exception e) {
@@ -35,7 +35,7 @@ public abstract class BrowserDriver<T extends ChromeDriver> {
 	/**
 	 * Selector가 로드 됐을 때 불러오기
 	 */
-	public WebElement getSelector(String selector) {
+	public WebElement findOneByCss(String selector) {
 		WebElement element = null;
 		try {
 			element = driverWait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(selector)));
@@ -48,7 +48,7 @@ public abstract class BrowserDriver<T extends ChromeDriver> {
 	/**
 	 * Selector가 로드 됐을 때 리스트로 불러오기
 	 */
-	public List<WebElement> getListSelector(String selector) {
+	public List<WebElement> findAllByCss(String selector) {
 		List<WebElement> elements = null;
 		try {
 			elements = driverWait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector(selector)));
@@ -61,7 +61,7 @@ public abstract class BrowserDriver<T extends ChromeDriver> {
 	/**
 	 * Xpath가 로드 됐을 때 불러오기
 	 */
-	public WebElement getXpath(String xPath) {
+	public WebElement findOneByXpath(String xPath) {
 		WebElement element = null;
 		try {
 			element = driverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(xPath)));
@@ -74,7 +74,7 @@ public abstract class BrowserDriver<T extends ChromeDriver> {
 	/**
 	 * Xpath가 로드 됐을 때 리스트로 불러오기
 	 */
-	public List<WebElement> getListXpath(String xPath) {
+	public List<WebElement> findAllByXpath(String xPath) {
 		List<WebElement> element = null;
 		try {
 			element = driverWait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.xpath(xPath)));
@@ -87,7 +87,7 @@ public abstract class BrowserDriver<T extends ChromeDriver> {
 	/**
 	 * Tag가 로드 됐을 때 불러오기
 	 */
-	public WebElement getTag(String tagName) {
+	public WebElement findOneByTag(String tagName) {
 		WebElement element = null;
 		try {
 			element = driverWait.until(ExpectedConditions.presenceOfElementLocated(By.tagName(tagName)));
@@ -126,9 +126,9 @@ public abstract class BrowserDriver<T extends ChromeDriver> {
 	/**
 	 * 일정 시간 대기
 	 */
-	public void wait(int second) {
+	public void wait(int millis) {
 		try {
-			Thread.sleep(second * 1000L);
+			Thread.sleep(millis);
 		} catch (InterruptedException e) {
 			log.error(e.getMessage());
 		}

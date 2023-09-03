@@ -19,6 +19,8 @@ public class Naver extends BaseTimeEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	private String pid;
+
 	@Column(length = 1000, nullable = false)
 	private String title;
 
@@ -40,8 +42,9 @@ public class Naver extends BaseTimeEntity {
 	private String etc;
 
 	@Builder
-	public Naver(String title, String link, String price, String imgSrc,
+	public Naver(String pid, String title, String link, String price, String imgSrc,
 	             String uploadDate, String releaseYear, String etc) {
+		this.pid = pid;
 		this.title = title;
 		this.link = link;
 		this.price = convertPrice(price);

@@ -28,14 +28,14 @@ public class CarrotService {
 
 		for (int page = startPage; page <= endPage; page++) {
 			try {
-				log.info("carrot market page open: [{}]", page);
 				List<Carrot> carrots = crawlingCarrotPage(url + page);
 				if (ObjectUtils.isEmpty(carrots)) {
 					log.info("carrot market page: [{}] is empty", page);
 					endPage = page - 1;
 					break;
 				}
-				saveCarrots(carrots);
+				List<Carrot> result = saveCarrots(carrots);
+				log.info("carrot market page: [{}], saved item: [{}]", page, result.size());
 			} catch (Exception e) {
 				throw new RuntimeException("carrot market connect error", e);
 			}
@@ -44,9 +44,8 @@ public class CarrotService {
 	}
 
 	@Transactional
-	public void saveCarrots(List<Carrot> items) {
-		List<Carrot> result = carrotRepository.saveAll(items);
-		log.info("save complete. saved size: {}", result.size());
+	public List<Carrot> saveCarrots(List<Carrot> items) {
+		return carrotRepository.saveAll(items);
 	}
 
 	private List<Carrot> crawlingCarrotPage(String url) throws IOException {

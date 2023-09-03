@@ -5,8 +5,7 @@ import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 
-import static team.three.usedstroller.collector.util.UnitConversionUtils.convertPrice;
-import static team.three.usedstroller.collector.util.UnitConversionUtils.convertToTimeFormat;
+import static team.three.usedstroller.collector.util.UnitConversionUtils.*;
 
 @Entity
 @Getter
@@ -16,6 +15,8 @@ public class HelloMarket extends BaseTimeEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	private String pid;
+	@Column(length = 1000, nullable = false)
 	private String title;
 	@Lob
 	@Type(type = "org.hibernate.type.TextType")
@@ -29,6 +30,7 @@ public class HelloMarket extends BaseTimeEntity {
 
 	@Builder
 	public HelloMarket(String title, String link, String price, String imgSrc, String uploadTime) {
+		this.pid = convertPid(link, "item/");
 		this.title = title;
 		this.link = link;
 		this.price = convertPrice(price);
