@@ -8,6 +8,7 @@ import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.util.UriComponentsBuilder;
 import team.three.usedstroller.collector.domain.Carrot;
 import team.three.usedstroller.collector.repository.CarrotRepository;
 
@@ -21,8 +22,14 @@ import java.util.List;
 public class CarrotService {
 
 	private final CarrotRepository carrotRepository;
+	private final String url = UriComponentsBuilder.newInstance()
+			.scheme("https")
+			.host("www.daangn.com")
+			.path("/search/%EC%9C%A0%EB%AA%A8%EC%B0%A8/more/flea_market")
+			.queryParam("page", "")
+			.build().toUriString();
 
-	public String collectingCarrotMarket(String url, Integer startPage) {
+	public String collectingCarrotMarket(Integer startPage) {
 		int endPage = getTotalPages();
 		log.info("carrot market total page: {}", endPage);
 

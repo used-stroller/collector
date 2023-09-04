@@ -9,6 +9,7 @@ import org.openqa.selenium.WebElement;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.util.UriComponentsBuilder;
 import team.three.usedstroller.collector.config.ChromiumDriver;
 import team.three.usedstroller.collector.domain.Naver;
 import team.three.usedstroller.collector.repository.NaverShoppingRepository;
@@ -26,8 +27,23 @@ public class NaverService {
 
 	private final ChromiumDriver driver;
 	private final NaverShoppingRepository naverShoppingRepository;
+	private final String url = UriComponentsBuilder.newInstance()
+			.scheme("https")
+			.host("search.shopping.naver.com")
+			.path("/search/all")
+			.queryParam("brand", "27112%20215978%2029436%20215480%2026213%20219842%2028497%2013770%20236955%20151538%20242564%2028546")
+			.queryParam("frm", "NVSHBRD")
+			.queryParam("origQuery", "%EC%9C%A0%EB%AA%A8%EC%B0%A8")
+			.queryParam("pagingSize", "40")
+			.queryParam("productSet", "total")
+			.queryParam("query", "%EC%9C%A0%EB%AA%A8%EC%B0%A8")
+			.queryParam("sort", "rel")
+			.queryParam("timestamp", "")
+			.queryParam("viewType", "list")
+			.queryParam("pagingIndex", "")
+			.build().toUriString();
 
-	public String collectingNaverShopping(String url, int startPage, int endPage) {
+	public String collectingNaverShopping(int startPage, int endPage) {
 		driver.open(url + startPage);
 		int page = startPage;
 
