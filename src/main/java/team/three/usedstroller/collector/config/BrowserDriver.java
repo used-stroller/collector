@@ -2,27 +2,21 @@ package team.three.usedstroller.collector.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
-public abstract class BrowserDriver <T extends RemoteWebDriver> {
-
-	protected T driver;
-	protected int port;
+public abstract class BrowserDriver<T extends ChromeDriver> {
+	public T driver;
 	public WebDriverWait driverWait;
 	public ChromeOptions options;
-	protected boolean isWait;
-	public WebDriver webDriver;
-
 
 	/**
 	 * 페이지 열기
@@ -30,18 +24,18 @@ public abstract class BrowserDriver <T extends RemoteWebDriver> {
 	public void open(String url) {
 		try {
 			log.info("Chrome Open URL : {}", url);
-			this.driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+			this.driver.manage().timeouts().implicitlyWait(Duration.ofMillis(100));
 			this.driver.get(url);
 			this.driver.manage().window().maximize();
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new RuntimeException("Chrome Open Error", e);
 		}
 	}
 
 	/**
 	 * Selector가 로드 됐을 때 불러오기
 	 */
-	public WebElement get(String selector) {
+	public WebElement findOneByCss(String selector) {
 		WebElement element = null;
 		try {
 			element = driverWait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(selector)));
@@ -54,7 +48,7 @@ public abstract class BrowserDriver <T extends RemoteWebDriver> {
 	/**
 	 * Selector가 로드 됐을 때 리스트로 불러오기
 	 */
-	public List<WebElement> getList(String selector) {
+	public List<WebElement> findAllByCss(String selector) {
 		List<WebElement> elements = null;
 		try {
 			elements = driverWait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector(selector)));
@@ -67,12 +61,12 @@ public abstract class BrowserDriver <T extends RemoteWebDriver> {
 	/**
 	 * Xpath가 로드 됐을 때 불러오기
 	 */
-	public WebElement getXpath(String selector) {
+	public WebElement findOneByXpath(String xPath) {
 		WebElement element = null;
 		try {
-			element = driverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(selector)));
+			element = driverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(xPath)));
 		} catch (WebDriverException e) {
-			log.error("{} 오브젝트를 불러오는데 실패했습니다.", selector);
+			log.error("{} 오브젝트를 불러오는데 실패했습니다.", xPath);
 		}
 		return element;
 	}
@@ -80,43 +74,64 @@ public abstract class BrowserDriver <T extends RemoteWebDriver> {
 	/**
 	 * Xpath가 로드 됐을 때 리스트로 불러오기
 	 */
-	public List<WebElement> getListXpath(String parent, String child) {
-		List<WebElement> elements = null;
+	public List<WebElement> findAllByXpath(String xPath) {
+		List<WebElement> element = null;
 		try {
-			elements = driverWait.until(ExpectedConditions.presenceOfNestedElementsLocatedBy(By.xpath(parent), By.xpath(child)));
+			element = driverWait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.xpath(xPath)));
 		} catch (WebDriverException e) {
-			log.error("{} > {} 오브젝트를 불러오는데 실패했습니다.", parent, child);
+			log.error("{} 오브젝트를 불러오는데 실패했습니다.", xPath);
 		}
-		return elements;
+		return element;
 	}
 
 	/**
-	 * driver close
+	 * Tag가 로드 됐을 때 불러오기
+	 */
+	public WebElement findOneByTag(String tagName) {
+		WebElement element = null;
+		try {
+			element = driverWait.until(ExpectedConditions.presenceOfElementLocated(By.tagName(tagName)));
+		} catch (WebDriverException e) {
+			log.error("{} 오브젝트를 불러오는데 실패했습니다.", tagName);
+		}
+		return element;
+	}
+
+	/**
+	 * 탭 닫기
 	 */
 	public void close() {
 		if (driver != null) {
 			driver.close();
-			driver.quit();
 		}
 	}
 
-	public void quit(){
-		if(driver !=null){
+	/**
+	 * 브라우저 종료
+	 */
+	public void quit() {
+		if (driver != null) {
 			driver.quit();
 		}
 	}
 
 	/**
+	 * 암묵적 대기 설정: 지정 시간동안 대기하며, 요소가 나타나면 즉시 진행
+	 */
+	public void implicitWait(Duration duration) {
+		driver.manage().timeouts().implicitlyWait(duration);
+	}
+
+
+	/**
 	 * 일정 시간 대기
 	 */
-	public void wait(int second) {
+	public void wait(int millis) {
 		try {
-			isWait = true;
-			Thread.sleep(second * 1000L);
+			Thread.sleep(millis);
 		} catch (InterruptedException e) {
 			log.error(e.getMessage());
-		} finally {
-			isWait = false;
 		}
 	}
+
 }
