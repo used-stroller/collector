@@ -52,6 +52,8 @@ dependencies {
 
     //jpa-mariadb연동
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client' // MariaDB
+
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 }
 
 tasks.named('test') {
