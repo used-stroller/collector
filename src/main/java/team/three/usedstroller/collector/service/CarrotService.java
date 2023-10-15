@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.util.UriComponentsBuilder;
-import team.three.usedstroller.collector.domain.Carrot;
-import team.three.usedstroller.collector.repository.CarrotRepository;
+import team.three.usedstroller.collector.domain.Product;
+import team.three.usedstroller.collector.repository.ProductRepository;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CarrotService {
 
-	private final CarrotRepository carrotRepository;
+	private final ProductRepository productRepository;
 	private final String url = UriComponentsBuilder.newInstance()
 			.scheme("https")
 			.host("www.daangn.com")
@@ -35,13 +35,13 @@ public class CarrotService {
 
 		for (int page = startPage; page <= endPage; page++) {
 			try {
-				List<Carrot> carrots = crawlingCarrotPage(url + page);
+				List<Product> carrots = crawlingCarrotPage(url + page);
 				if (ObjectUtils.isEmpty(carrots)) {
 					log.info("carrot market page: [{}] is empty", page);
 					endPage = page - 1;
 					break;
 				}
-				List<Carrot> result = saveCarrots(carrots);
+				List<Product> result = saveCarrots(carrots);
 				log.info("carrot market page: [{}], saved item: [{}]", page, result.size());
 			} catch (Exception e) {
 				throw new RuntimeException("carrot market connect error", e);
@@ -51,12 +51,12 @@ public class CarrotService {
 	}
 
 	@Transactional
-	public List<Carrot> saveCarrots(List<Carrot> items) {
-		return carrotRepository.saveAll(items);
+	public List<Product> saveCarrots(List<Product> items) {
+		return productRepository.saveAll(items);
 	}
 
-	private List<Carrot> crawlingCarrotPage(String url) throws IOException {
-		List<Carrot> list = new ArrayList<>();
+	private List<Product> crawlingCarrotPage(String url) throws IOException {
+		List<Product> list = new ArrayList<>();
 		Document doc = Jsoup.connect(url).get();
 		doc.select("article.flea-market-article")
 				.forEach(element -> {
@@ -66,15 +66,8 @@ public class CarrotService {
 					String price = element.select("p.article-price").text();
 					String imgSrc = element.select("div.card-photo > img").attr("src");
 					String link = element.select("a.flea-market-article-link").attr("href");
-					Carrot carrot = Carrot.builder()
-							.title(title)
-							.content(content)
-							.region(region)
-							.price(price)
-							.imgSrc(imgSrc)
-							.link(link)
-							.build();
-					list.add(carrot);
+					Product product = Product.createCarrot(title, price, region, link, imgSrc, content);
+					list.add(product);
 				});
 		return list;
 	}

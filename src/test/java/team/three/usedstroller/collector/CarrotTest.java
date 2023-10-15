@@ -7,7 +7,7 @@ import org.jsoup.nodes.Element;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.ObjectUtils;
-import team.three.usedstroller.collector.domain.Carrot;
+import team.three.usedstroller.collector.domain.Product;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,7 +40,7 @@ class CarrotTest {
 		//given
 		String url = "https://www.daangn.com/search/%EC%9C%A0%EB%AA%A8%EC%B0%A8/more/flea_market?page=";
 		int page = 1;
-		List<Carrot> list = new ArrayList<>();
+		List<Product> list = new ArrayList<>();
 
 		//when
 		Document doc = Jsoup.connect(url + page).get();
@@ -52,15 +52,8 @@ class CarrotTest {
 					String price = element.select("p.article-price").text();
 					String imgSrc = element.select("div.card-photo > img").attr("src");
 					String link = element.select("a.flea-market-article-link").attr("href");
-					Carrot carrot = Carrot.builder()
-							.title(title)
-							.content(content)
-							.region(region)
-							.price(price)
-							.imgSrc(imgSrc)
-							.link(link)
-							.build();
-					list.add(carrot);
+					Product product = Product.createCarrot(title, content, region, price, imgSrc, link);
+					list.add(product);
 				});
 
 		//then

@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import team.three.usedstroller.collector.config.ChromiumDriver;
-import team.three.usedstroller.collector.domain.BunJang;
-import team.three.usedstroller.collector.repository.BunJangRepository;
+import team.three.usedstroller.collector.domain.Product;
+import team.three.usedstroller.collector.repository.ProductRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +22,7 @@ import static io.netty.util.internal.StringUtil.EMPTY_STRING;
 public class BunJangService {
 
 	private final ChromiumDriver driver;
-	private final BunJangRepository bunJangRepository;
+	private final ProductRepository productRepository;
 
 	public int collectingBunJang() {
 		int complete = 0;
@@ -50,7 +50,7 @@ public class BunJangService {
 
 	@Transactional
 	public int saveItemList(List<WebElement> list) {
-		List<BunJang> items = new ArrayList<>();
+		List<Product> items = new ArrayList<>();
 		String img;
 		String price;
 		String title;
@@ -59,6 +59,16 @@ public class BunJangService {
 		String uploadTime;
 
 		for (WebElement element : list) {
+			uploadTime = element.findElements(By.xpath("a/div[2]/div[2]/div[2]/span"))
+				.stream()
+				.findFirst()
+				.map(WebElement::getText)
+				.orElseGet(() -> EMPTY_STRING);
+
+			if (uploadTime.isEmpty()) {
+				continue; // uploadTime이 없으면 광고이기 때문에 패스
+			}
+
 			title = element.findElement(By.xpath("a/div[2]/div[1]")).getText();
 			link = element.findElement(By.xpath("a")).getAttribute("href");
 			price = element.findElement(By.xpath("a/div[2]/div[2]/div[1]")).getText();
@@ -68,24 +78,12 @@ public class BunJangService {
 					.findFirst()
 					.map(WebElement::getText)
 					.orElseGet(() -> EMPTY_STRING);
-			uploadTime = element.findElements(By.xpath("a/div[2]/div[2]/div[2]/span"))
-					.stream()
-					.findFirst()
-					.map(WebElement::getText)
-					.orElseGet(() -> EMPTY_STRING);
 
-			BunJang bunJang = BunJang.builder()
-					.title(title)
-					.link(link)
-					.price(price)
-					.imgSrc(img)
-					.address(address)
-					.uploadTime(uploadTime)
-					.build();
-			items.add(bunJang);
+			Product product = Product.createBunJang(title, link, price, img, address, uploadTime);
+			items.add(product);
 		}
 
-		bunJangRepository.saveAll(items);
+		productRepository.saveAll(items);
 		return items.size();
 	}
 
