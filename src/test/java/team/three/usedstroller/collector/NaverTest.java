@@ -11,7 +11,6 @@ import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import team.three.usedstroller.collector.domain.Naver;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -90,13 +89,8 @@ class NaverTest {
 			title = el.findElement(By.xpath(".//a[@title]")).getText();
 			price = el.findElement(By.xpath(".//span[contains(@class, 'price')]")).getText()
 					.replace("최저", "").trim();
-			Naver naver = Naver.builder()
-					.title(title)
-					.link(link)
-					.price(price)
-					.imgSrc(imgSrc)
-					.build();
-			System.out.println("naver = " + naver.toString());
+			System.out.println("link = " + link + ", imgSrc = " + imgSrc + ", title = " + title + ", price = " + price);
+
 		}
 
 		Thread.sleep(2000);

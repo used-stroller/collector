@@ -54,9 +54,14 @@ public class UnitConversionUtils {
 	}
 
 	public static LocalDate changeLocalDate(String uploadDate) {
-		return ObjectUtils.isEmpty(uploadDate) ? null :
-				LocalDate.parse(uploadDate.length() < 9 ? uploadDate + "01" : uploadDate,
-						DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+		String pattern = uploadDate.contains("-") ? "yyyy-MM-dd" : "yyyy.MM.dd";
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+		return ObjectUtils.isEmpty(uploadDate) ? null : LocalDate.parse(getDateText(uploadDate),  formatter);
+	}
+
+	private static String getDateText(String uploadDate) {
+		return uploadDate.length() < 9 ? uploadDate + "01" :
+			uploadDate.length() > 11 ? uploadDate.substring(0, 10) : uploadDate;
 	}
 
 	public static String convertToTimeFormat(String time) {

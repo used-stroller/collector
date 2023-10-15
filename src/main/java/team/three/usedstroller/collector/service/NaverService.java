@@ -11,8 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 import team.three.usedstroller.collector.config.ChromiumDriver;
-import team.three.usedstroller.collector.domain.Naver;
-import team.three.usedstroller.collector.repository.NaverShoppingRepository;
+import team.three.usedstroller.collector.domain.Product;
+import team.three.usedstroller.collector.repository.ProductRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +26,7 @@ import static io.netty.util.internal.StringUtil.EMPTY_STRING;
 public class NaverService {
 
 	private final ChromiumDriver driver;
-	private final NaverShoppingRepository naverShoppingRepository;
+	private final ProductRepository productRepository;
 	private final String url = UriComponentsBuilder.newInstance()
 			.scheme("https")
 			.host("search.shopping.naver.com")
@@ -78,7 +78,7 @@ public class NaverService {
 
 	@Transactional
 	public int saveNaverShopping(List<WebElement> list) {
-		List<Naver> items = new ArrayList<>();
+		List<Product> items = new ArrayList<>();
 		String pid = "";
 		String title = "";
 		String link = "";
@@ -127,21 +127,11 @@ public class NaverService {
 					.filter(e -> !ObjectUtils.isEmpty(e))
 					.collect(Collectors.joining(" | "));
 
-			Naver result = Naver.builder()
-					.pid(pid)
-					.title(title)
-					.link(link)
-					.price(price)
-					.imgSrc(imgSrc)
-					.uploadDate(uploadDate)
-					.releaseYear(releaseYear)
-					.etc(etc)
-					.build();
-
-			items.add(result);
+			Product product = Product.createNaver(pid, title, link, price, imgSrc, uploadDate, releaseYear, etc);
+			items.add(product);
 		}
 
-		List<Naver> result = naverShoppingRepository.saveAll(items);
+		List<Product> result = productRepository.saveAll(items);
 		return result.size();
 	}
 

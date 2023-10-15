@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import team.three.usedstroller.collector.config.ChromiumDriver;
-import team.three.usedstroller.collector.domain.HelloMarket;
-import team.three.usedstroller.collector.repository.HelloMarketRepository;
+import team.three.usedstroller.collector.domain.Product;
+import team.three.usedstroller.collector.repository.ProductRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +22,7 @@ import java.util.List;
 public class HelloMarketService {
 
 	private final ChromiumDriver driver;
-	private final HelloMarketRepository helloMarketRepository;
+	private final ProductRepository productRepository;
 
 	public int collectingHelloMarket() {
 		int complete = 0;
@@ -44,7 +44,7 @@ public class HelloMarketService {
 
 	@Transactional
 	public int saveItems(List<WebElement> list) {
-		List<HelloMarket> items = new ArrayList<>();
+		List<Product> items = new ArrayList<>();
 		String img;
 		String price;
 		String title;
@@ -64,17 +64,11 @@ public class HelloMarketService {
 			img = element.findElement(By.xpath(".//div[contains(@class, 'Item__ThumbnailBox')]/a/img")).getAttribute("src");
 			uploadTime = element.findElement(By.xpath(".//div[contains(@class, 'Item__TimeTag')]")).getText();
 
-			HelloMarket helloMarket = HelloMarket.builder()
-					.title(title)
-					.link(link)
-					.price(price)
-					.imgSrc(img)
-					.uploadTime(uploadTime)
-					.build();
-			items.add(helloMarket);
+			Product product = Product.createHelloMarket(title, link, price, img, uploadTime);
+			items.add(product);
 		}
 
-		helloMarketRepository.saveAll(items);
+		productRepository.saveAll(items);
 		return items.size();
 	}
 

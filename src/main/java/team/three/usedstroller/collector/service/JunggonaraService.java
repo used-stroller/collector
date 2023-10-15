@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import team.three.usedstroller.collector.config.ChromiumDriver;
-import team.three.usedstroller.collector.domain.Junggo;
-import team.three.usedstroller.collector.repository.JunggonaraRepository;
+import team.three.usedstroller.collector.domain.Product;
+import team.three.usedstroller.collector.repository.ProductRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +22,7 @@ import static io.netty.util.internal.StringUtil.EMPTY_STRING;
 public class JunggonaraService {
 
 	private final ChromiumDriver driver;
-	private final JunggonaraRepository junggonaraRepository;
+	private final ProductRepository productRepository;
 
 	public int collectingJunggonara(int startPage, int endPage) {
 		int complete = 0;
@@ -49,7 +49,7 @@ public class JunggonaraService {
 
 	@Transactional
 	public int saveItemList(List<WebElement> list) {
-		List<Junggo> items = new ArrayList<>();
+		List<Product> items = new ArrayList<>();
 		String img;
 		String price;
 		String title;
@@ -58,36 +58,29 @@ public class JunggonaraService {
 		String uploadTime;
 
 		for (WebElement element : list) {
-			if (!ObjectUtils.isEmpty(element.getAttribute("class")) || ObjectUtils.isEmpty(element.getText())) {
-				continue;
-			}
 			title = element.findElement(By.xpath(".//h2")).getText();
 			link = element.findElement(By.xpath(".//a")).getAttribute("href");
 			price = element.findElement(By.xpath(".//a/div[2]/div[1]")).getText();
 			img = element.findElement(By.xpath(".//a/div[1]/img")).getAttribute("src");
+			uploadTime = element.findElements(By.xpath(".//a/div[2]/div[2]/span[3]"))
+				.stream()
+				.findFirst()
+				.map(WebElement::getText)
+				.orElseGet(() -> EMPTY_STRING);
+			if (uploadTime.isEmpty() || uploadTime.contains("광고")) {
+				continue; // uploadTime이 없으면 광고이기 때문에 패스
+			}
 			address = element.findElements(By.xpath(".//a/div[2]/div[2]/span[1]"))
 					.stream()
 					.findFirst()
 					.map(WebElement::getText)
 					.orElseGet(() -> EMPTY_STRING);
-			uploadTime = element.findElements(By.xpath(".//a/div[2]/div[2]/span[3]"))
-					.stream()
-					.findFirst()
-					.map(WebElement::getText)
-					.orElseGet(() -> EMPTY_STRING);
 
-			Junggo junggo = Junggo.builder()
-					.title(title)
-					.link(link)
-					.price(price)
-					.imgSrc(img)
-					.address(address)
-					.uploadTime(uploadTime)
-					.build();
-			items.add(junggo);
+			Product product = Product.createJunggo(title, link, price, img, address, uploadTime);
+			items.add(product);
 		}
 
-		junggonaraRepository.saveAll(items);
+		productRepository.saveAll(items);
 		return items.size();
 	}
 
