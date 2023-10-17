@@ -1,12 +1,26 @@
 package team.three.usedstroller.collector.domain;
 
-import lombok.*;
-import org.hibernate.annotations.Type;
+import static team.three.usedstroller.collector.util.UnitConversionUtils.changeInt;
+import static team.three.usedstroller.collector.util.UnitConversionUtils.changeLocalDate;
+import static team.three.usedstroller.collector.util.UnitConversionUtils.convertPid;
+import static team.three.usedstroller.collector.util.UnitConversionUtils.convertPrice;
+import static team.three.usedstroller.collector.util.UnitConversionUtils.convertSimplePid;
+import static team.three.usedstroller.collector.util.UnitConversionUtils.convertToTimeFormat;
 
-import javax.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.time.LocalDate;
-
-import static team.three.usedstroller.collector.util.UnitConversionUtils.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Getter
@@ -24,12 +38,9 @@ public class Product extends BaseTimeEntity {
 	@Column(length = 1000, nullable = false)
 	private String title;
 	private Long price;
-	@Lob
-	@Type(type = "org.hibernate.type.TextType")
-	@Column(nullable = false)
+	@Column(columnDefinition = "text")
 	private String link;
-	@Lob
-	@Type(type = "org.hibernate.type.TextType")
+	@Column(columnDefinition = "text")
 	private String imgSrc;
 
 	//naver
@@ -43,8 +54,7 @@ public class Product extends BaseTimeEntity {
 
 	//carrot
 	private String region;
-	@Lob
-	@Type(type = "org.hibernate.type.TextType")
+	@Column(columnDefinition = "text")
 	private String content;
 
 	@Builder

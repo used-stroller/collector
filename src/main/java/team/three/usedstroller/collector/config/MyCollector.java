@@ -1,11 +1,11 @@
 package team.three.usedstroller.collector.config;
 
+import jakarta.annotation.PostConstruct;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,9 +36,7 @@ public class MyCollector {
 			webDriverPath = getResourcePath(winWebDriverPath);
 			webDownloadPath = winDownloadPath;
 		} else if (osName.contains("Mac")) {
-			if (osArch.contains("aarch64")) { // M1
-				webDriverPath = getResourcePath(macArmWebDriverPath);
-			}
+			webDriverPath = getResourcePath(macArmWebDriverPath);
 			webDownloadPath = macDownloadPath;
 		} else if (osName.contains("Linux")) {
 			webDriverPath = getResourcePath(linuxWebDriverPath);
