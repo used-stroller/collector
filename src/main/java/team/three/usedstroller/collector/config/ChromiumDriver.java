@@ -1,22 +1,17 @@
 package team.three.usedstroller.collector.config;
 
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.logging.LogType;
-import org.openqa.selenium.logging.LoggingPreferences;
-import org.openqa.selenium.remote.CapabilityType;
-import org.openqa.selenium.support.ui.WebDriverWait;
-import org.springframework.context.annotation.Configuration;
-
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.context.annotation.Configuration;
 
 @Slf4j
 @Configuration
@@ -80,21 +75,12 @@ public class ChromiumDriver extends BrowserDriver<ChromeDriver> {
 				myCollector.getPathMap().get("downloadPath"));
 	}
 
-	public void chromeDriverLogging() {
-		// 성능 로그 설정
-		LoggingPreferences logPrefs = new LoggingPreferences();
-		logPrefs.enable(LogType.PERFORMANCE, Level.ALL);
-		options.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
-	}
-
-
 	@PostConstruct
 	public void initChromeDriver() {
 //		chromeDriverDownloader.updateLatestDriver();
 		setByOs();
 		setHeadless();
 		setCustomOption();
-		chromeDriverLogging();
 		this.driver = new ChromeDriver(options);
 		this.driverWait = new WebDriverWait(this.driver, Duration.ofSeconds(5));
 	}

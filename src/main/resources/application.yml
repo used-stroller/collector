@@ -36,3 +36,7 @@ collector:
     mac-download-path: /Users/yd/Downloads
     linux-web-driver-path: libs/chromedriver-linux64/chromedriver
     linux-download-path: /home/yd/Downloads
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html

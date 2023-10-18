@@ -28,7 +28,6 @@ public class MyCollector {
 	@PostConstruct
 	public void setPathByOs() {
 		String osName = System.getProperty("os.name");
-		String osArch = System.getProperty("os.arch");
 		String webDriverPath = null;
 		String webDownloadPath = null;
 

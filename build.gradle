@@ -1,7 +1,10 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.1.3'
-    id 'io.spring.dependency-management' version '1.1.3'
+    id 'org.springframework.boot' version '3.1.4'
+}
+
+apply {
+    plugin 'io.spring.dependency-management'
 }
 
 group = 'team.three'
@@ -31,7 +34,7 @@ dependencies {
     // crawling - jsoup
     implementation 'org.jsoup:jsoup:1.16.1'
     // crawling - selenium
-    implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '4.10.0'
+    implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '4.14.1'
 
     //db
     runtimeOnly 'com.h2database:h2'
@@ -41,7 +44,7 @@ dependencies {
 //    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.8.0'
 
     //swagger address : {ip:port}/swagger-ui/index.html
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
 
     //lombok
     compileOnly 'org.projectlombok:lombok'
