@@ -1,4 +1,4 @@
-package team.three.usedstroller.collector.domain.dto;
+package team.three.usedstroller.collector.dto;
 
 import lombok.*;
 
