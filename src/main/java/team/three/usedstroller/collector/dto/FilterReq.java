@@ -13,4 +13,6 @@ public class FilterReq {
 
   private String keyword;
   private SourceType sourceType;
+  private Long minPrice;
+  private Long maxPrice;
 }
