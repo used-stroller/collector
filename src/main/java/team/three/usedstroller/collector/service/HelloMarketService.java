@@ -29,7 +29,6 @@ public class HelloMarketService {
 		String url = "https://www.hellomarket.com/search?q=%EC%9C%A0%EB%AA%A8%EC%B0%A8";
 		driver.open(url);
 		scrollToTheBottom();
-
 		List<WebElement> list = driver.findAllByXpath("//*[@id=\"__next\"]/div[3]/div[3]/div[2]/div/div/div");
 		if (ObjectUtils.isEmpty(list)) {
 			return complete;
@@ -48,21 +47,26 @@ public class HelloMarketService {
 		String img;
 		String price;
 		String title;
-		String link;
+		String link = "";
 		String uploadTime;
 
 		for (WebElement element : list) {
-			// 광고 제외
-			if (!ObjectUtils.isEmpty(element.getAttribute("class"))) {
-				continue;
-			}
+			WebElement textBox = element.findElement(By.xpath(".//div/div[2]"));
+			img = textBox.findElement(By.xpath(".//img")).getAttribute("src");
+			System.out.println("img = " + img);
 
-			WebElement textBox = element.findElement(By.xpath(".//div[contains(@class, 'Item__TextBox') or contains(@class, 'Search__TextBox')]"));
-			price = textBox.findElement(By.xpath(".//a[1]/div[contains(@class, 'Item__Text')]")).getText();
-			title = textBox.findElement(By.xpath(".//a[2]/div[contains(@class, 'Item__Text')]")).getText();
-			link = element.findElement(By.xpath(".//a[1]")).getAttribute("href");
-			img = element.findElement(By.xpath(".//div[contains(@class, 'Item__ThumbnailBox')]/a/img")).getAttribute("src");
-			uploadTime = element.findElement(By.xpath(".//div[contains(@class, 'Item__TimeTag')]")).getText();
+			System.out.println("element = " + element.getAttribute("class"));
+			System.out.println("element = " + element.getTagName());
+			System.out.println("element = " + element.getText());
+			price = textBox.findElement(By.xpath(".//div[2]")).getText();
+			title = textBox.findElement(By.xpath(".//div[3]")).getText();
+			uploadTime = textBox.findElement(By.xpath(".//div[4]")).getText();
+			if (uploadTime.contains("무료배송")) {
+				uploadTime = textBox.findElement(By.xpath(".//div[5]")).getText();
+			}
+//			link = element.findElement(By.xpath(".//a[1]")).getAttribute("href");
+//			img = element.findElement(By.xpath(".//div/div[1]/div[1]/img")).getAttribute("src");
+//			uploadTime = element.findElement(By.xpath(".//div[contains(@class, 'Item__TimeTag')]")).getText();
 
 			Product product = Product.createHelloMarket(title, link, price, img, uploadTime);
 			items.add(product);

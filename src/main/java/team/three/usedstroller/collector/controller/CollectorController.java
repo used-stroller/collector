@@ -1,16 +1,27 @@
 package team.three.usedstroller.collector.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.StopWatch;
-import org.springframework.web.bind.annotation.*;
-import team.three.usedstroller.collector.service.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+import team.three.usedstroller.collector.service.BunJangService;
+import team.three.usedstroller.collector.service.CarrotService;
+import team.three.usedstroller.collector.service.HelloMarketService;
+import team.three.usedstroller.collector.service.JunggonaraService;
+import team.three.usedstroller.collector.service.NaverService;
 
 @RestController
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/collector")
+@Tag(name = "collector", description = "수집기")
 public class CollectorController {
 
 	private final NaverService naverService;
@@ -46,8 +57,9 @@ public class CollectorController {
 	@PostMapping("/junggonara")
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
-	public int junggonara(@RequestParam(required = true) Integer startPage,
-	                      @RequestParam(required = true) Integer endPage) {
+	public int junggonara(
+			@RequestParam(required = true) Integer startPage,
+			@RequestParam(required = true) Integer endPage) {
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
 		int count = junggonaraService.collectingJunggonara(startPage, endPage);
@@ -107,8 +119,9 @@ public class CollectorController {
 	 */
 	@PostMapping("/naver-shopping")
 	@ResponseStatus(HttpStatus.CREATED)
-	public void naverShopping(@RequestParam(required = true) Integer startPage,
-													  @RequestParam(required = true) Integer endPage) {
+	public void naverShopping(
+			@RequestParam(required = true) Integer startPage,
+			@RequestParam(required = true) Integer endPage) {
 
 		log.info("naver shopping collector start");
 		StopWatch stopWatch = new StopWatch();

@@ -4,7 +4,7 @@ public enum SourceType {
 	NAVER,
 	CARROT,
 	HELLO,
-    BUNJANG,
-    JUNGGO;
+	BUNJANG,
+	JUNGGO;
 
 }

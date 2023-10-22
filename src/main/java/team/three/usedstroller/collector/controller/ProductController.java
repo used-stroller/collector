@@ -1,23 +1,32 @@
 package team.three.usedstroller.collector.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Controller;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import team.three.usedstroller.collector.dto.FilterReq;
+import team.three.usedstroller.collector.dto.PageRequest;
+import team.three.usedstroller.collector.dto.ProductRes;
+import team.three.usedstroller.collector.service.ProductService;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/product")
+@Tag(name = "product", description = "상품 관련")
 public class ProductController {
 
-  /**
-   * 상품리스트 가져오기 Top10 브랜드, 모델리스트, 토탈카운트 포함 동네,가격,모델명,기간,브랜ㄷ,사이트별 파라미터 다 들어가는 한방 쿼리
-   */
+  private final ProductService productService;
 
+  /**
+   * 상품리스트 가져오기 Top10 브랜드, 모델리스트, 토탈카운트 포함 동네,가격,모델명,기간,브랜드,사이트별 파라미터 다 들어가는 한방 쿼리
+   */
   @GetMapping("/list")
-  public void getProductList() {
+  public Page<ProductRes> getProducts(FilterReq filter, PageRequest pageable) {
+    return productService.getProducts(filter, pageable.of());
   }
 
   /**
