@@ -7,22 +7,21 @@ import static team.three.usedstroller.collector.util.UnitConversionUtils.convert
 import static team.three.usedstroller.collector.util.UnitConversionUtils.convertSimplePid;
 import static team.three.usedstroller.collector.util.UnitConversionUtils.convertToTimeFormat;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
+import jakarta.persistence.Table;
 import java.time.LocalDate;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.hibernate.annotations.Type;
 
 @Entity
 @Getter
@@ -40,17 +39,16 @@ public class Product extends BaseTimeEntity {
   @Column(length = 1000, nullable = false)
   private String title;
   private Long price;
-  @Lob
-  @Type(type = "org.hibernate.type.TextType")
+
   @Column(nullable = false)
   private String link;
-  @Lob
-  @Type(type = "org.hibernate.type.TextType")
+
+  @Column(length = 1000)
   private String imgSrc;
 
   //naver
   private int releaseYear;
-  @Column(length = 1000)
+
   private String etc;
   private LocalDate uploadDate;
 
@@ -60,7 +58,6 @@ public class Product extends BaseTimeEntity {
   //carrot
   private String region;
   @Lob
-  @Type(type = "org.hibernate.type.TextType")
   private String content;
 
   @Builder
