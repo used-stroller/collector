@@ -17,6 +17,8 @@ public class ProductDsl<T> {
 
     applyKeyword(filter.getKeyword());
     applySourceType(filter.getSourceType());
+    applyTown(filter.getTown());
+    applyPriceRange(filter.getMinPrice(), filter.getMaxPrice());
   }
 
   private void applySourceType(SourceType sourceType) {
@@ -30,6 +32,18 @@ public class ProductDsl<T> {
       jpaQuery.where(product.title.containsIgnoreCase(keyword)
           .or(product.content.containsIgnoreCase(keyword))
           .or(product.etc.containsIgnoreCase(keyword)));
+    }
+  }
+
+  private void applyTown(String town) {
+    if (town != null) {
+      jpaQuery.where(product.address.containsIgnoreCase(town));
+    }
+  }
+
+  private void applyPriceRange(Integer min, Integer max) {
+    if (min != null && max != null) {
+      jpaQuery.where(product.price.between(min, max));
     }
   }
 

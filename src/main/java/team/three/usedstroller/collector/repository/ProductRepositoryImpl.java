@@ -21,11 +21,12 @@ public class ProductRepositoryImpl implements CustomProductRepository {
 
   private final JPAQueryFactory queryFactory;
 
+
   @Override
   public Page<ProductRes> getProducts(FilterReq filter, Pageable pageable) {
 
     ProductDsl<Product> productDsl = new ProductDsl<>(getSelectProduct(), filter);
-    List<ProductRes> products = productDsl.getDsl()
+    List<ProductRes> products = productDsl.getDsl() //
         .orderBy(product.createdAt.desc())
         .offset(pageable.getOffset())
         .limit(pageable.getPageSize())
@@ -46,4 +47,5 @@ public class ProductRepositoryImpl implements CustomProductRepository {
   private JPAQuery<Long> getSelectProductCount() {
     return queryFactory.select(product.count());
   }
+  
 }
