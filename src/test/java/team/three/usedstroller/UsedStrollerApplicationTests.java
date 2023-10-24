@@ -1,21 +1,39 @@
 package team.three.usedstroller;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
+import team.three.usedstroller.collector.domain.Product;
+import team.three.usedstroller.collector.domain.QProduct;
 
 @SpringBootTest
+@Transactional
+@ActiveProfiles("local")
 class UsedStrollerApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
+  @Autowired
+  EntityManager em;
+  JPAQueryFactory queryFactory;
 
-	@Test
-	void parseIntTest(){
-		String qty = "18,025  개의 상품";
-		String intStr = qty.replaceAll("[^0-9]", "");
-		int i = Integer.parseInt(intStr);
-		System.out.println("i = " + i);
-	}
+  @BeforeEach
+  public void init() {
+    queryFactory = new JPAQueryFactory(em);
+  }
+
+  @Test
+  void findById() {
+    Product productOne = queryFactory
+        .selectFrom(QProduct.product)
+        .where(QProduct.product.id.eq(1L))
+        .fetchOne();
+    System.out.println("product = " + productOne);
+
+  }
+
 
 }
