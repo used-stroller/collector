@@ -1,5 +1,9 @@
 package team.three.usedstroller.collector;
 
+import java.io.IOException;
+import java.time.Duration;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
@@ -7,16 +11,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.logging.LogType;
-import org.openqa.selenium.logging.LoggingPreferences;
-import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
-import java.io.IOException;
-import java.time.Duration;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 
 class NaverTest {
 
@@ -28,9 +23,6 @@ class NaverTest {
 		ChromeOptions options = new ChromeOptions();
 		options.addArguments("--remote-allow-origins=*"); // 크로스 도메인 허용
 //		options.setHeadless(true);
-		LoggingPreferences logPrefs = new LoggingPreferences();
-		logPrefs.enable(LogType.PERFORMANCE, Level.ALL);
-		options.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
 		driver = new ChromeDriver(options);
 		driverWait = new WebDriverWait(driver, Duration.ofSeconds(5));
 	}
