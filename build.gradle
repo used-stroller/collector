@@ -35,9 +35,6 @@ dependencies {
     //db
     implementation 'org.postgresql:postgresql'
 
-    //TODO 배포시 제거 필요(jpa sql 보는 용도. 개발시에만 사용)
-//    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.8.0'
-
     //swagger address : {ip:port}/swagger-ui/index.html
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
 

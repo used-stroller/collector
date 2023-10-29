@@ -51,7 +51,7 @@ public class CollectorController {
 	 * 중고나라 '유모차' 검색 결과를 수집한다. (약 18,000건)
 	 * (양이 너무 많고 오래 걸려서 수집 갯수를 제한해야 할 듯)
 	 * @param startPage 시작 페이지
-	 * @param endPage 끝 페이지
+	 * @param endPage 끝 페이지 (약 125페이지)
 	 * @runningTime 16분 (약 10,000건)
 	 */
 	@PostMapping("/junggonara")
@@ -114,8 +114,8 @@ public class CollectorController {
 	 * "&pagingSize=40&productSet=total&query=%EC%9C%A0%EB%AA%A8%EC%B0%A8&sort=rel&timestamp=&viewType=list" +
 	 * "&pagingIndex=";
 	 * @param startPage 시작 페이지
-	 * @param endPage 끝 페이지
-	 * @runningTime 약 40분 (약 5500건)
+	 * @param endPage 끝 페이지 (약 150페이지)
+	 * @runningTime 약 70분 (약 6000건)
 	 */
 	@PostMapping("/naver-shopping")
 	@ResponseStatus(HttpStatus.CREATED)

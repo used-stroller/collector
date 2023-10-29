@@ -34,6 +34,7 @@ public class Product extends BaseTimeEntity {
 	private Long id;
 	@Enumerated(EnumType.STRING)
 	private SourceType sourceType;
+	@Column(unique = true)
 	private String pid;
 	@Column(length = 1000, nullable = false)
 	private String title;

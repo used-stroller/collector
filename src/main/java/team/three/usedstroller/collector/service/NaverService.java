@@ -89,13 +89,13 @@ public class NaverService {
 		String etc = "";
 
 		for (WebElement el : list) {
-			pid = el.findElement(By.xpath(".//a[contains(@class, 'thumbnail')]")).getAttribute("data-i");
-			link = el.findElement(By.xpath(".//a[contains(@class, 'thumbnail')]")).getAttribute("href");
+			pid = el.findElement(By.xpath(".//a[contains(@class, 'thumbnail_thumb')]")).getAttribute("data-i");
+			link = el.findElement(By.xpath(".//a[contains(@class, 'thumbnail_thumb')]")).getAttribute("href");
 
 			try {
-				imgSrc = el.findElement(By.xpath(".//a[contains(@class, 'thumbnail')]/img")).getAttribute("src");
+				imgSrc = el.findElement(By.xpath(".//a[contains(@class, 'thumbnail_thumb')]/img")).getAttribute("src");
 			} catch (NoSuchElementException e) {
-				imgSrc = el.findElement(By.xpath(".//a[contains(@class, 'thumbnail')]/span")).getText(); // 이미지 없는 경우(예: 청소년 유해상품)
+				imgSrc = el.findElement(By.xpath(".//a[contains(@class, 'thumbnail_thumb')]/span")).getText(); // 이미지 없는 경우(예: 청소년 유해상품)
 			}
 
 			title = el.findElement(By.xpath(".//a[@title]")).getText();
@@ -107,21 +107,21 @@ public class NaverService {
 				price = el.findElement(By.xpath(".//div[contains(@class, 'price')]")).getText(); // 가격 없는 경우(예: 판매중단)
 			}
 
-			uploadDate = el.findElements(By.xpath(".//span[contains(@class, 'roduct_etc')]"))
+			uploadDate = el.findElements(By.xpath(".//span[contains(@class, 'product_etc')]"))
 					.stream()
 					.filter(e -> e.getText() != null && e.getText().contains("등록일"))
 					.findFirst()
 					.map(e -> e.getText().split("등록일")[1].trim())
 					.orElseGet(() -> EMPTY_STRING);
 
-			releaseYear = el.findElements(By.xpath(".//a[contains(@class, 'roduct_detail')]"))
+			releaseYear = el.findElements(By.xpath(".//a[contains(@class, 'product_detail')]"))
 					.stream()
 					.filter(e -> e.getText() != null && e.getText().contains("출시년도"))
 					.findFirst()
 					.map(e -> e.getText().split("출시년도 :")[1].trim())
 					.orElseGet(() -> EMPTY_STRING);
 
-			etc = el.findElements(By.xpath(".//a[contains(@class, 'roduct_detail')]"))
+			etc = el.findElements(By.xpath(".//a[contains(@class, 'product_detail')]"))
 					.stream()
 					.map(WebElement::getText)
 					.filter(e -> !ObjectUtils.isEmpty(e))
