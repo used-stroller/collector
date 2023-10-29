@@ -1,5 +1,7 @@
 package team.three.usedstroller.collector.service;
 
+import static team.three.usedstroller.collector.validation.PidDuplicationValidator.isNotExistPid;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
@@ -56,7 +58,7 @@ public class CarrotService {
 	}
 
 	private List<Product> crawlingCarrotPage(String url) throws IOException {
-		List<Product> list = new ArrayList<>();
+		List<Product> items = new ArrayList<>();
 		Document doc = Jsoup.connect(url).get();
 		doc.select("article.flea-market-article")
 				.forEach(element -> {
@@ -66,10 +68,22 @@ public class CarrotService {
 					String price = element.select("p.article-price").text();
 					String imgSrc = element.select("div.card-photo > img").attr("src");
 					String link = element.select("a.flea-market-article-link").attr("href");
-					Product product = Product.createCarrot(title, price, region, link, imgSrc, content);
-					list.add(product);
+					Document detailDoc = null;
+					String uploadTime = "";
+					try {
+						detailDoc = Jsoup.connect("https://www.daangn.com" + link).get();
+						Element time = detailDoc.getElementsByTag("time").stream().findFirst()
+								.orElseGet(() -> null);
+						uploadTime = ObjectUtils.isEmpty(time) ? "" : time.text().replace("끌올", "");
+					} catch (IOException e) {
+						throw new RuntimeException("당근마켓 상세정보 가져오기 실패");
+					}
+					Product product = Product.createCarrot(title, price, region, link, imgSrc, content, uploadTime);
+					if (isNotExistPid(productRepository, product)) {
+						items.add(product);
+					}
 				});
-		return list;
+		return items;
 	}
 
 	private int getTotalPages() {

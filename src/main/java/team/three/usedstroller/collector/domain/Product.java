@@ -34,7 +34,6 @@ public class Product extends BaseTimeEntity {
 	private Long id;
 	@Enumerated(EnumType.STRING)
 	private SourceType sourceType;
-	@Column(unique = true)
 	private String pid;
 	@Column(length = 1000, nullable = false)
 	private String title;
@@ -50,16 +49,13 @@ public class Product extends BaseTimeEntity {
 	private String etc;
 	private LocalDate uploadDate;
 
-	//bunjang
-	private String address;
-
 	//carrot
 	private String region;
 	@Column(columnDefinition = "text")
 	private String content;
 
 	@Builder
-	private Product(SourceType sourceType, String pid, String title, String link, Long price, String imgSrc, String address,
+	private Product(SourceType sourceType, String pid, String title, String link, Long price, String imgSrc,
 	                int releaseYear, String etc, LocalDate uploadDate, String region, String content) {
 		this.sourceType = sourceType;
 		this.pid = pid;
@@ -67,7 +63,6 @@ public class Product extends BaseTimeEntity {
 		this.link = link;
 		this.price = price;
 		this.imgSrc = imgSrc;
-		this.address = address;
 		this.releaseYear = releaseYear;
 		this.etc = etc;
 		this.uploadDate = uploadDate;
@@ -90,7 +85,7 @@ public class Product extends BaseTimeEntity {
 			.build();
 	}
 
-	public static Product createBunJang(String title, String link, String price, String imgSrc, String address, String uploadTime) {
+	public static Product createBunJang(String title, String link, String price, String imgSrc, String region, String uploadTime) {
 		return Product.builder()
 			.sourceType(SourceType.BUNJANG)
 			.pid(convertPid(link, "products/"))
@@ -98,12 +93,12 @@ public class Product extends BaseTimeEntity {
 			.link(link)
 			.price(convertPrice(price))
 			.imgSrc(imgSrc)
-			.address(address)
+			.region(region)
 			.uploadDate(changeLocalDate(convertToTimeFormat(uploadTime)))
 			.build();
 	}
 
-	public static Product createJunggo(String title, String link, String price, String imgSrc,String address,String uploadTime) {
+	public static Product createJunggo(String title, String link, String price, String imgSrc, String region, String uploadTime) {
 		return Product.builder()
 			.sourceType(SourceType.JUNGGO)
 			.pid(convertSimplePid(link, "product/"))
@@ -111,7 +106,7 @@ public class Product extends BaseTimeEntity {
 			.link(link)
 			.price(convertPrice(price))
 			.imgSrc(imgSrc)
-			.address(address)
+			.region(region)
 			.uploadDate(changeLocalDate(convertToTimeFormat(uploadTime)))
 			.build();
 	}
@@ -128,7 +123,7 @@ public class Product extends BaseTimeEntity {
 			.build();
 	}
 
-	public static Product createCarrot(String title, String price, String region, String link, String imgSrc, String content) {
+	public static Product createCarrot(String title, String price, String region, String link, String imgSrc, String content, String uploadTime) {
 		return Product.builder()
 			.sourceType(SourceType.CARROT)
 			.pid(convertSimplePid(link, "/"))
@@ -138,6 +133,7 @@ public class Product extends BaseTimeEntity {
 			.link(link)
 			.imgSrc(imgSrc)
 			.content(content)
+			.uploadDate(changeLocalDate(convertToTimeFormat(uploadTime)))
 			.build();
 	}
 

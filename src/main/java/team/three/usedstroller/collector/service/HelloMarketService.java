@@ -1,5 +1,7 @@
 package team.three.usedstroller.collector.service;
 
+import static team.three.usedstroller.collector.validation.PidDuplicationValidator.isNotExistPid;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
@@ -69,7 +71,9 @@ public class HelloMarketService {
 //			uploadTime = element.findElement(By.xpath(".//div[contains(@class, 'Item__TimeTag')]")).getText();
 
 			Product product = Product.createHelloMarket(title, link, price, img, uploadTime);
-			items.add(product);
+			if (isNotExistPid(productRepository, product)) {
+				items.add(product);
+			}
 		}
 
 		productRepository.saveAll(items);

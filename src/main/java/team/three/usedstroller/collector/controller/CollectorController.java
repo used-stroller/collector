@@ -32,7 +32,7 @@ public class CollectorController {
 
 	/**
 	 * 번개장터 '유모차' 검색 결과를 수집한다.
-	 * @runningTime 3분 32초 (3207건)
+	 * @runningTime 약 37분 (약 3200건)
 	 */
 	@PostMapping("/bunjang")
 	@ResponseStatus(HttpStatus.OK)
@@ -91,7 +91,7 @@ public class CollectorController {
 	 * 더보기 검색 수집은 100 페이지까지만 가능하다. 101 페이지부터 빈 페이지를 응답받는다.
 	 * "https://www.daangn.com/search/%EC%9C%A0%EB%AA%A8%EC%B0%A8/more/flea_market?page="
 	 * @param startPage 시작 페이지
-	 * @runningTime 1분 14초 (약 1200건)
+	 * @runningTime 약 6분 (약 1000건)
 	 */
 	@PostMapping("/carrot-market")
 	@ResponseStatus(HttpStatus.CREATED)
@@ -121,7 +121,7 @@ public class CollectorController {
 	@ResponseStatus(HttpStatus.CREATED)
 	public void naverShopping(
 			@RequestParam(required = true) Integer startPage,
-			@RequestParam(required = true) Integer endPage) {
+			@RequestParam(required = false, defaultValue = "200") Integer endPage) {
 
 		log.info("naver shopping collector start");
 		StopWatch stopWatch = new StopWatch();

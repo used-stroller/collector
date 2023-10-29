@@ -1,5 +1,11 @@
 package team.three.usedstroller.collector.service;
 
+import static io.netty.util.internal.StringUtil.EMPTY_STRING;
+import static team.three.usedstroller.collector.validation.PidDuplicationValidator.isExistPid;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
@@ -12,13 +18,8 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 import team.three.usedstroller.collector.config.ChromiumDriver;
 import team.three.usedstroller.collector.domain.Product;
+import team.three.usedstroller.collector.domain.SourceType;
 import team.three.usedstroller.collector.repository.ProductRepository;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static io.netty.util.internal.StringUtil.EMPTY_STRING;
 
 @Service
 @Slf4j
@@ -54,13 +55,11 @@ public class NaverService {
 				List<WebElement> products = getProducts();
 				int size = saveNaverShopping(products);
 				log.info("naver shopping page: [{}], saved item: [{}]", page, size);
-				if (size != 0) {
-					if (page == endPage || !getNextPage()) {
-						break;
-					}
-					page++;
-					driver.wait(2000);
+				if (page == endPage || !getNextPage()) {
+					break;
 				}
+				page++;
+				driver.wait(2000);
 			}
 
 		} catch (Exception e) {
@@ -90,6 +89,9 @@ public class NaverService {
 
 		for (WebElement el : list) {
 			pid = el.findElement(By.xpath(".//a[contains(@class, 'thumbnail_thumb')]")).getAttribute("data-i");
+			if (isExistPid(productRepository, pid, SourceType.NAVER)) {
+				continue;
+			}
 			link = el.findElement(By.xpath(".//a[contains(@class, 'thumbnail_thumb')]")).getAttribute("href");
 
 			try {
