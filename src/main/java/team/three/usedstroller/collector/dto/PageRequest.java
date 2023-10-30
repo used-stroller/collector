@@ -1,5 +1,7 @@
 package team.three.usedstroller.collector.dto;
 
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -49,9 +51,13 @@ public final class PageRequest {
     }
 
     String[] split = sort.split(",");
-    if (split.length == 2) {
-      Order order = new Order(Direction.fromString(split[1].trim()), split[0]);
-      return Sort.by(order);
+    if (split.length >= 2) {
+      List<Order> orders = new ArrayList<>();
+      for (int i = 0; i < split.length; i = i+2) {
+        orders.add(new Order(Direction.fromString(split[i+1].trim()), split[i]));
+      }
+
+      return Sort.by(orders);
     }
 
     return Sort.unsorted();

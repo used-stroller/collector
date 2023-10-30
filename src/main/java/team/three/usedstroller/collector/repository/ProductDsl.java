@@ -9,7 +9,7 @@ import team.three.usedstroller.collector.dto.FilterReq;
 
 public class ProductDsl<T> {
 
-  private JPAQuery<T> jpaQuery;
+  private final JPAQuery<T> jpaQuery;
 
   public ProductDsl(JPAQuery<T> jpaQuery, FilterReq filter) {
     this.jpaQuery = jpaQuery
@@ -19,6 +19,17 @@ public class ProductDsl<T> {
     applySourceType(filter.getSourceType());
     applyTown(filter.getTown());
     applyPriceRange(filter.getMinPrice(), filter.getMaxPrice());
+    applyPriceRange(filter.getMinPrice(), filter.getMaxPrice());
+  }
+
+  private void applyPriceRange(Long minPrice, Long maxPrice) {
+    if (minPrice != null && maxPrice != null) {
+      jpaQuery.where(product.price.between(minPrice, maxPrice));
+    } else if (minPrice != null) {
+      jpaQuery.where(product.price.goe(minPrice));
+    } else if (maxPrice != null) {
+      jpaQuery.where(product.price.loe(maxPrice));
+    }
   }
 
   private void applySourceType(SourceType sourceType) {

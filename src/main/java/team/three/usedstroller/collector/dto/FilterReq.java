@@ -1,6 +1,5 @@
 package team.three.usedstroller.collector.dto;
 
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,12 +12,7 @@ import team.three.usedstroller.collector.domain.SourceType;
 public class FilterReq {
 
   private String keyword;
-  private String town;
-  private Integer price;
-  private List<String> model;
-  private String period;
-  private List<String> brand;
   private SourceType sourceType;
-  private Integer minPrice;
-  private Integer maxPrice;
+  private Long minPrice;
+  private Long maxPrice;
 }
