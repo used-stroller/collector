@@ -53,3 +53,12 @@ tasks.named('test') {
 jar {
     enabled = false
 }
+
+bootJar {
+    destinationDirectory = file("../docker-setting/jar-path")
+}
+
+clean {
+    delete file('src/main/generated')
+    delete file('../docker-setting/jar-path/used-stroller-0.0.1-SNAPSHOT.jar')
+}
