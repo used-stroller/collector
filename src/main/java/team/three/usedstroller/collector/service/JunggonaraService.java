@@ -1,10 +1,5 @@
 package team.three.usedstroller.collector.service;
 
-import static io.netty.util.internal.StringUtil.EMPTY_STRING;
-import static team.three.usedstroller.collector.validation.PidDuplicationValidator.isNotExistPid;
-
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
@@ -15,6 +10,11 @@ import org.springframework.util.ObjectUtils;
 import team.three.usedstroller.collector.config.ChromiumDriver;
 import team.three.usedstroller.collector.domain.Product;
 import team.three.usedstroller.collector.repository.ProductRepository;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static io.netty.util.internal.StringUtil.EMPTY_STRING;
 
 @Service
 @Slf4j
@@ -77,9 +77,7 @@ public class JunggonaraService {
 					.orElseGet(() -> EMPTY_STRING);
 
 			Product product = Product.createJunggo(title, link, price, img, address, uploadTime);
-			if (isNotExistPid(productRepository, product)) {
-				items.add(product);
-			}
+			items.add(product);
 		}
 
 		productRepository.saveAll(items);

@@ -52,23 +52,12 @@ class CarrotTest {
 					String price = element.select("p.article-price").text();
 					String imgSrc = element.select("div.card-photo > img").attr("src");
 					String link = element.select("a.flea-market-article-link").attr("href");
-					Document detailDoc = null;
-					String uploadTime = "";
-					try {
-						detailDoc = Jsoup.connect("https://www.daangn.com" + link).get();
-						Element time = detailDoc.getElementsByTag("time").stream().findFirst()
-								.orElseGet(() -> null);
-						uploadTime = ObjectUtils.isEmpty(time) ? "" : time.text().replace("끌올", "");
-					} catch (IOException e) {
-						throw new RuntimeException("당근마켓 상세정보 가져오기 실패");
-					}
-					Product product = Product.createCarrot(title, price, region, link, imgSrc, content, uploadTime);
+					Product product = Product.createCarrot(title, content, region, price, imgSrc, link);
 					list.add(product);
 				});
 
 		//then
 		Assertions.assertThat(list).isNotNull().isNotEmpty();
 		Assertions.assertThat(list).hasSize(12);
-		System.out.println("list = " + list);
 	}
 }

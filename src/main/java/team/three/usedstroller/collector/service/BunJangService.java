@@ -1,10 +1,5 @@
 package team.three.usedstroller.collector.service;
 
-import static io.netty.util.internal.StringUtil.EMPTY_STRING;
-import static team.three.usedstroller.collector.validation.PidDuplicationValidator.isNotExistPid;
-
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
@@ -15,6 +10,11 @@ import org.springframework.util.ObjectUtils;
 import team.three.usedstroller.collector.config.ChromiumDriver;
 import team.three.usedstroller.collector.domain.Product;
 import team.three.usedstroller.collector.repository.ProductRepository;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static io.netty.util.internal.StringUtil.EMPTY_STRING;
 
 @Service
 @Slf4j
@@ -55,7 +55,7 @@ public class BunJangService {
 		String price;
 		String title;
 		String link;
-		String region;
+		String address;
 		String uploadTime;
 
 		for (WebElement element : list) {
@@ -73,17 +73,14 @@ public class BunJangService {
 			link = element.findElement(By.xpath("a")).getAttribute("href");
 			price = element.findElement(By.xpath("a/div[2]/div[2]/div[1]")).getText();
 			img = element.findElement(By.xpath("a/div[1]/img")).getAttribute("src");
-			region = element.findElements(By.xpath("a/div[3]"))
+			address = element.findElements(By.xpath("a/div[3]"))
 					.stream()
 					.findFirst()
 					.map(WebElement::getText)
 					.orElseGet(() -> EMPTY_STRING);
 
-			Product product = Product.createBunJang(title, link, price, img, region, uploadTime);
-
-			if (isNotExistPid(productRepository, product)) {
-				items.add(product);
-			}
+			Product product = Product.createBunJang(title, link, price, img, address, uploadTime);
+			items.add(product);
 		}
 
 		productRepository.saveAll(items);
