@@ -79,7 +79,7 @@ public class CollectorController {
   @PostMapping("/hello-market")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public int hello() throws JSONException {
+  public int hello() throws JSONException, InterruptedException {
     StopWatch stopWatch = new StopWatch();
     stopWatch.start();
     int count = helloMarketService.collectingHelloMarket();

@@ -15,4 +15,5 @@ public class FilterReq {
   private SourceType sourceType;
   private Long minPrice;
   private Long maxPrice;
+  private String town;
 }
