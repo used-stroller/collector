@@ -1,5 +1,7 @@
 package team.three.usedstroller.collector.service;
 
+import static team.three.usedstroller.collector.validation.PidDuplicationValidator.isNotExistPid;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,6 +18,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 import team.three.usedstroller.collector.config.ChromiumDriver;
 import team.three.usedstroller.collector.domain.Product;
 import team.three.usedstroller.collector.repository.ProductRepository;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Slf4j

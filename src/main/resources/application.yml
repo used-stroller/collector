@@ -1,17 +1,22 @@
 server:
-  port: 8090
+  port: 8080
 
 spring:
   application:
     name: used-stroller
+  datasource:
+    url: jdbc:postgresql://${db.hostname}:${db.port}/${db.name}
+    username: ${db.username}
+    password: ${db.password}
+    driver-class-name: org.postgresql.Driver
 
 #  mvc:
 #    pathmatch:
 #      matching-strategy: ant_path_matcher
   jpa:
     hibernate:
-      ddl-auto: update
-    show-sql: true
+      ddl-auto: none
+    show-sql: false
     open-in-view: false
     properties:
       hibernate:
