@@ -3,6 +3,7 @@ package team.three.usedstroller.collector.controller;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONException;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -69,22 +70,23 @@ public class CollectorController {
 		return count;
 	}
 
-	/**
-	 * 헬로마켓 '유모차' 검색 결과를 수집한다.
-	 * @runningTime 42초 (약 571건)
-	 */
-	@PostMapping("/hello-market")
-	@ResponseStatus(HttpStatus.OK)
-	@ResponseBody
-	public int hello() {
-		StopWatch stopWatch = new StopWatch();
-		stopWatch.start();
-		int count = helloMarketService.collectingHelloMarket();
-		stopWatch.stop();
-		log.info("total running time: {} s", stopWatch.getTotalTimeSeconds());
-		log.info("hello market complete : [{}]", count);
-		return count;
-	}
+  /**
+   * 헬로마켓 '유모차' 검색 결과를 수집한다.
+   *
+   * @runningTime 42초 (약 571건)
+   */
+  @PostMapping("/hello-market")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public int hello() throws JSONException, InterruptedException {
+    StopWatch stopWatch = new StopWatch();
+    stopWatch.start();
+    int count = helloMarketService.collectingHelloMarket();
+    stopWatch.stop();
+    log.info("total running time: {} s", stopWatch.getTotalTimeSeconds());
+    log.info("hello market complete : [{}]", count);
+    return count;
+  }
 
 	/**
 	 * 당근마켓 '유모차' 검색 결과를 수집한다.

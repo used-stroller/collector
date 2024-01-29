@@ -26,6 +26,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+//    developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
     // crawling - jsoup
     implementation 'org.jsoup:jsoup:1.16.1'
@@ -33,7 +34,11 @@ dependencies {
     implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '4.14.1'
 
     //db
+    runtimeOnly 'com.h2database:h2'
     implementation 'org.postgresql:postgresql'
+
+    //TODO 배포시 제거 필요(jpa sql 보는 용도. 개발시에만 사용)
+//    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.8.0'
 
     //swagger address : {ip:port}/swagger-ui/index.html
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
@@ -44,6 +49,19 @@ dependencies {
 
     //test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    //queryDsl
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor 'com.querydsl:querydsl-apt:5.0.0:jakarta'
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
+    //webclient
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    //starter-web
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '3.1.0'
+    //json 라이브러리
+    implementation group: 'org.json', name: 'json', version: '20090211'
 }
 
 tasks.named('test') {

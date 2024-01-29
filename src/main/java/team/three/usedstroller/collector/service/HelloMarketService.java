@@ -2,15 +2,19 @@ package team.three.usedstroller.collector.service;
 
 import static team.three.usedstroller.collector.validation.PidDuplicationValidator.isNotExistPid;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebElement;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
+import org.springframework.web.reactive.function.client.WebClient;
 import team.three.usedstroller.collector.config.ChromiumDriver;
 import team.three.usedstroller.collector.domain.Product;
 import team.three.usedstroller.collector.repository.ProductRepository;
@@ -23,77 +27,85 @@ import java.util.List;
 @RequiredArgsConstructor
 public class HelloMarketService {
 
-	private final ChromiumDriver driver;
-	private final ProductRepository productRepository;
+  private final ChromiumDriver driver;
+  private final ProductRepository productRepository;
 
-	public int collectingHelloMarket() {
-		int complete = 0;
-		String url = "https://www.hellomarket.com/search?q=%EC%9C%A0%EB%AA%A8%EC%B0%A8";
-		driver.open(url);
-		scrollToTheBottom();
-		List<WebElement> list = driver.findAllByXpath("//*[@id=\"__next\"]/div[3]/div[3]/div[2]/div/div/div");
-		if (ObjectUtils.isEmpty(list)) {
-			return complete;
-		}
+  public int collectingHelloMarket() throws JSONException, InterruptedException {
+    int complete = 0;
+    int i = 1;
+    String url = "https://hellomarket.com/api/search/items?q=유모차&page=" + i + "&limit=30";
+    int totalCount = getTotalCount(url);
+    int page = totalCount / 30;
 
-		int size = saveItems(list);
-		complete += size;
-		log.info("hello market saved item: {}", complete);
+    for (i = 1; i <= page; i++) {
+      complete += saveByPage(url);
+      Thread.sleep(1000);
+    }
+    log.info("hello market saved item: {}", complete);
+    return complete;
+  }
 
-		return complete;
-	}
+  private int getTotalCount(String url) throws JSONException {
+    String response = WebClient.create()
+        .get()
+        .uri(url)
+        .retrieve()
+        .bodyToMono(String.class)
+        .block();
 
-	@Transactional
-	public int saveItems(List<WebElement> list) {
-		List<Product> items = new ArrayList<>();
-		String img;
-		String price;
-		String title;
-		String link = "";
-		String uploadTime;
+    JSONObject jsonObject = new JSONObject(response);
+    String totalCount = jsonObject.getJSONObject("result").getString("totalCount");
+    int cnt = Integer.parseInt(totalCount);
+    return cnt;
+  }
 
-		for (WebElement element : list) {
-			WebElement textBox = element.findElement(By.xpath(".//div/div[2]"));
-			img = textBox.findElement(By.xpath(".//img")).getAttribute("src");
-			System.out.println("img = " + img);
+  private int saveByPage(String url) throws JSONException {
+    List<Product> productList = new ArrayList<>();
+    JSONObject obj;
 
-			System.out.println("element = " + element.getAttribute("class"));
-			System.out.println("element = " + element.getTagName());
-			System.out.println("element = " + element.getText());
-			price = textBox.findElement(By.xpath(".//div[2]")).getText();
-			title = textBox.findElement(By.xpath(".//div[3]")).getText();
-			uploadTime = textBox.findElement(By.xpath(".//div[4]")).getText();
-			if (uploadTime.contains("무료배송")) {
-				uploadTime = textBox.findElement(By.xpath(".//div[5]")).getText();
-			}
-//			link = element.findElement(By.xpath(".//a[1]")).getAttribute("href");
-//			img = element.findElement(By.xpath(".//div/div[1]/div[1]/img")).getAttribute("src");
-//			uploadTime = element.findElement(By.xpath(".//div[contains(@class, 'Item__TimeTag')]")).getText();
+    String response = callApi(url);
+    JSONObject jsonObject = new JSONObject(response);
+    JSONArray jsonArr = jsonObject.optJSONArray("list");
 
-			Product product = Product.createHelloMarket(title, link, price, img, uploadTime);
-			if (isNotExistPid(productRepository, product)) {
-				items.add(product);
-			}
-		}
+    for (int i = 0; i < jsonArr.length(); i++) {
+      obj = (JSONObject) jsonArr.opt(i);
+      Product product = covertJSONObjectToProduct(obj);
+      productList.add(product);
+    }
+    int complete = saveItems(productList);
 
-		productRepository.saveAll(items);
-		return items.size();
-	}
+    return complete;
+  }
 
-	private void scrollToTheBottom() {
-		JavascriptExecutor js = (JavascriptExecutor) driver.driver;
+  private static String callApi(String url) {
+    String response = WebClient.create()
+        .get()
+        .uri(url)
+        .retrieve()
+        .bodyToMono(String.class)
+        .block();
+    return response;
+  }
 
-		long scrollHeight = 0;
-		long afterHeight = 1;
+  private Product covertJSONObjectToProduct(JSONObject element) throws JSONException {
+    String pid = element.getString("itemIdx");
+    String title = element.getString("title");
+    String price = element.getString("price");
+    String link =
+        "https://www.hellomarket.com/item/" + pid;
+    String img = element.getString("imageUrl");
+    String timestamp = element.getString("timestamp"); //LocalDateTime으로변환필요
 
-		while (scrollHeight != afterHeight) {
-			scrollHeight = (long) js.executeScript("return document.body.scrollHeight"); //현재높이
-			WebElement body = driver.findOneByTag("body");
-			body.sendKeys(Keys.END);
-			driver.wait(2000);
-			afterHeight = (long) js.executeScript("return document.body.scrollHeight");
-		}
-	}
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA);
+    Date date = new Date(Long.parseLong(timestamp));
+    String uploadTime = sdf.format(date);
 
+    return Product.createHelloMarket(pid, title, link, price, img, uploadTime);
+  }
 
+  @Transactional
+  public int saveItems(List<Product> list) {
+    productRepository.saveAll(list);
+    return list.size();
+  }
 }

@@ -111,17 +111,18 @@ public class Product extends BaseTimeEntity {
 			.build();
 	}
 
-	public static Product createHelloMarket(String title, String link, String price, String imgSrc, String uploadTime) {
-		return Product.builder()
-			.sourceType(SourceType.HELLO)
-			.pid(convertPid(link, "item/"))
-			.title(title)
-			.link(link)
-			.price(convertPrice(price))
-			.imgSrc(imgSrc)
-			.uploadDate(changeLocalDate(convertToTimeFormat(uploadTime)))
-			.build();
-	}
+  public static Product createHelloMarket(String pid, String title, String link, String price,
+      String imgSrc, String uploadTime) {
+    return Product.builder()
+        .sourceType(SourceType.HELLO)
+        .pid(pid)
+        .title(title)
+        .link(link)
+        .price(convertPrice(price))
+        .imgSrc(imgSrc)
+        .uploadDate(changeLocalDate(uploadTime))
+        .build();
+  }
 
 	public static Product createCarrot(String title, String price, String region, String link, String imgSrc, String content, String uploadTime) {
 		return Product.builder()
