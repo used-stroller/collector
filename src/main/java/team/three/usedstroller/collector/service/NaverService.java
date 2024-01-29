@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.C;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
@@ -32,8 +33,8 @@ public class NaverService {
 			.scheme("https")
 			.host("search.shopping.naver.com")
 			.path("/search/all")
-			.queryParam("brand", "27112%20215978%2029436%20215480%2026213%20219842%2028497%2013770%20236955%20151538%20242564%2028546")
-			.queryParam("frm", "NVSHBRD")
+			.queryParam("brand", "27112%20215978%20215480%2029436%2013770%2026213%20236955%20219842%20242564%2028546%2028497%20151538%20134696%20212765%20148890%20242729%20240016")
+			.queryParam("frm", "NVSHATC")
 			.queryParam("origQuery", "%EC%9C%A0%EB%AA%A8%EC%B0%A8")
 			.queryParam("pagingSize", "40")
 			.queryParam("productSet", "total")
