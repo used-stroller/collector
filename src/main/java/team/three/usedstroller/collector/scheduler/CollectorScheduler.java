@@ -42,7 +42,7 @@ public class CollectorScheduler {
     log.info("carrot scheduler start");
     StopWatch stopWatch = new StopWatch();
     stopWatch.start();
-    String result = carrotService.collectingCarrotMarket(1);
+    String result = carrotService.collectingCarrotMarket(1, 100);
     stopWatch.stop();
     log.info("carrot running time: {} s", stopWatch.getTotalTimeSeconds());
     log.info(result);

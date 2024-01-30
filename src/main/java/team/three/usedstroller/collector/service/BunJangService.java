@@ -24,6 +24,10 @@ public class BunJangService {
 	private final ChromiumDriver driver;
 	private final ProductRepository productRepository;
 
+	/**
+	 * TODO: 크롤링에서 api 호출로 변경해야됨
+	 * api url: https://api.bunjang.co.kr/api/1/find_v2.json?q=%EC%9C%A0%EB%AA%A8%EC%B0%A8&page=0&n=200
+	 */
 	public int collectingBunJang() {
 		int complete = 0;
 		int pageTotal = getTotalPageBunJang();

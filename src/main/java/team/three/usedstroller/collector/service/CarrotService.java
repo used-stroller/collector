@@ -28,13 +28,10 @@ public class CarrotService {
 			.scheme("https")
 			.host("www.daangn.com")
 			.path("/search/%EC%9C%A0%EB%AA%A8%EC%B0%A8/more/flea_market")
-			.queryParam("page", "")
+			.queryParam("next_page", "")
 			.build().toUriString();
 
-	public String collectingCarrotMarket(Integer startPage) {
-		int endPage = getTotalPages();
-		log.info("carrot market total page: {}", endPage);
-
+	public String collectingCarrotMarket(Integer startPage, Integer endPage) {
 		for (int page = startPage; page <= endPage; page++) {
 			try {
 				List<Product> carrots = crawlingCarrotPage(url + page);
@@ -86,6 +83,7 @@ public class CarrotService {
 		return items;
 	}
 
+	// 2024-01-30 전체페이지 수 없어짐
 	private int getTotalPages() {
 		String url = "https://www.daangn.com/search/%EC%9C%A0%EB%AA%A8%EC%B0%A8/";
 		Document document = null;

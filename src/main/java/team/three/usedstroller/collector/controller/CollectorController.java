@@ -37,14 +37,12 @@ public class CollectorController {
 	 */
 	@PostMapping("/bunjang")
 	@ResponseStatus(HttpStatus.OK)
-	@ResponseBody
 	public int bunjang() {
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
 		int count = bunJangService.collectingBunJang();
 		stopWatch.stop();
-		log.info("total running time: {} s", stopWatch.getTotalTimeSeconds());
-		log.info("bunjang complete : [{}]", count);
+		log.info("번개장터 완료: {}건, 수집 시간: {}s", count, stopWatch.getTotalTimeSeconds());
 		return count;
 	}
 
@@ -57,7 +55,6 @@ public class CollectorController {
 	 */
 	@PostMapping("/junggonara")
 	@ResponseStatus(HttpStatus.OK)
-	@ResponseBody
 	public int junggonara(
 			@RequestParam(required = true) Integer startPage,
 			@RequestParam(required = true) Integer endPage) {
@@ -65,26 +62,22 @@ public class CollectorController {
 		stopWatch.start();
 		int count = junggonaraService.collectingJunggonara(startPage, endPage);
 		stopWatch.stop();
-		log.info("total running time: {} s", stopWatch.getTotalTimeSeconds());
-		log.info("junggonara complete : [{}]", count);
+		log.info("중고나라 완료: {}건, 수집 시간: {}s", count, stopWatch.getTotalTimeSeconds());
 		return count;
 	}
 
   /**
    * 헬로마켓 '유모차' 검색 결과를 수집한다.
-   *
    * @runningTime 42초 (약 571건)
    */
   @PostMapping("/hello-market")
   @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
   public int hello() throws JSONException, InterruptedException {
     StopWatch stopWatch = new StopWatch();
     stopWatch.start();
     int count = helloMarketService.collectingHelloMarket();
     stopWatch.stop();
-    log.info("total running time: {} s", stopWatch.getTotalTimeSeconds());
-    log.info("hello market complete : [{}]", count);
+		log.info("헬로마켓 완료: {}건, 수집 시간: {}s", count, stopWatch.getTotalTimeSeconds());
     return count;
   }
 
@@ -97,15 +90,16 @@ public class CollectorController {
 	 */
 	@PostMapping("/carrot-market")
 	@ResponseStatus(HttpStatus.CREATED)
-	public void carrotMarket(@RequestParam(required = true) Integer startPage) {
+	public void carrotMarket(
+			@RequestParam(required = true) Integer startPage,
+			@RequestParam(required = true, defaultValue = "100") Integer endPage) {
 
 		log.info("carrot market collector start");
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
-		String result = carrotService.collectingCarrotMarket(startPage);
+		String result = carrotService.collectingCarrotMarket(startPage, endPage);
 		stopWatch.stop();
-		log.info("total running time: {} s", stopWatch.getTotalTimeSeconds());
-		log.info(result);
+		log.info("당근마켓 완료: {}, 수집 시간: {}s", result, stopWatch.getTotalTimeSeconds());
 	}
 
 	/**
@@ -130,8 +124,7 @@ public class CollectorController {
 		stopWatch.start();
 		String result = naverService.collectingNaverShopping(startPage, endPage);
 		stopWatch.stop();
-		log.info("total running time: {} s", stopWatch.getTotalTimeSeconds());
-		log.info(result);
+		log.info("네이버쇼핑 완료: {}, 수집 시간: {}s", result, stopWatch.getTotalTimeSeconds());
 	}
 
 }

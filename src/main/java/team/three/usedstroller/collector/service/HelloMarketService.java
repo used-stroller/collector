@@ -27,7 +27,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class HelloMarketService {
 
-  private final ChromiumDriver driver;
   private final ProductRepository productRepository;
 
   public int collectingHelloMarket() throws JSONException, InterruptedException {
@@ -78,13 +77,12 @@ public class HelloMarketService {
   }
 
   private static String callApi(String url) {
-    String response = WebClient.create()
+    return WebClient.create()
         .get()
         .uri(url)
         .retrieve()
         .bodyToMono(String.class)
         .block();
-    return response;
   }
 
   private Product covertJSONObjectToProduct(JSONObject element) throws JSONException {
