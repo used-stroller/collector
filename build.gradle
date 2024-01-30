@@ -58,8 +58,6 @@ dependencies {
 
     //webclient
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    //starter-web
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '3.1.0'
     //json 라이브러리
     implementation group: 'org.json', name: 'json', version: '20090211'
 }
