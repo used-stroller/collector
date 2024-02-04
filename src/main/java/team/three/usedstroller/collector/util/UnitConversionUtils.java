@@ -1,5 +1,7 @@
 package team.three.usedstroller.collector.util;
 
+import java.time.Instant;
+import java.time.ZoneId;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.util.ObjectUtils;
@@ -15,13 +17,8 @@ public class UnitConversionUtils {
 
 	private static final String NOT_NUMBER = "\\D";
 
-	public static String convertPid(String link, String str) {
-		if (!link.contains(str)) {
-			return "";
-		}
-		int start = link.indexOf(str) + str.length();
-		int end = link.indexOf("?");
-		return link.substring(start, end);
+	public static String convertLink(String pid) {
+		return "https://m.bunjang.co.kr/products/" + pid;
 	}
 
 	public static String convertSimplePid(String link, String str) {
@@ -51,6 +48,12 @@ public class UnitConversionUtils {
 	public static int changeInt(String releaseYear) {
 		return ObjectUtils.isEmpty(releaseYear) ? 0 :
 				Integer.parseInt(releaseYear.replaceAll(NOT_NUMBER, ""));
+	}
+
+	public static LocalDate convertLocalDate(Long updateTime) {
+		return Instant.ofEpochSecond(updateTime)
+				.atZone(ZoneId.systemDefault())
+				.toLocalDate();
 	}
 
 	public static LocalDate changeLocalDate(String uploadDate) {

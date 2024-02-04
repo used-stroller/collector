@@ -1,15 +1,27 @@
 package team.three.usedstroller.collector;
 
+import java.time.Instant;
+import java.time.ZoneId;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters.LocalDateConverter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class UnitTest {
+
+	@Test
+	void convert_date() {
+		long timeStamp = 1706951909L;
+		LocalDate date = Instant.ofEpochSecond(timeStamp)
+				.atZone(ZoneId.systemDefault())
+				.toLocalDate();
+		System.out.println("date = " + date);
+	}
 
 	@Test
 	void year_month_parse() {

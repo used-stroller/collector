@@ -33,17 +33,19 @@ public class CollectorController {
 
 	/**
 	 * 번개장터 '유모차' 검색 결과를 수집한다.
-	 * @runningTime 약 37분 (약 3200건)
+	 * @runningTime 5초 (약 2800건)
 	 */
 	@PostMapping("/bunjang")
 	@ResponseStatus(HttpStatus.OK)
-	public int bunjang() {
+	public void bunjang() {
 		StopWatch stopWatch = new StopWatch();
-		stopWatch.start();
-		int count = bunJangService.collectingBunJang();
-		stopWatch.stop();
-		log.info("번개장터 완료: {}건, 수집 시간: {}s", count, stopWatch.getTotalTimeSeconds());
-		return count;
+		bunJangService.collectingBunJang()
+				.doOnSubscribe(subscription -> stopWatch.start())
+				.doOnSuccess(count -> {
+					stopWatch.stop();
+					log.info("번개장터 완료: {}건, 수집 시간: {}s", count, stopWatch.getTotalTimeSeconds());
+				})
+				.subscribe();
 	}
 
 	/**

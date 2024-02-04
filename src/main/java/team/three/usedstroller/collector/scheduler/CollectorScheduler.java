@@ -55,11 +55,13 @@ public class CollectorScheduler {
   public void bunjang() {
     log.info("bunjang scheduler start");
     StopWatch stopWatch = new StopWatch();
-    stopWatch.start();
-    int count = bunJangService.collectingBunJang();
-    stopWatch.stop();
-    log.info("bunjang running time: {} s", stopWatch.getTotalTimeSeconds());
-    log.info("bunjang complete : [{}]", count);
+    bunJangService.collectingBunJang()
+        .doOnSubscribe(subscription -> stopWatch.start())
+        .doOnSuccess(count -> {
+          stopWatch.stop();
+          log.info("번개장터 완료: {}건, 수집 시간: {}s", count, stopWatch.getTotalTimeSeconds());
+        })
+        .subscribe();
   }
 
   /**

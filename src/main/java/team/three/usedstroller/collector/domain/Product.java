@@ -2,7 +2,8 @@ package team.three.usedstroller.collector.domain;
 
 import static team.three.usedstroller.collector.util.UnitConversionUtils.changeInt;
 import static team.three.usedstroller.collector.util.UnitConversionUtils.changeLocalDate;
-import static team.three.usedstroller.collector.util.UnitConversionUtils.convertPid;
+import static team.three.usedstroller.collector.util.UnitConversionUtils.convertLink;
+import static team.three.usedstroller.collector.util.UnitConversionUtils.convertLocalDate;
 import static team.three.usedstroller.collector.util.UnitConversionUtils.convertPrice;
 import static team.three.usedstroller.collector.util.UnitConversionUtils.convertSimplePid;
 import static team.three.usedstroller.collector.util.UnitConversionUtils.convertToTimeFormat;
@@ -21,6 +22,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import team.three.usedstroller.collector.service.dto.BunjangItem;
 
 @Entity
 @Getter
@@ -85,16 +87,17 @@ public class Product extends BaseTimeEntity {
 			.build();
 	}
 
-	public static Product createBunJang(String title, String link, String price, String imgSrc, String region, String uploadTime) {
+	public static Product createBunJang(BunjangItem item) {
 		return Product.builder()
 			.sourceType(SourceType.BUNJANG)
-			.pid(convertPid(link, "products/"))
-			.title(title)
-			.link(link)
-			.price(convertPrice(price))
-			.imgSrc(imgSrc)
-			.region(region)
-			.uploadDate(changeLocalDate(convertToTimeFormat(uploadTime)))
+			.pid(item.getPid())
+			.title(item.getName())
+			.link(convertLink(item.getPid()))
+			.price(Long.parseLong(item.getPrice().replaceAll("[^0-9]", "")))
+			.imgSrc(item.getProductImage())
+			.region(item.getLocation())
+			.etc(item.getTag())
+			.uploadDate(convertLocalDate(item.getUpdateTime()))
 			.build();
 	}
 
