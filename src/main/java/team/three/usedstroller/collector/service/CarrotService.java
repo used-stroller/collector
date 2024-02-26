@@ -73,7 +73,7 @@ public class CarrotService {
 								.orElseGet(() -> null);
 						uploadTime = ObjectUtils.isEmpty(time) ? "" : time.text().replace("끌올", "");
 					} catch (IOException e) {
-						throw new RuntimeException("당근마켓 상세정보 가져오기 실패", e);
+						throw new IllegalArgumentException("당근마켓 상세정보 가져오기 실패", e);
 					}
 					Product product = Product.createCarrot(title, price, region, link, imgSrc, content, uploadTime);
 					if (isNotExistPid(productRepository, product)) {
@@ -83,16 +83,4 @@ public class CarrotService {
 		return items;
 	}
 
-	// 2024-01-30 전체페이지 수 없어짐
-	private int getTotalPages() {
-		String url = "https://www.daangn.com/search/%EC%9C%A0%EB%AA%A8%EC%B0%A8/";
-		Document document = null;
-		try {
-			document = Jsoup.connect(url).get();
-		} catch (IOException e) {
-			throw new RuntimeException("carrot market connect error", e);
-		}
-		Element more = document.select("div.more-btn").stream().findFirst().orElseGet(() -> null);
-		return ObjectUtils.isEmpty(more) ? 0 : Integer.parseInt(more.attr("data-total-pages"));
-	}
 }

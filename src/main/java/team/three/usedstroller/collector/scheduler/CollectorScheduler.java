@@ -30,17 +30,6 @@ public class CollectorScheduler {
   private final ProductRepository productRepository;
 
   @Scheduled(cron = "0 0 4 * * *", zone = "Asia/Seoul")
-  public void hellomarket() throws JSONException, InterruptedException {
-    log.info("hellomarket scheduler start");
-    StopWatch stopWatch = new StopWatch();
-    stopWatch.start();
-    int count = helloMarketService.collectingHelloMarket();
-    stopWatch.stop();
-    log.info("hellomarket running time: {} s", stopWatch.getTotalTimeSeconds());
-    log.info("hellomarket complete : [{}]", count);
-  }
-
-  @Scheduled(cron = "0 5 4 * * *", zone = "Asia/Seoul")
   public void bunjang() {
     log.info("bunjang scheduler start");
     StopWatch stopWatch = new StopWatch();
@@ -51,6 +40,17 @@ public class CollectorScheduler {
           log.info("번개장터 완료: {}건, 수집 시간: {}s", count, stopWatch.getTotalTimeSeconds());
         })
         .subscribe();
+  }
+
+  @Scheduled(cron = "0 3 4 * * *", zone = "Asia/Seoul")
+  public void hellomarket() throws JSONException, InterruptedException {
+    log.info("hellomarket scheduler start");
+    StopWatch stopWatch = new StopWatch();
+    stopWatch.start();
+    int count = helloMarketService.collectingHelloMarket();
+    stopWatch.stop();
+    log.info("hellomarket running time: {} s", stopWatch.getTotalTimeSeconds());
+    log.info("hellomarket complete : [{}]", count);
   }
 
   @Scheduled(cron = "0 10 4 * * *", zone = "Asia/Seoul")

@@ -28,21 +28,35 @@ public class UnitConversionUtils {
 		return link.substring(link.lastIndexOf(str) + str.length());
 	}
 
+	public static long convertPricePart(String pricePart) {
+		boolean isHundredMillion = pricePart.contains("억");
+		boolean isTenThousand = pricePart.contains("만");
+		boolean isThousand = pricePart.contains("천");
+		String numberPart = pricePart.replaceAll("\\D", "");
+		long number = Long.parseLong(numberPart);
+		if (isHundredMillion) {
+			return number * 100000000;
+		} else if (isTenThousand) {
+			return number * 10000;
+		} else if (isThousand) {
+			return number * 1000;
+		} else {
+			return number;
+		}
+	}
+
 	public static Long convertPrice(String price) {
 		String regex = "나눔|가격|연락|없음|중단";
 		Pattern pattern = Pattern.compile(regex);
 		if (ObjectUtils.isEmpty(price) || pattern.matcher(price).find()) {
 			return 0L;
-		} else {
-			if (price.contains("만원")) {
-				return Long.parseLong(price.replaceAll(NOT_NUMBER, "")) * 10000;
-			}
-			if (price.contains("억") || price.contains("억원")) {
-				return Long.parseLong(price.replaceAll(NOT_NUMBER, "")) * 100000000;
-			}
-			price = price.replaceAll("[,억만원]", "");
-			return Long.parseLong(price);
 		}
+		String[] priceParts = price.split("\\s+");
+		long total = 0;
+		for (String pricePart : priceParts) {
+			total += convertPricePart(pricePart);
+		}
+		return total;
 	}
 
 	public static int changeInt(String releaseYear) {
