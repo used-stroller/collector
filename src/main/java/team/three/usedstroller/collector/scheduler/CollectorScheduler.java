@@ -1,17 +1,22 @@
 package team.three.usedstroller.collector.scheduler;
 
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
+import team.three.usedstroller.collector.repository.ProductRepository;
 import team.three.usedstroller.collector.service.BunJangService;
 import team.three.usedstroller.collector.service.CarrotService;
 import team.three.usedstroller.collector.service.HelloMarketService;
 import team.three.usedstroller.collector.service.JunggonaraService;
 import team.three.usedstroller.collector.service.NaverService;
 
+/**
+ * 매일 새벽 4시마다 정해진 가견으로 실행
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -22,11 +27,9 @@ public class CollectorScheduler {
   private final JunggonaraService junggonaraService;
   private final NaverService naverService;
   private final CarrotService carrotService;
+  private final ProductRepository productRepository;
 
-  /**
-   * 매일 6시간마다 실행
-   */
-  @Scheduled(cron = "0 0 */6 * * *", zone = "Asia/Seoul")
+  @Scheduled(cron = "0 0 4 * * *", zone = "Asia/Seoul")
   public void hellomarket() throws JSONException, InterruptedException {
     log.info("hellomarket scheduler start");
     StopWatch stopWatch = new StopWatch();
@@ -37,21 +40,7 @@ public class CollectorScheduler {
     log.info("hellomarket complete : [{}]", count);
   }
 
-  @Scheduled(cron = "0 3 */6 * * *", zone = "Asia/Seoul")
-  public void carrot() {
-    log.info("carrot scheduler start");
-    StopWatch stopWatch = new StopWatch();
-    stopWatch.start();
-    String result = carrotService.collectingCarrotMarket(1, 100);
-    stopWatch.stop();
-    log.info("carrot running time: {} s", stopWatch.getTotalTimeSeconds());
-    log.info(result);
-  }
-
-  /**
-   * 매일 오전 6시, 오후 6시 6분에 실행한다.
-   */
-  @Scheduled(cron = "0 6 */6 * * *", zone = "Asia/Seoul")
+  @Scheduled(cron = "0 5 4 * * *", zone = "Asia/Seoul")
   public void bunjang() {
     log.info("bunjang scheduler start");
     StopWatch stopWatch = new StopWatch();
@@ -64,10 +53,19 @@ public class CollectorScheduler {
         .subscribe();
   }
 
-  /**
-   * 매일 오전 6시, 오후 6시 12분에 실행한다.
-   */
-  @Scheduled(cron = "0 12 */6 * * *", zone = "Asia/Seoul")
+  @Scheduled(cron = "0 10 4 * * *", zone = "Asia/Seoul")
+  public void carrot() {
+    log.info("carrot scheduler start");
+    StopWatch stopWatch = new StopWatch();
+    stopWatch.start();
+    String result = carrotService.collectingCarrotMarket(1, 100);
+    stopWatch.stop();
+    log.info("carrot running time: {} s", stopWatch.getTotalTimeSeconds());
+    log.info(result);
+  }
+
+
+  @Scheduled(cron = "0 30 4 * * *", zone = "Asia/Seoul")
   public void junggonara() {
     log.info("junggonara scheduler start");
     StopWatch stopWatch = new StopWatch();
@@ -78,10 +76,7 @@ public class CollectorScheduler {
     log.info("junggonara complete : [{}]", count);
   }
 
-  /**
-   * 매일 오전 6시, 오후 6시 22분에 실행한다.
-   */
-  @Scheduled(cron = "0 22 */6 * * *", zone = "Asia/Seoul")
+  @Scheduled(cron = "0 0 5 * * *", zone = "Asia/Seoul")
   public void naver() {
     log.info("naver scheduler start");
     StopWatch stopWatch = new StopWatch();
@@ -90,6 +85,16 @@ public class CollectorScheduler {
     stopWatch.stop();
     log.info("naver running time: {} s", stopWatch.getTotalTimeSeconds());
     log.info(result);
+  }
+
+  @Scheduled(cron = "0 0 6 * * *", zone = "Asia/Seoul")
+  public void clearOldData() {
+    log.info("clear start");
+    StopWatch stopWatch = new StopWatch();
+    stopWatch.start();
+    productRepository.deleteAllByCreatedAtIsBefore(LocalDateTime.now().minusDays(1));
+    stopWatch.stop();
+    log.info("clear running time: {} s", stopWatch.getTotalTimeSeconds());
   }
 
 }
