@@ -92,7 +92,7 @@ public class CollectorScheduler {
     log.info("clear start");
     StopWatch stopWatch = new StopWatch();
     stopWatch.start();
-    productRepository.deleteAllByCreatedAtIsBefore(LocalDateTime.now().minusDays(1));
+    productRepository.deleteAllByUpdatedAtIsBefore(LocalDateTime.now().minusDays(1));
     stopWatch.stop();
     log.info("clear running time: {} s", stopWatch.getTotalTimeSeconds());
   }
