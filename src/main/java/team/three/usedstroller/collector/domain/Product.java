@@ -17,6 +17,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -141,4 +142,45 @@ public class Product extends BaseTimeEntity {
 			.build();
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		Product product = (Product) o;
+		return releaseYear == product.releaseYear && sourceType == product.sourceType
+				&& Objects.equals(pid, product.pid) && Objects.equals(title, product.title)
+				&& Objects.equals(price, product.price) && Objects.equals(link, product.link)
+				&& Objects.equals(imgSrc, product.imgSrc) && Objects.equals(etc, product.etc)
+				&& Objects.equals(uploadDate, product.uploadDate)
+				&& Objects.equals(region, product.region) && Objects.equals(content, product.content);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(sourceType, pid, title, price, link, imgSrc, releaseYear, etc,
+				uploadDate, region, content);
+	}
+
+	public void update(Product newProduct) {
+		super.updateData(newProduct);
+		this.sourceType = newProduct.getSourceType();
+		this.pid = newProduct.getPid();
+		this.title = newProduct.getTitle();
+		this.link = newProduct.getLink();
+		this.price = newProduct.getPrice();
+		this.imgSrc = newProduct.getImgSrc();
+		this.releaseYear = newProduct.getReleaseYear();
+		this.etc = newProduct.getEtc();
+		this.uploadDate = newProduct.getUploadDate();
+		this.region = newProduct.getRegion();
+		this.content = newProduct.getContent();
+	}
+
+	public void updateDate() {
+		super.updateDate();
+	}
 }

@@ -40,7 +40,7 @@ collector:
     mac-arm-web-driver-path: libs/chromedriver-mac-arm64/chromedriver
     mac-download-path: /Users/yd/Downloads
     linux-web-driver-path: libs/chromedriver-linux64/chromedriver
-    linux-download-path: /home/yd/Downloads
+    linux-download-path: /home/team3/Downloads
 
 springdoc:
   swagger-ui:

@@ -21,4 +21,12 @@ public class BaseTimeEntity {
 
 	@LastModifiedDate
 	private LocalDateTime updatedAt;
+
+	protected void updateData(BaseTimeEntity data) {
+		this.updatedAt = data.getUpdatedAt();
+	}
+
+	protected void updateDate() {
+		this.updatedAt = LocalDateTime.now();
+	}
 }

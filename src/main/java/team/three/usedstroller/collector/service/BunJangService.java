@@ -1,25 +1,17 @@
 package team.three.usedstroller.collector.service;
 
-import static io.netty.util.internal.StringUtil.EMPTY_STRING;
-import static team.three.usedstroller.collector.validation.PidDuplicationValidator.isNotExistPid;
-
-import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
-import team.three.usedstroller.collector.config.ChromiumDriver;
 import team.three.usedstroller.collector.domain.Product;
+import team.three.usedstroller.collector.domain.SourceType;
 import team.three.usedstroller.collector.repository.ProductRepository;
 import team.three.usedstroller.collector.service.dto.BunjangApiResponse;
 import team.three.usedstroller.collector.service.dto.BunjangItem;
@@ -68,17 +60,27 @@ public class BunJangService {
 	}
 
 	public Mono<Integer> saveItemList(List<BunjangItem> list) {
-		List<Product> items = new ArrayList<>();
-
-		for (BunjangItem item : list) {
-			Product product = Product.createBunJang(item);
-			if (isNotExistPid(productRepository, product)) {
-				items.add(product);
-			}
-		}
-
-		productRepository.saveAll(items);
-		return Mono.just(items.size());
+		return Flux.fromIterable(list)
+			.publishOn(Schedulers.boundedElastic())
+			.flatMap(item -> {
+				Product newProduct = Product.createBunJang(item);
+				Optional<Product> dbProduct = productRepository.findByPidAndSourceType(
+						newProduct.getPid(), newProduct.getSourceType());
+				if (dbProduct.isPresent()) {
+					Product oldProduct = dbProduct.get();
+					boolean isEquals = oldProduct.equals(newProduct);
+					if (isEquals) {
+						oldProduct.updateDate();
+						productRepository.save(oldProduct);
+						return Mono.just(0);
+					}
+					oldProduct.update(newProduct);
+					productRepository.save(oldProduct);
+        } else {
+					productRepository.save(newProduct);
+        }
+        return Mono.just(1);
+      }).reduce(Integer::sum);
 	}
 
 	private Mono<Integer> getTotalPageBunJang() {
