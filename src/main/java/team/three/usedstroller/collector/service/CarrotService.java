@@ -1,29 +1,27 @@
 package team.three.usedstroller.collector.service;
 
-import static team.three.usedstroller.collector.validation.PidDuplicationValidator.isNotExistPid;
-
-import lombok.RequiredArgsConstructor;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 import team.three.usedstroller.collector.domain.Product;
 import team.three.usedstroller.collector.repository.ProductRepository;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 @Slf4j
 @Service
-@RequiredArgsConstructor
-public class CarrotService {
+public class CarrotService extends CommonService {
 
-	private final ProductRepository productRepository;
+	public CarrotService(ProductRepository productRepository) {
+		super(productRepository);
+	}
+
 	private final String url = UriComponentsBuilder.newInstance()
 			.scheme("https")
 			.host("www.daangn.com")
@@ -31,7 +29,9 @@ public class CarrotService {
 			.queryParam("next_page", "")
 			.build().toUriString();
 
-	public String collectingCarrotMarket(Integer startPage, Integer endPage) {
+	public Integer collectingCarrotMarket(Integer startPage, Integer endPage) {
+		AtomicInteger updateCount = new AtomicInteger(0);
+
 		for (int page = startPage; page <= endPage; page++) {
 			try {
 				List<Product> carrots = crawlingCarrotPage(url + page);
@@ -40,18 +40,17 @@ public class CarrotService {
 					endPage = page - 1;
 					break;
 				}
-				List<Product> result = saveCarrots(carrots);
-				log.info("carrot market page: [{}], saved item: [{}]", page, result.size());
+				int finalPage = page;
+				saveProducts(carrots)
+						.subscribe(count -> {
+							log.info("carrot market page: [{}], saved item: [{}]", finalPage, count);
+							updateCount.addAndGet(count);
+						});
 			} catch (Exception e) {
-				throw new RuntimeException("carrot market connect error", e);
+				throw new IllegalArgumentException("carrot market connect error", e);
 			}
 		}
-		return "carrot market collector complete. total page: " + endPage;
-	}
-
-	@Transactional
-	public List<Product> saveCarrots(List<Product> items) {
-		return productRepository.saveAll(items);
+		return updateCount.get();
 	}
 
 	private List<Product> crawlingCarrotPage(String url) throws IOException {
@@ -76,9 +75,7 @@ public class CarrotService {
 						throw new IllegalArgumentException("당근마켓 상세정보 가져오기 실패", e);
 					}
 					Product product = Product.createCarrot(title, price, region, link, imgSrc, content, uploadTime);
-					if (isNotExistPid(productRepository, product)) {
-						items.add(product);
-					}
+					items.add(product);
 				});
 		return items;
 	}

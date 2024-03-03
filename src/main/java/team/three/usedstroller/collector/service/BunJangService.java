@@ -1,8 +1,6 @@
 package team.three.usedstroller.collector.service;
 
 import java.util.List;
-import java.util.Optional;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
@@ -11,19 +9,22 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import team.three.usedstroller.collector.domain.Product;
-import team.three.usedstroller.collector.domain.SourceType;
 import team.three.usedstroller.collector.repository.ProductRepository;
 import team.three.usedstroller.collector.service.dto.BunjangApiResponse;
 import team.three.usedstroller.collector.service.dto.BunjangItem;
 import team.three.usedstroller.collector.util.ApiService;
 
-@Service
 @Slf4j
-@RequiredArgsConstructor
-public class BunJangService {
+@Service
+public class BunJangService extends CommonService {
 
-	private final ProductRepository productRepository;
 	private final ApiService apiService;
+
+	public BunJangService(ProductRepository productRepository, ApiService apiService) {
+		super(productRepository);
+		this.apiService = apiService;
+	}
+
 	ParameterizedTypeReference<BunjangApiResponse> typeReference = new ParameterizedTypeReference<>() {};
 
 	/**
@@ -38,7 +39,6 @@ public class BunJangService {
 				log.info("bunjang total page: {}", totalPage);
 
 				return Flux.range(0, totalPage)
-//						.delayElements(Duration.ofMillis(1000)) // 1초 간격으로 호출
 						.flatMap(page -> {
 							String url = "https://api.bunjang.co.kr/api/1/find_v2.json?q=%EC%9C%A0%EB%AA%A8%EC%B0%A8&n=200&page=" + page;
 
@@ -46,41 +46,21 @@ public class BunJangService {
 								.switchIfEmpty(Mono.defer(Mono::empty))
 								.onErrorResume(e -> Mono.error(new RuntimeException("bunjang api connect error", e)))
 								.publishOn(Schedulers.boundedElastic())
-								.flatMap(res -> {
-									return saveItemList(res.getList())
+								.flatMap(res -> saveItemList(res.getList())
 										.flatMap(count -> {
 											log.info("bunjang page: [{}], saved item: [{}]", page, count);
 											return Mono.just(count);
-										})
-										.onErrorResume(e -> Mono.error(new RuntimeException("bunjang save error", e)));
-								});
+										}));
 						})
-						.reduce(0, Integer::sum);
+						.reduce(Integer::sum);
 			});
 	}
 
 	public Mono<Integer> saveItemList(List<BunjangItem> list) {
 		return Flux.fromIterable(list)
-			.publishOn(Schedulers.boundedElastic())
-			.flatMap(item -> {
-				Product newProduct = Product.createBunJang(item);
-				Optional<Product> dbProduct = productRepository.findByPidAndSourceType(
-						newProduct.getPid(), newProduct.getSourceType());
-				if (dbProduct.isPresent()) {
-					Product oldProduct = dbProduct.get();
-					boolean isEquals = oldProduct.equals(newProduct);
-					if (isEquals) {
-						oldProduct.updateDate();
-						productRepository.save(oldProduct);
-						return Mono.just(0);
-					}
-					oldProduct.update(newProduct);
-					productRepository.save(oldProduct);
-        } else {
-					productRepository.save(newProduct);
-        }
-        return Mono.just(1);
-      }).reduce(Integer::sum);
+				.flatMap(Product::createBunJang)
+				.collectList()
+				.flatMap(this::saveProducts);
 	}
 
 	private Mono<Integer> getTotalPageBunJang() {

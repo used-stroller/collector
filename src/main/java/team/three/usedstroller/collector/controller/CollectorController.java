@@ -3,20 +3,18 @@ package team.three.usedstroller.collector.controller;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONException;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import team.three.usedstroller.collector.service.BunJangService;
 import team.three.usedstroller.collector.service.CarrotService;
-import team.three.usedstroller.collector.service.HelloMarketService;
 import team.three.usedstroller.collector.service.JunggonaraService;
 import team.three.usedstroller.collector.service.NaverService;
+import team.three.usedstroller.collector.service.SecondWearService;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,7 +25,7 @@ public class CollectorController {
 
 	private final NaverService naverService;
 	private final CarrotService carrotService;
-	private final HelloMarketService helloMarketService;
+	private final SecondWearService secondWearService;
 	private final BunJangService bunJangService;
 	private final JunggonaraService junggonaraService;
 
@@ -69,17 +67,17 @@ public class CollectorController {
 	}
 
   /**
-   * 헬로마켓 '유모차' 검색 결과를 수집한다.
+   * 세컨웨어(구 헬로마켓) '유모차' 검색 결과를 수집한다.
    * @runningTime 42초 (약 571건)
    */
-  @PostMapping("/hello-market")
+  @PostMapping("/secondwear")
   @ResponseStatus(HttpStatus.OK)
-  public int hello() throws JSONException, InterruptedException {
+  public int secondwear() {
     StopWatch stopWatch = new StopWatch();
     stopWatch.start();
-    int count = helloMarketService.collectingHelloMarket();
+    Integer count = secondWearService.collecting();
     stopWatch.stop();
-		log.info("헬로마켓 완료: {}건, 수집 시간: {}s", count, stopWatch.getTotalTimeSeconds());
+		log.info("세컨웨어 완료: {}건, 수집 시간: {}s", count, stopWatch.getTotalTimeSeconds());
     return count;
   }
 
@@ -99,9 +97,9 @@ public class CollectorController {
 		log.info("carrot market collector start");
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
-		String result = carrotService.collectingCarrotMarket(startPage, endPage);
+		Integer count = carrotService.collectingCarrotMarket(startPage, endPage);
 		stopWatch.stop();
-		log.info("당근마켓 완료: {}, 수집 시간: {}s", result, stopWatch.getTotalTimeSeconds());
+		log.info("댱근 완료: {}건, 수집 시간: {}s", count, stopWatch.getTotalTimeSeconds());
 	}
 
 	/**

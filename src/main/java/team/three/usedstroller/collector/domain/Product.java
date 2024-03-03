@@ -23,6 +23,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import reactor.core.publisher.Mono;
 import team.three.usedstroller.collector.service.dto.BunjangItem;
 
 @Entity
@@ -88,8 +89,8 @@ public class Product extends BaseTimeEntity {
 			.build();
 	}
 
-	public static Product createBunJang(BunjangItem item) {
-		return Product.builder()
+	public static Mono<Product> createBunJang(BunjangItem item) {
+		Product product = Product.builder()
 			.sourceType(SourceType.BUNJANG)
 			.pid(item.getPid())
 			.title(item.getName())
@@ -100,6 +101,7 @@ public class Product extends BaseTimeEntity {
 			.etc(item.getTag())
 			.uploadDate(convertLocalDate(item.getUpdateTime()))
 			.build();
+		return Mono.just(product);
 	}
 
 	public static Product createJunggo(String title, String link, String price, String imgSrc, String region, String uploadTime) {
@@ -118,7 +120,7 @@ public class Product extends BaseTimeEntity {
   public static Product createHelloMarket(String pid, String title, String link, String price,
       String imgSrc, String uploadTime) {
     return Product.builder()
-        .sourceType(SourceType.HELLO)
+        .sourceType(SourceType.SECOND)
         .pid(pid)
         .title(title)
         .link(link)
