@@ -8,18 +8,25 @@ import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
 import io.netty.resolver.DefaultAddressResolverGroup;
 import java.time.Duration;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import javax.net.ssl.SSLException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ClientHttpConnector;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 
+@Slf4j
 @Service
 public class ApiService {
 
@@ -72,6 +79,58 @@ public class ApiService {
         .retrieve()
         .bodyToMono(responseRef)
         .timeout(Duration.ofSeconds(300));
+  }
+
+  public <T> Mono<T> apiCallPost(String baseUrl, Object params,
+      ParameterizedTypeReference<T> responseRef, MediaType responseType) {
+
+    SslContext sslContext = null;
+
+    try {
+      sslContext = SslContextBuilder
+          .forClient()
+          .trustManager(InsecureTrustManagerFactory.INSTANCE)
+          .build();
+    } catch (Exception e) {
+      log.error("sslContext error!");
+    }
+
+    SslContext finalSslContext = sslContext;
+
+    HttpClient httpClient = HttpClient.create()
+        .resolver(DefaultAddressResolverGroup.INSTANCE)
+        .secure(builder -> builder.sslContext(finalSslContext))
+        .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 60000);
+
+
+    DefaultUriBuilderFactory factory = new DefaultUriBuilderFactory(baseUrl);
+    factory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.VALUES_ONLY);
+
+    String headerType = responseType.getType() + "/" + responseType.getSubtype();
+
+    if (!ObjectUtils.isEmpty(responseType.getCharset())) {
+      headerType =
+          headerType + ";" + Objects.requireNonNull(responseType.getCharset()).name();
+    }
+
+
+    WebClient wc = WebClient
+        .builder()
+        .clientConnector(new ReactorClientHttpConnector(httpClient))
+        .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(20 * 1024 * 1024))
+        .uriBuilderFactory(factory)
+        .baseUrl(baseUrl)
+        .defaultHeader(HttpHeaders.CONTENT_TYPE, headerType)
+        .defaultHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36")
+        .build();
+
+    return wc.post()
+        .accept(responseType)
+        .header(HttpHeaders.CONTENT_TYPE, headerType)
+        .body(BodyInserters.fromValue(params))
+        .retrieve()
+        .onStatus(HttpStatusCode::isError, response -> Mono.error(new IllegalStateException()))
+        .bodyToMono(responseRef);
   }
 
 }

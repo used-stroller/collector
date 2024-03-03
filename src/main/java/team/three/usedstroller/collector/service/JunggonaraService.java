@@ -1,100 +1,92 @@
 package team.three.usedstroller.collector.service;
 
-import static io.netty.util.internal.StringUtil.EMPTY_STRING;
-import static team.three.usedstroller.collector.validation.PidDuplicationValidator.isNotExistPid;
-
-import java.util.ArrayList;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
-import team.three.usedstroller.collector.config.ChromiumDriver;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import team.three.usedstroller.collector.domain.Product;
 import team.three.usedstroller.collector.repository.ProductRepository;
+import team.three.usedstroller.collector.service.dto.JunggonaraApiRequest;
+import team.three.usedstroller.collector.service.dto.JunggonaraApiResponse;
+import team.three.usedstroller.collector.service.dto.JunggonaraItem;
+import team.three.usedstroller.collector.util.ApiService;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
-public class JunggonaraService {
+public class JunggonaraService extends CommonService {
 
-	private final ChromiumDriver driver;
-	private final ProductRepository productRepository;
+	private final ApiService apiService;
 
-	public int collectingJunggonara(int startPage, int endPage) {
-		int complete = 0;
-//		int pageTotal = getTotalPageJungGo();
-//		log.info("junggonara total page: {}", pageTotal);
-
-		for (int i = startPage; i <= endPage; i++) {
-			String url = "https://web.joongna.com/search/%EC%9C%A0%EB%AA%A8%EC%B0%A8?page=" + i;
-			driver.open(url);
-			driver.wait(1500);
-
-			List<WebElement> list = driver.findAllByXpath("//*[@id='__next']/div/main/div[1]/div[2]/ul/li");
-			if (ObjectUtils.isEmpty(list)) {
-				return complete;
-			}
-
-			int size = saveItemList(list);
-			complete += size;
-			log.info("junggonara page: [{}], saved item: [{}]", i, complete);
-		}
-
-		return complete;
+	public JunggonaraService(ProductRepository productRepository, ApiService apiService) {
+		super(productRepository);
+		this.apiService = apiService;
 	}
 
-	@Transactional
-	public int saveItemList(List<WebElement> list) {
-		List<Product> items = new ArrayList<>();
-		String img;
-		String price;
-		String title;
-		String link;
-		String address;
-		String uploadTime;
+	private final String URL = "https://search-api.joongna.com/v3/search/all";
+	private final String SORT = "RECENT_SORT";
+	private final String KEYWORD = "유모차";
+	private final Integer QUANTITY = 100;
+	ParameterizedTypeReference<JunggonaraApiResponse> typeReference = new ParameterizedTypeReference<>() {};
 
-		for (WebElement element : list) {
-			title = element.findElement(By.xpath(".//h2")).getText();
-			link = element.findElement(By.xpath(".//a")).getAttribute("href");
-			price = element.findElement(By.xpath(".//a/div[2]/div[1]")).getText();
-			img = element.findElement(By.xpath(".//a/div[1]/img")).getAttribute("src");
-			uploadTime = element.findElements(By.xpath(".//a/div[2]/div[2]/span[3]"))
-				.stream()
-				.findFirst()
-				.map(WebElement::getText)
-				.orElseGet(() -> EMPTY_STRING);
-			if (uploadTime.isEmpty() || uploadTime.contains("광고")) {
-				continue; // uploadTime이 없으면 광고이기 때문에 패스
-			}
-			address = element.findElements(By.xpath(".//a/div[2]/div[2]/span[1]"))
-					.stream()
-					.findFirst()
-					.map(WebElement::getText)
-					.orElseGet(() -> EMPTY_STRING);
+	public Mono<Integer> collecting() {
+		return getTotalPage()
+				.flatMap(totalPage -> {
+					log.info("junggonara total page: {}", totalPage);
 
-			Product product = Product.createJunggo(title, link, price, img, address, uploadTime);
-			if (isNotExistPid(productRepository, product)) {
-				items.add(product);
-			}
-		}
+					return Flux.range(0, totalPage)
+							.flatMap(page -> {
+								JunggonaraApiRequest request = JunggonaraApiRequest.builder()
+										.page(page)
+										.quantity(QUANTITY)
+										.sort(SORT)
+										.searchWord(KEYWORD)
+										.build();
 
-		productRepository.saveAll(items);
-		return items.size();
+								return apiService.apiCallPost(URL, request, typeReference, MediaType.APPLICATION_JSON)
+										.switchIfEmpty(Mono.defer(Mono::empty))
+										.onErrorResume(e -> Mono.error(new RuntimeException("junggonara api connect error", e)))
+										.publishOn(Schedulers.boundedElastic())
+										.flatMap(res -> saveItemList(res.getData().getItems())
+												.flatMap(count -> {
+													log.info("junggonara page: [{}], saved item: [{}]", page, count);
+													return Mono.just(count);
+												}));
+							})
+							.reduce(Integer::sum);
+				});
 	}
 
-	private int getTotalPageJungGo() {
-		int qtyPerPage = 86;
-		String url = "https://web.joongna.com/search/%EC%9C%A0%EB%AA%A8%EC%B0%A8?page=1";
-		driver.open(url);
-		WebElement content = driver.findOneByXpath("//*[@id=\"__next\"]");
-		String totalQty = content.findElement(By.xpath("//*[@id=\"__next\"]/div/main/div[1]/div[2]/div[2]/div/div/div[1]")).getText();
-		String intStr = totalQty.replaceAll("[^0-9]", "");
-		int totalQtyInt = Integer.parseInt(intStr);
-		return (int) Math.ceil((double) totalQtyInt / qtyPerPage);
+	public Mono<Integer> saveItemList(List<JunggonaraItem> list) {
+		return Flux.fromIterable(list)
+				.flatMap(Product::createJunggo)
+				.collectList()
+				.flatMap(this::saveProducts);
+	}
+
+	private Mono<Integer> getTotalPage() {
+		JunggonaraApiRequest request = JunggonaraApiRequest.builder()
+				.page(0)
+				.quantity(1)
+				.sort(SORT)
+				.searchWord(KEYWORD)
+				.build();
+		return apiService.apiCallPost(URL, request, typeReference, MediaType.APPLICATION_JSON)
+				.switchIfEmpty(Mono.defer(Mono::empty))
+				.onErrorResume(e -> Mono.error(new IllegalArgumentException("junggonara api connect error", e)))
+				.flatMap(res -> Mono.just(division(res.getData().getTotalSize())));
+	}
+
+	/**
+	 * 최대 10000개까지만 조회 가능한 것으로 추정(100개씩이면 0부터 99페이지까지만 요청 가능)
+	 * 따라서 100페이지가 넘는다면 최대 횟수인 100을 리턴
+	 */
+	private Integer division(Integer totalSize) {
+		int totalPage = (totalSize / QUANTITY) + 1;
+		return Math.min(totalPage, 100);
 	}
 
 }

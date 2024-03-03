@@ -37,7 +37,7 @@ public class CollectorController {
 	@ResponseStatus(HttpStatus.OK)
 	public void bunjang() {
 		StopWatch stopWatch = new StopWatch();
-		bunJangService.collectingBunJang()
+		bunJangService.collecting()
 				.doOnSubscribe(subscription -> stopWatch.start())
 				.doOnSuccess(count -> {
 					stopWatch.stop();
@@ -48,27 +48,24 @@ public class CollectorController {
 
 	/**
 	 * 중고나라 '유모차' 검색 결과를 수집한다. (약 18,000건)
-	 * (양이 너무 많고 오래 걸려서 수집 갯수를 제한해야 할 듯)
-	 * @param startPage 시작 페이지
-	 * @param endPage 끝 페이지 (약 125페이지)
-	 * @runningTime 16분 (약 10,000건)
+	 * @runningTime 약 20초 (약 10,000건)
 	 */
 	@PostMapping("/junggonara")
 	@ResponseStatus(HttpStatus.OK)
-	public int junggonara(
-			@RequestParam(required = true) Integer startPage,
-			@RequestParam(required = true) Integer endPage) {
+	public void junggonara() {
 		StopWatch stopWatch = new StopWatch();
-		stopWatch.start();
-		int count = junggonaraService.collectingJunggonara(startPage, endPage);
-		stopWatch.stop();
-		log.info("중고나라 완료: {}건, 수집 시간: {}s", count, stopWatch.getTotalTimeSeconds());
-		return count;
+		junggonaraService.collecting()
+				.doOnSubscribe(subscription -> stopWatch.start())
+				.doOnSuccess(count -> {
+					stopWatch.stop();
+					log.info("중고나라 완료: {}건, 수집 시간: {}s", count, stopWatch.getTotalTimeSeconds());
+				})
+				.subscribe();
 	}
 
   /**
    * 세컨웨어(구 헬로마켓) '유모차' 검색 결과를 수집한다.
-   * @runningTime 42초 (약 571건)
+   * @runningTime 약 10초 (약 600건)
    */
   @PostMapping("/secondwear")
   @ResponseStatus(HttpStatus.OK)
@@ -83,16 +80,15 @@ public class CollectorController {
 
 	/**
 	 * 당근마켓 '유모차' 검색 결과를 수집한다.
-	 * 더보기 검색 수집은 100 페이지까지만 가능하다. 101 페이지부터 빈 페이지를 응답받는다.
 	 * "https://www.daangn.com/search/%EC%9C%A0%EB%AA%A8%EC%B0%A8/more/flea_market?page="
 	 * @param startPage 시작 페이지
-	 * @runningTime 약 6분 (약 1000건)
+	 * @runningTime 500페이지에 약 30분 (약 3000건)
 	 */
 	@PostMapping("/carrot-market")
 	@ResponseStatus(HttpStatus.CREATED)
 	public void carrotMarket(
 			@RequestParam(required = true) Integer startPage,
-			@RequestParam(required = true, defaultValue = "100") Integer endPage) {
+			@RequestParam(required = true, defaultValue = "500") Integer endPage) {
 
 		log.info("carrot market collector start");
 		StopWatch stopWatch = new StopWatch();

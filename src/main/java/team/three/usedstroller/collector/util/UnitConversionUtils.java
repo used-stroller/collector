@@ -17,8 +17,12 @@ public class UnitConversionUtils {
 
 	private static final String NOT_NUMBER = "\\D";
 
-	public static String convertLink(String pid) {
+	public static String convertBunjangLink(String pid) {
 		return "https://m.bunjang.co.kr/products/" + pid;
+	}
+
+	public static String convertJunggoLink(String pid) {
+		return "https://web.joongna.com/product/" + pid;
 	}
 
 	public static String convertSimplePid(String link, String str) {

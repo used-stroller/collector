@@ -32,8 +32,8 @@ public class BunJangService extends CommonService {
 	 * page: 0 (페이지 번호)
 	 * n: 200 (한번에 가져오는 상품 수)
 	 */
-	public Mono<Integer> collectingBunJang() {
-		return getTotalPageBunJang()
+	public Mono<Integer> collecting() {
+		return getTotalPage()
 			.flatMap(totalCount -> {
 				int totalPage = totalCount / 200;
 				log.info("bunjang total page: {}", totalPage);
@@ -63,10 +63,10 @@ public class BunJangService extends CommonService {
 				.flatMap(this::saveProducts);
 	}
 
-	private Mono<Integer> getTotalPageBunJang() {
+	private Mono<Integer> getTotalPage() {
 		String url = "https://api.bunjang.co.kr/api/1/find_v2.json?q=%EC%9C%A0%EB%AA%A8%EC%B0%A8&page=0&n=0";
 		return apiService.apiCallGet(url, typeReference, MediaType.APPLICATION_JSON, true)
-				.switchIfEmpty(Mono.empty())
+				.switchIfEmpty(Mono.defer(Mono::empty))
 				.flatMap(res -> Mono.just(res.getNumFound()))
 				.onErrorResume(e -> Mono.error(new RuntimeException("bunjang totalCount api connect error", e)));
 	}

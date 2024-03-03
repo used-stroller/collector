@@ -2,7 +2,8 @@ package team.three.usedstroller.collector.domain;
 
 import static team.three.usedstroller.collector.util.UnitConversionUtils.changeInt;
 import static team.three.usedstroller.collector.util.UnitConversionUtils.changeLocalDate;
-import static team.three.usedstroller.collector.util.UnitConversionUtils.convertLink;
+import static team.three.usedstroller.collector.util.UnitConversionUtils.convertBunjangLink;
+import static team.three.usedstroller.collector.util.UnitConversionUtils.convertJunggoLink;
 import static team.three.usedstroller.collector.util.UnitConversionUtils.convertLocalDate;
 import static team.three.usedstroller.collector.util.UnitConversionUtils.convertPrice;
 import static team.three.usedstroller.collector.util.UnitConversionUtils.convertSimplePid;
@@ -17,6 +18,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -25,6 +27,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import reactor.core.publisher.Mono;
 import team.three.usedstroller.collector.service.dto.BunjangItem;
+import team.three.usedstroller.collector.service.dto.JunggonaraItem;
 
 @Entity
 @Getter
@@ -94,7 +97,7 @@ public class Product extends BaseTimeEntity {
 			.sourceType(SourceType.BUNJANG)
 			.pid(item.getPid())
 			.title(item.getName())
-			.link(convertLink(item.getPid()))
+			.link(convertBunjangLink(item.getPid()))
 			.price(Long.parseLong(item.getPrice().replaceAll("[^0-9]", "")))
 			.imgSrc(item.getProductImage())
 			.region(item.getLocation())
@@ -104,17 +107,18 @@ public class Product extends BaseTimeEntity {
 		return Mono.just(product);
 	}
 
-	public static Product createJunggo(String title, String link, String price, String imgSrc, String region, String uploadTime) {
-		return Product.builder()
+	public static Mono<Product> createJunggo(JunggonaraItem item) {
+		Product product = Product.builder()
 			.sourceType(SourceType.JUNGGO)
-			.pid(convertSimplePid(link, "product/"))
-			.title(title)
-			.link(link)
-			.price(convertPrice(price))
-			.imgSrc(imgSrc)
-			.region(region)
-			.uploadDate(changeLocalDate(convertToTimeFormat(uploadTime)))
+			.pid(item.getSeq().toString())
+			.title(item.getTitle())
+			.link(convertJunggoLink(item.getSeq().toString()))
+			.price(item.getPrice())
+			.imgSrc(item.getUrl())
+			.region(Arrays.toString(item.getLocationNames()))
+			.uploadDate(changeLocalDate(item.getSortDate()))
 			.build();
+		return Mono.just(product);
 	}
 
   public static Product createHelloMarket(String pid, String title, String link, String price,

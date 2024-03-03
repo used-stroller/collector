@@ -32,7 +32,7 @@ public class CollectorScheduler {
   public void bunjang() {
     log.info("번개장터 예약 수집 시작");
     StopWatch stopWatch = new StopWatch();
-    bunJangService.collectingBunJang()
+    bunJangService.collecting()
         .doOnSubscribe(subscription -> stopWatch.start())
         .doOnSuccess(count -> {
           stopWatch.stop();
@@ -52,6 +52,19 @@ public class CollectorScheduler {
   }
 
   @Scheduled(cron = "0 10 3 * * *", zone = "Asia/Seoul")
+  public void junggonara() {
+    log.info("중고나라 예약 수집 시작");
+    StopWatch stopWatch = new StopWatch();
+    junggonaraService.collecting()
+        .doOnSubscribe(subscription -> stopWatch.start())
+        .doOnSuccess(count -> {
+          stopWatch.stop();
+          log.info("중고나라 예약 수집 완료: {}건, 수집 시간: {}s", count, stopWatch.getTotalTimeSeconds());
+        })
+        .subscribe();
+  }
+
+  @Scheduled(cron = "0 15 3 * * *", zone = "Asia/Seoul")
   public void carrot() {
     log.info("당근 예약 수집 시작");
     StopWatch stopWatch = new StopWatch();
@@ -61,18 +74,7 @@ public class CollectorScheduler {
     log.info("댱근 예약 수집 완료: {}건, 수집 시간: {}s", count, stopWatch.getTotalTimeSeconds());
   }
 
-
   @Scheduled(cron = "0 0 4 * * *", zone = "Asia/Seoul")
-  public void junggonara() {
-    log.info("중고나라 예약 수집 시작");
-    StopWatch stopWatch = new StopWatch();
-    stopWatch.start();
-    int count = junggonaraService.collectingJunggonara(1, 300);
-    stopWatch.stop();
-    log.info("중고나라 예약 수집 완료: {}건, 수집 시간: {}s", count, stopWatch.getTotalTimeSeconds());
-  }
-
-  @Scheduled(cron = "0 0 5 * * *", zone = "Asia/Seoul")
   public void naver() {
     log.info("네이버쇼핑 예약 수집 시작");
     StopWatch stopWatch = new StopWatch();
@@ -82,7 +84,7 @@ public class CollectorScheduler {
     log.info("네이버쇼핑 예약 수집 완료: {}건, 수집 시간: {}s", count, stopWatch.getTotalTimeSeconds());
   }
 
-  @Scheduled(cron = "0 0 6 * * *", zone = "Asia/Seoul")
+  @Scheduled(cron = "0 0 5 * * *", zone = "Asia/Seoul")
   public void clearOldData() {
     log.info("과거 데이터 삭제 시작");
     StopWatch stopWatch = new StopWatch();
