@@ -1,14 +1,17 @@
 package team.three.usedstroller.collector.service;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import team.three.usedstroller.collector.domain.Product;
+import team.three.usedstroller.collector.domain.SourceType;
 import team.three.usedstroller.collector.repository.ProductRepository;
 import team.three.usedstroller.collector.service.dto.JunggonaraApiRequest;
 import team.three.usedstroller.collector.service.dto.JunggonaraApiResponse;
@@ -32,7 +35,23 @@ public class JunggonaraService extends CommonService {
 	private final Integer QUANTITY = 100;
 	ParameterizedTypeReference<JunggonaraApiResponse> typeReference = new ParameterizedTypeReference<>() {};
 
+	public void start() {
+		StopWatch stopWatch = new StopWatch();
+		collecting()
+				.doOnSubscribe(subscription -> stopWatch.start())
+				.doOnSuccess(count -> {
+					stopWatch.stop();
+					log.info("중고나라 완료: {}건, 수집 시간: {}s", count, stopWatch.getTotalTimeSeconds());
+				})
+				.publishOn(Schedulers.boundedElastic())
+				.doFinally(f -> super.deleteOldData(SourceType.JUNGGO))
+				.subscribe();
+	}
+
+
 	public Mono<Integer> collecting() {
+		AtomicInteger updateCount = new AtomicInteger(0);
+
 		return getTotalPage()
 				.flatMap(totalPage -> {
 					log.info("junggonara total page: {}", totalPage);
@@ -52,7 +71,7 @@ public class JunggonaraService extends CommonService {
 										.publishOn(Schedulers.boundedElastic())
 										.flatMap(res -> saveItemList(res.getData().getItems())
 												.flatMap(count -> {
-													log.info("junggonara page: [{}], saved item: [{}]", page, count);
+													log.info("junggonara page: [{}], saved item: [{}], total update: [{}]", page, count, updateCount.addAndGet(count));
 													return Mono.just(count);
 												}));
 							})

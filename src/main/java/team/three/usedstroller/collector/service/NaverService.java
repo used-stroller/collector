@@ -1,21 +1,20 @@
 package team.three.usedstroller.collector.service;
 
 import static io.netty.util.internal.StringUtil.EMPTY_STRING;
-import static team.three.usedstroller.collector.validation.PidDuplicationValidator.isExistPid;
 
+import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.checkerframework.checker.units.qual.C;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StopWatch;
 import org.springframework.web.util.UriComponentsBuilder;
 import team.three.usedstroller.collector.config.ChromiumDriver;
 import team.three.usedstroller.collector.domain.Product;
@@ -24,11 +23,15 @@ import team.three.usedstroller.collector.repository.ProductRepository;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
-public class NaverService {
+public class NaverService extends CommonService {
 
 	private final ChromiumDriver driver;
-	private final ProductRepository productRepository;
+
+	public NaverService(ProductRepository productRepository, ChromiumDriver driver) {
+		super(productRepository);
+		this.driver = driver;
+	}
+
 	private final String url = UriComponentsBuilder.newInstance()
 			.scheme("https")
 			.host("search.shopping.naver.com")
@@ -45,17 +48,34 @@ public class NaverService {
 			.queryParam("pagingIndex", "")
 			.build().toUriString();
 
-	public String collectingNaverShopping(int startPage, int endPage) {
+	@Transactional
+	public void start(Integer startPage, Integer endPage) {
+		log.info("naver shopping collector start");
+		StopWatch stopWatch = new StopWatch();
+		stopWatch.start();
+		Integer count = collecting(startPage, endPage);
+		stopWatch.stop();
+		log.info("네이버쇼핑 완료: {}, 수집 시간: {}s", count, stopWatch.getTotalTimeSeconds());
+		super.deleteOldData(SourceType.NAVER);
+	}
+
+	public Integer collecting(int startPage, int endPage) {
 		driver.open(url + startPage);
 		int page = startPage;
+		AtomicInteger updateCount = new AtomicInteger(0);
 
 		try {
 			while (true) {
 				scrollToTheBottomToSeeAllProducts();
 				driver.wait(1000);
 				List<WebElement> products = getProducts();
-				int size = saveNaverShopping(products);
-				log.info("naver shopping page: [{}], saved item: [{}]", page, size);
+				List<Product> items = saveNaverShopping(products);
+				int finalPage = page;
+				saveProducts(items)
+						.doOnSuccess(count -> {
+							log.info("naver shopping page: [{}], saved item: [{}], total update: [{}]", finalPage, count, updateCount.addAndGet(count));
+						})
+						.subscribe();
 				if (page == endPage || !getNextPage()) {
 					break;
 				}
@@ -64,10 +84,9 @@ public class NaverService {
 			}
 
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			throw new IllegalArgumentException("Naver collect error!", e);
 		}
-
-		return "naver shopping collector complete. total page: " + page;
+		return updateCount.get();
 	}
 
 	private List<WebElement> getProducts() {
@@ -76,8 +95,7 @@ public class NaverService {
 		return prodList.findElements(By.xpath(".//div[contains(@class, 'item')]"));
 	}
 
-	@Transactional
-	public int saveNaverShopping(List<WebElement> list) {
+	public List<Product> saveNaverShopping(List<WebElement> list) {
 		List<Product> items = new ArrayList<>();
 		String pid = "";
 		String title = "";
@@ -90,9 +108,6 @@ public class NaverService {
 
 		for (WebElement el : list) {
 			pid = el.findElement(By.xpath(".//a[contains(@class, 'thumbnail_thumb')]")).getAttribute("data-i");
-			if (isExistPid(productRepository, pid, SourceType.NAVER)) {
-				continue;
-			}
 			link = el.findElement(By.xpath(".//a[contains(@class, 'thumbnail_thumb')]")).getAttribute("href");
 
 			try {
@@ -134,8 +149,7 @@ public class NaverService {
 			items.add(product);
 		}
 
-		List<Product> result = productRepository.saveAll(items);
-		return result.size();
+		return items;
 	}
 
 	private boolean getNextPage() {

@@ -10,8 +10,10 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StopWatch;
 import org.springframework.web.util.UriComponentsBuilder;
 import team.three.usedstroller.collector.domain.Product;
+import team.three.usedstroller.collector.domain.SourceType;
 import team.three.usedstroller.collector.repository.ProductRepository;
 
 @Slf4j
@@ -29,7 +31,17 @@ public class CarrotService extends CommonService {
 			.queryParam("next_page", "")
 			.build().toUriString();
 
-	public Integer collectingCarrotMarket(Integer startPage, Integer endPage) {
+	public void start(Integer startPage, Integer endPage) {
+		log.info("carrot market collector start");
+		StopWatch stopWatch = new StopWatch();
+		stopWatch.start();
+		Integer count = collecting(startPage, endPage);
+		stopWatch.stop();
+		log.info("댱근 완료: {}건, 수집 시간: {}s", count, stopWatch.getTotalTimeSeconds());
+		super.deleteOldData(SourceType.CARROT);
+	}
+
+	public Integer collecting(Integer startPage, Integer endPage) {
 		AtomicInteger updateCount = new AtomicInteger(0);
 
 		for (int page = startPage; page <= endPage; page++) {
@@ -37,19 +49,19 @@ public class CarrotService extends CommonService {
 				List<Product> carrots = crawlingCarrotPage(url + page);
 				if (ObjectUtils.isEmpty(carrots)) {
 					log.info("carrot market page: [{}] is empty", page);
-					endPage = page - 1;
 					break;
 				}
 				int finalPage = page;
 				saveProducts(carrots)
-						.subscribe(count -> {
-							log.info("carrot market page: [{}], saved item: [{}]", finalPage, count);
-							updateCount.addAndGet(count);
-						});
+						.doOnSuccess(count -> {
+							log.info("carrot market page: [{}], saved item: [{}], total update: [{}]", finalPage, count, updateCount.addAndGet(count));
+						})
+						.subscribe();
 			} catch (Exception e) {
 				throw new IllegalArgumentException("carrot market connect error", e);
 			}
 		}
+
 		return updateCount.get();
 	}
 

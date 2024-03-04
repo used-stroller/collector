@@ -13,5 +13,5 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
   Optional<Product> findByPidAndSourceType(String pid, SourceType sourceType);
 
   @Modifying
-  void deleteAllByUpdatedAtIsBefore(LocalDateTime updatedAt);
+  void deleteAllBySourceTypeAndUpdatedAtIsBefore(SourceType sourceType, LocalDateTime updatedAt);
 }

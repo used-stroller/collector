@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,16 +33,9 @@ public class CollectorController {
 	 * @runningTime 5초 (약 2800건)
 	 */
 	@PostMapping("/bunjang")
-	@ResponseStatus(HttpStatus.OK)
+	@ResponseStatus(HttpStatus.CREATED)
 	public void bunjang() {
-		StopWatch stopWatch = new StopWatch();
-		bunJangService.collecting()
-				.doOnSubscribe(subscription -> stopWatch.start())
-				.doOnSuccess(count -> {
-					stopWatch.stop();
-					log.info("번개장터 완료: {}건, 수집 시간: {}s", count, stopWatch.getTotalTimeSeconds());
-				})
-				.subscribe();
+		bunJangService.start();
 	}
 
 	/**
@@ -51,16 +43,9 @@ public class CollectorController {
 	 * @runningTime 약 20초 (약 10,000건)
 	 */
 	@PostMapping("/junggonara")
-	@ResponseStatus(HttpStatus.OK)
+	@ResponseStatus(HttpStatus.CREATED)
 	public void junggonara() {
-		StopWatch stopWatch = new StopWatch();
-		junggonaraService.collecting()
-				.doOnSubscribe(subscription -> stopWatch.start())
-				.doOnSuccess(count -> {
-					stopWatch.stop();
-					log.info("중고나라 완료: {}건, 수집 시간: {}s", count, stopWatch.getTotalTimeSeconds());
-				})
-				.subscribe();
+		junggonaraService.start();
 	}
 
   /**
@@ -68,14 +53,9 @@ public class CollectorController {
    * @runningTime 약 10초 (약 600건)
    */
   @PostMapping("/secondwear")
-  @ResponseStatus(HttpStatus.OK)
-  public int secondwear() {
-    StopWatch stopWatch = new StopWatch();
-    stopWatch.start();
-    Integer count = secondWearService.collecting();
-    stopWatch.stop();
-		log.info("세컨웨어 완료: {}건, 수집 시간: {}s", count, stopWatch.getTotalTimeSeconds());
-    return count;
+  @ResponseStatus(HttpStatus.CREATED)
+  public void secondwear() {
+		secondWearService.start();
   }
 
 	/**
@@ -88,14 +68,8 @@ public class CollectorController {
 	@ResponseStatus(HttpStatus.CREATED)
 	public void carrotMarket(
 			@RequestParam(required = true) Integer startPage,
-			@RequestParam(required = true, defaultValue = "500") Integer endPage) {
-
-		log.info("carrot market collector start");
-		StopWatch stopWatch = new StopWatch();
-		stopWatch.start();
-		Integer count = carrotService.collectingCarrotMarket(startPage, endPage);
-		stopWatch.stop();
-		log.info("댱근 완료: {}건, 수집 시간: {}s", count, stopWatch.getTotalTimeSeconds());
+			@RequestParam(required = true) Integer endPage) {
+		carrotService.start(startPage, endPage);
 	}
 
 	/**
@@ -114,13 +88,7 @@ public class CollectorController {
 	public void naverShopping(
 			@RequestParam(required = true) Integer startPage,
 			@RequestParam(required = false, defaultValue = "200") Integer endPage) {
-
-		log.info("naver shopping collector start");
-		StopWatch stopWatch = new StopWatch();
-		stopWatch.start();
-		String result = naverService.collectingNaverShopping(startPage, endPage);
-		stopWatch.stop();
-		log.info("네이버쇼핑 완료: {}, 수집 시간: {}s", result, stopWatch.getTotalTimeSeconds());
+		naverService.start(startPage, endPage);
 	}
 
 }
