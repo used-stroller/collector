@@ -1,6 +1,5 @@
 package team.three.usedstroller.collector.domain;
 
-import static team.three.usedstroller.collector.util.UnitConversionUtils.changeInt;
 import static team.three.usedstroller.collector.util.UnitConversionUtils.changeLocalDate;
 import static team.three.usedstroller.collector.util.UnitConversionUtils.convertBunjangLink;
 import static team.three.usedstroller.collector.util.UnitConversionUtils.convertJunggoLink;
@@ -28,6 +27,7 @@ import lombok.ToString;
 import reactor.core.publisher.Mono;
 import team.three.usedstroller.collector.service.dto.BunjangItem;
 import team.three.usedstroller.collector.service.dto.JunggonaraItem;
+import team.three.usedstroller.collector.service.dto.NaverApiResponse;
 
 @Entity
 @Getter
@@ -77,19 +77,17 @@ public class Product extends BaseTimeEntity {
 		this.content = content;
 	}
 
-	public static Product createNaver(String pid, String title, String link, String price, String imgSrc,
-	             String uploadDate, String releaseYear, String etc) {
-		return Product.builder()
+	public static Mono<Product> createNaver(NaverApiResponse.Items item) {
+		Product product = Product.builder()
 			.sourceType(SourceType.NAVER)
-			.pid(pid)
-			.title(title)
-			.link(link)
-			.price(convertPrice(price))
-			.imgSrc(imgSrc)
-			.uploadDate(changeLocalDate(uploadDate))
-			.releaseYear(changeInt(releaseYear))
-			.etc(etc)
+			.pid(item.getProductId())
+			.title(item.getTitle())
+			.link(item.getLink())
+			.price(item.getPrice())
+			.imgSrc(item.getImage())
+			.etc(item.getBrand())
 			.build();
+		return Mono.just(product);
 	}
 
 	public static Mono<Product> createBunJang(BunjangItem item) {

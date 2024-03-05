@@ -43,15 +43,17 @@ public class CollectorScheduler {
   }
 
   @Scheduled(cron = "0 15 3 * * *", zone = "Asia/Seoul")
+  public void naver() {
+    log.info("네이버쇼핑 예약 수집 시작");
+    naverService.start();
+  }
+
+  @Scheduled(cron = "0 20 3 * * *", zone = "Asia/Seoul")
   public void carrot() {
     log.info("당근 예약 수집 시작");
     carrotService.start(1, 500);
   }
 
-  @Scheduled(cron = "0 0 4 * * *", zone = "Asia/Seoul")
-  public void naver() {
-    log.info("네이버쇼핑 예약 수집 시작");
-    naverService.start(1, 200);
-  }
+
 
 }

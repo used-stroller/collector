@@ -1,179 +1,92 @@
 package team.three.usedstroller.collector.service;
 
-import static io.netty.util.internal.StringUtil.EMPTY_STRING;
-
-import jakarta.transaction.Transactional;
-import java.util.ArrayList;
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
+import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebElement;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
 import org.springframework.util.StopWatch;
-import org.springframework.web.util.UriComponentsBuilder;
-import team.three.usedstroller.collector.config.ChromiumDriver;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import team.three.usedstroller.collector.domain.Product;
 import team.three.usedstroller.collector.domain.SourceType;
 import team.three.usedstroller.collector.repository.ProductRepository;
+import team.three.usedstroller.collector.service.dto.NaverApiResponse;
+import team.three.usedstroller.collector.util.ApiService;
 
-@Service
 @Slf4j
+@Service
 public class NaverService extends CommonService {
 
-	private final ChromiumDriver driver;
+  private final ApiService apiService;
+  ParameterizedTypeReference<NaverApiResponse> typeReference = new ParameterizedTypeReference<>() {
+  };
+  @Value("${naver.id}")
+  private String id;
+  @Value("${naver.secret}")
+  private String secret;
+  @Value("${naver.url}")
+  private String url;
 
-	public NaverService(ProductRepository productRepository, ChromiumDriver driver) {
-		super(productRepository);
-		this.driver = driver;
-	}
+  public NaverService(ProductRepository productRepository, ApiService apiService) {
+    super(productRepository);
+    this.apiService = apiService;
+  }
 
-	private final String url = UriComponentsBuilder.newInstance()
-			.scheme("https")
-			.host("search.shopping.naver.com")
-			.path("/search/all")
-			.queryParam("brand", "27112%20215978%20215480%2029436%2013770%2026213%20236955%20219842%20242564%2028546%2028497%20151538%20134696%20212765%20148890%20242729%20240016")
-			.queryParam("frm", "NVSHATC")
-			.queryParam("origQuery", "%EC%9C%A0%EB%AA%A8%EC%B0%A8")
-			.queryParam("pagingSize", "40")
-			.queryParam("productSet", "total")
-			.queryParam("query", "%EC%9C%A0%EB%AA%A8%EC%B0%A8")
-			.queryParam("sort", "rel")
-			.queryParam("timestamp", "")
-			.queryParam("viewType", "list")
-			.queryParam("pagingIndex", "")
-			.build().toUriString();
+  public void start() {
+    StopWatch stopWatch = new StopWatch();
+    collecting()
+        .doOnSubscribe(subscription -> stopWatch.start())
+        .doOnSuccess(count -> {
+          stopWatch.stop();
+          log.info("네이버쇼핑 완료: {}건, 수집 시간: {}s", count, stopWatch.getTotalTimeSeconds());
+        })
+        .publishOn(Schedulers.boundedElastic())
+        .doFinally(f -> super.deleteOldData(SourceType.NAVER))
+        .subscribe();
+  }
 
-	@Transactional
-	public void start(Integer startPage, Integer endPage) {
-		log.info("naver shopping collector start");
-		StopWatch stopWatch = new StopWatch();
-		stopWatch.start();
-		Integer count = collecting(startPage, endPage);
-		stopWatch.stop();
-		log.info("네이버쇼핑 완료: {}, 수집 시간: {}s", count, stopWatch.getTotalTimeSeconds());
-		super.deleteOldData(SourceType.NAVER);
-	}
+  /**
+   * 요청 가능한 최대 page 수 100개씩 1000페이지(10만건) 총 상품 수가 45만건이 넘기 때문에 한도까지 모두 수집
+   */
+  public Mono<Integer> collecting() {
+    AtomicInteger updateCount = new AtomicInteger(0);
+    Consumer<HttpHeaders> headerConsumer = headers -> {
+      headers.add("Accept", MediaType.APPLICATION_JSON_VALUE);
+      headers.add("X-Naver-Client-Id", id);
+      headers.add("X-Naver-Client-Secret", secret);
+    };
 
-	public Integer collecting(int startPage, int endPage) {
-		driver.open(url + startPage);
-		int page = startPage;
-		AtomicInteger updateCount = new AtomicInteger(0);
+    return Flux.range(1, 9)
+        .map(start -> start * 100 + 1)
+        .delayElements(Duration.ofMillis(500))
+        .flatMap(start -> {
+          return apiService.apiCallGet(url + start, typeReference, headerConsumer,
+                  MediaType.APPLICATION_JSON, true)
+              .switchIfEmpty(Mono.defer(Mono::empty))
+              .onErrorResume(e -> Mono.error(new RuntimeException("naver api connect error", e)))
+              .publishOn(Schedulers.boundedElastic())
+              .flatMap(res -> saveItemList(res.getItems())
+                  .flatMap(count -> {
+                    log.info("naver start: [{}], saved item: [{}], total update: [{}]", start,
+                        count, updateCount.addAndGet(count));
+                    return Mono.just(count);
+                  }));
+        })
+        .reduce(Integer::sum);
+  }
 
-		try {
-			while (true) {
-				scrollToTheBottomToSeeAllProducts();
-				driver.wait(1000);
-				List<WebElement> products = getProducts();
-				List<Product> items = saveNaverShopping(products);
-				int finalPage = page;
-				saveProducts(items)
-						.doOnSuccess(count -> {
-							log.info("naver shopping page: [{}], saved item: [{}], total update: [{}]", finalPage, count, updateCount.addAndGet(count));
-						})
-						.subscribe();
-				if (page == endPage || !getNextPage()) {
-					break;
-				}
-				page++;
-				driver.wait(2000);
-			}
-
-		} catch (Exception e) {
-			throw new IllegalArgumentException("Naver collect error!", e);
-		}
-		return updateCount.get();
-	}
-
-	private List<WebElement> getProducts() {
-		scrollToTheBottomToSeeAllProducts();
-		WebElement prodList = driver.findOneByXpath("//*[@id=\"content\"]/div[contains(@class, 'content')]/div[contains(@class, 'basicList')]");
-		return prodList.findElements(By.xpath(".//div[contains(@class, 'item')]"));
-	}
-
-	public List<Product> saveNaverShopping(List<WebElement> list) {
-		List<Product> items = new ArrayList<>();
-		String pid = "";
-		String title = "";
-		String link = "";
-		String price = "";
-		String imgSrc = "";
-		String uploadDate = "";
-		String releaseYear = "";
-		String etc = "";
-
-		for (WebElement el : list) {
-			pid = el.findElement(By.xpath(".//a[contains(@class, 'thumbnail_thumb')]")).getAttribute("data-i");
-			link = el.findElement(By.xpath(".//a[contains(@class, 'thumbnail_thumb')]")).getAttribute("href");
-
-			try {
-				imgSrc = el.findElement(By.xpath(".//a[contains(@class, 'thumbnail_thumb')]/img")).getAttribute("src");
-			} catch (NoSuchElementException e) {
-				imgSrc = el.findElement(By.xpath(".//a[contains(@class, 'thumbnail_thumb')]/span")).getText(); // 이미지 없는 경우(예: 청소년 유해상품)
-			}
-
-			title = el.findElement(By.xpath(".//a[@title]")).getText();
-
-			try {
-				price = el.findElement(By.xpath(".//span[contains(@class, 'price')]")).getText()
-						.replace("최저", "").trim();
-			} catch (NoSuchElementException e) {
-				price = el.findElement(By.xpath(".//div[contains(@class, 'price')]")).getText(); // 가격 없는 경우(예: 판매중단)
-			}
-
-			uploadDate = el.findElements(By.xpath(".//span[contains(@class, 'product_etc')]"))
-					.stream()
-					.filter(e -> e.getText() != null && e.getText().contains("등록일"))
-					.findFirst()
-					.map(e -> e.getText().split("등록일")[1].trim())
-					.orElseGet(() -> EMPTY_STRING);
-
-			releaseYear = el.findElements(By.xpath(".//a[contains(@class, 'product_detail')]"))
-					.stream()
-					.filter(e -> e.getText() != null && e.getText().contains("출시년도"))
-					.findFirst()
-					.map(e -> e.getText().split("출시년도 :")[1].trim())
-					.orElseGet(() -> EMPTY_STRING);
-
-			etc = el.findElements(By.xpath(".//a[contains(@class, 'product_detail')]"))
-					.stream()
-					.map(WebElement::getText)
-					.filter(e -> !ObjectUtils.isEmpty(e))
-					.collect(Collectors.joining(" | "));
-
-			Product product = Product.createNaver(pid, title, link, price, imgSrc, uploadDate, releaseYear, etc);
-			items.add(product);
-		}
-
-		return items;
-	}
-
-	private boolean getNextPage() {
-		WebElement next = driver.findOneByXpath("//a[contains(@class, 'pagination_next')]");
-		if (next == null) {
-			return false;
-		}
-		next.click();
-		return true;
-	}
-
-	private void scrollToTheBottomToSeeAllProducts() {
-		JavascriptExecutor js = driver.driver;
-		long intialLength = (long) js.executeScript("return document.body.scrollHeight");
-
-		while (true) {
-			js.executeScript("window.scrollTo({top:document.body.scrollHeight, behavior:'smooth'})");
-			driver.wait(1000);
-			long currentLength = (long) js.executeScript("return document.body.scrollHeight");
-			if(intialLength == currentLength) {
-				break;
-			}
-			intialLength = currentLength;
-		}
-	}
+  public Mono<Integer> saveItemList(List<NaverApiResponse.Items> list) {
+    return Flux.fromIterable(list)
+        .flatMap(Product::createNaver)
+        .collectList()
+        .flatMap(this::saveProducts);
+  }
 
 }

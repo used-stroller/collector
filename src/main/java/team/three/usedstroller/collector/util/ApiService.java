@@ -10,6 +10,7 @@ import io.netty.resolver.DefaultAddressResolverGroup;
 import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import javax.net.ssl.SSLException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
@@ -39,7 +40,7 @@ public class ApiService {
    * @return <T> 응답 객체 타입
    */
   public <T> Mono<T> apiCallGet(String baseUrl, ParameterizedTypeReference<T> responseRef,
-      MediaType responseType, boolean useRedirect) {
+      Consumer<HttpHeaders> headers, MediaType responseType, boolean useRedirect) {
     DefaultUriBuilderFactory factory = new DefaultUriBuilderFactory(baseUrl);
     factory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.VALUES_ONLY);
     SslContext sslContext = null;
@@ -75,6 +76,7 @@ public class ApiService {
         .baseUrl(baseUrl)
         .build();
     return wc.get()
+        .headers(headers)
         .accept(responseType)
         .retrieve()
         .bodyToMono(responseRef)

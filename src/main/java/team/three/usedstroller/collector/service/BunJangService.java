@@ -2,8 +2,10 @@ package team.three.usedstroller.collector.service;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
@@ -29,6 +31,7 @@ public class BunJangService extends CommonService {
 	}
 
 	ParameterizedTypeReference<BunjangApiResponse> typeReference = new ParameterizedTypeReference<>() {};
+	Consumer<HttpHeaders> headerConsumer = headers -> headers.add("Accept", MediaType.APPLICATION_JSON_VALUE);
 
 	public void start() {
 		StopWatch stopWatch = new StopWatch();
@@ -59,11 +62,9 @@ public class BunJangService extends CommonService {
 				return Flux.range(0, totalPage)
 						.flatMap(page -> {
 							String url = "https://api.bunjang.co.kr/api/1/find_v2.json?q=%EC%9C%A0%EB%AA%A8%EC%B0%A8&n=200&page=" + page;
-
-							return apiService.apiCallGet(url, typeReference, MediaType.APPLICATION_JSON, true)
+							return apiService.apiCallGet(url, typeReference, headerConsumer, MediaType.APPLICATION_JSON, true)
 								.switchIfEmpty(Mono.defer(Mono::empty))
 								.onErrorResume(e -> Mono.error(new RuntimeException("bunjang api connect error", e)))
-								.publishOn(Schedulers.boundedElastic())
 								.flatMap(res -> saveItemList(res.getList())
 										.flatMap(count -> {
 											log.info("bunjang page: [{}], saved item: [{}], total update: [{}]", page, count, updateCount.addAndGet(count));
@@ -83,7 +84,7 @@ public class BunJangService extends CommonService {
 
 	private Mono<Integer> getTotalPage() {
 		String url = "https://api.bunjang.co.kr/api/1/find_v2.json?q=%EC%9C%A0%EB%AA%A8%EC%B0%A8&page=0&n=0";
-		return apiService.apiCallGet(url, typeReference, MediaType.APPLICATION_JSON, true)
+		return apiService.apiCallGet(url, typeReference, headerConsumer, MediaType.APPLICATION_JSON, true)
 				.switchIfEmpty(Mono.defer(Mono::empty))
 				.flatMap(res -> Mono.just(res.getNumFound()))
 				.onErrorResume(e -> Mono.error(new RuntimeException("bunjang totalCount api connect error", e)));

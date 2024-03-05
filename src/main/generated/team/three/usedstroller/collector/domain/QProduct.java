@@ -21,8 +21,6 @@ public class QProduct extends EntityPathBase<Product> {
 
     public final QBaseTimeEntity _super = new QBaseTimeEntity(this);
 
-    public final StringPath address = createString("address");
-
     public final StringPath content = createString("content");
 
     //inherited

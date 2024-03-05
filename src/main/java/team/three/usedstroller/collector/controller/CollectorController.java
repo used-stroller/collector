@@ -73,22 +73,13 @@ public class CollectorController {
 	}
 
 	/**
-	 * 네이버쇼핑 '유모차' 메이저 브랜드로 필터링 된 검색 결과를 수집한다.
-	 * "https://search.shopping.naver.com/search/all" +
-	 * "?brand=27112%20215978%2029436%20215480%2026213%20219842%2028497%2013770%20236955%20151538%20242564%2028546" +
-	 * "&frm=NVSHBRD&origQuery=%EC%9C%A0%EB%AA%A8%EC%B0%A8" +
-	 * "&pagingSize=40&productSet=total&query=%EC%9C%A0%EB%AA%A8%EC%B0%A8&sort=rel&timestamp=&viewType=list" +
-	 * "&pagingIndex=";
-	 * @param startPage 시작 페이지
-	 * @param endPage 끝 페이지 (약 150페이지)
-	 * @runningTime 약 70분 (약 6000건)
+	 * 네이버쇼핑 검색 API를 이용해서 '유모차' 검색 결과를 수집한다.
+	 * @runningTime 약 10초 (1000건)
 	 */
 	@PostMapping("/naver-shopping")
 	@ResponseStatus(HttpStatus.CREATED)
-	public void naverShopping(
-			@RequestParam(required = true) Integer startPage,
-			@RequestParam(required = false, defaultValue = "200") Integer endPage) {
-		naverService.start(startPage, endPage);
+	public void naverShopping() {
+		naverService.start();
 	}
 
 }

@@ -32,16 +32,11 @@ spring:
       max-file-size: -1
       max-request-size: -1
 
-collector:
-  crawler:
-    web-driver-id: webdriver.chrome.driver
-    win-web-driver-path: libs\chromedriver-win64\chromedriver.exe
-    win-download-path: C:\\chromedriver\\downloads
-    mac-arm-web-driver-path: libs/chromedriver-mac-arm64/chromedriver
-    mac-download-path: /Users/yd/Downloads
-    linux-web-driver-path: libs/chromedriver-linux64/chromedriver
-    linux-download-path: /home/team3/Downloads
-
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+
+naver:
+  id: Vyg0atzW6yZeGd_V7R_c
+  secret: smu6p56tiV
+  url: https://openapi.naver.com/v1/search/shop.json?query=%EC%9C%A0%EB%AA%A8%EC%B0%A8&display=100&sort=sim&filter=&exclude=rental:cbshop&start=

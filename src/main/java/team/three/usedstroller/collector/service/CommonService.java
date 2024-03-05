@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 import team.three.usedstroller.collector.domain.Product;
 import team.three.usedstroller.collector.domain.SourceType;
 import team.three.usedstroller.collector.repository.ProductRepository;
@@ -18,6 +17,7 @@ import team.three.usedstroller.collector.repository.ProductRepository;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public abstract class CommonService {
 
   private final ProductRepository productRepository;
@@ -43,7 +43,6 @@ public abstract class CommonService {
 
   public Mono<Integer> saveProducts(List<Product> items) {
     return Flux.fromIterable(items)
-        .publishOn(Schedulers.boundedElastic())
         .flatMap(this::saveItem)
         .onErrorResume(e -> Mono.error(new RuntimeException("Save Error!", e)))
         .reduce(Integer::sum);
