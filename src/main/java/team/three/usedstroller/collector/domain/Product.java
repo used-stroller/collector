@@ -17,7 +17,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -36,88 +35,89 @@ import team.three.usedstroller.collector.service.dto.NaverApiResponse;
 @Table(name = "products")
 public class Product extends BaseTimeEntity {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-	@Enumerated(EnumType.STRING)
-	private SourceType sourceType;
-	private String pid;
-	@Column(length = 1000, nullable = false)
-	private String title;
-	private Long price;
-	@Column(columnDefinition = "text")
-	private String link;
-	@Column(columnDefinition = "text")
-	private String imgSrc;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+  @Enumerated(EnumType.STRING)
+  private SourceType sourceType;
+  private String pid;
+  @Column(length = 1000, nullable = false)
+  private String title;
+  private Long price;
+  @Column(columnDefinition = "text")
+  private String link;
+  @Column(columnDefinition = "text")
+  private String imgSrc;
 
-	//naver
-	private int releaseYear;
-	@Column(length = 1000)
-	private String etc;
-	private LocalDate uploadDate;
+  //naver
+  private int releaseYear;
+  @Column(length = 1000)
+  private String etc;
+  private LocalDate uploadDate;
 
-	//carrot
-	private String region;
-	@Column(columnDefinition = "text")
-	private String content;
+  //carrot
+  private String region;
+  @Column(columnDefinition = "text")
+  private String content;
 
-	@Builder
-	private Product(SourceType sourceType, String pid, String title, String link, Long price, String imgSrc,
-	                int releaseYear, String etc, LocalDate uploadDate, String region, String content) {
-		this.sourceType = sourceType;
-		this.pid = pid;
-		this.title = title;
-		this.link = link;
-		this.price = price;
-		this.imgSrc = imgSrc;
-		this.releaseYear = releaseYear;
-		this.etc = etc;
-		this.uploadDate = uploadDate;
-		this.region = region;
-		this.content = content;
-	}
+  @Builder
+  private Product(SourceType sourceType, String pid, String title, String link, Long price,
+      String imgSrc,
+      int releaseYear, String etc, LocalDate uploadDate, String region, String content) {
+    this.sourceType = sourceType;
+    this.pid = pid;
+    this.title = title;
+    this.link = link;
+    this.price = price;
+    this.imgSrc = imgSrc;
+    this.releaseYear = releaseYear;
+    this.etc = etc;
+    this.uploadDate = uploadDate;
+    this.region = region;
+    this.content = content;
+  }
 
-	public static Mono<Product> createNaver(NaverApiResponse.Items item) {
-		Product product = Product.builder()
-			.sourceType(SourceType.NAVER)
-			.pid(item.getProductId())
-			.title(item.getTitle())
-			.link(item.getLink())
-			.price(item.getPrice())
-			.imgSrc(item.getImage())
-			.etc(item.getBrand())
-			.build();
-		return Mono.just(product);
-	}
+  public static Mono<Product> createNaver(NaverApiResponse.Items item) {
+    Product product = Product.builder()
+        .sourceType(SourceType.NAVER)
+        .pid(item.getProductId())
+        .title(item.getTitle())
+        .link(item.getLink())
+        .price(item.getPrice())
+        .imgSrc(item.getImage())
+        .etc(item.getBrand())
+        .build();
+    return Mono.just(product);
+  }
 
-	public static Mono<Product> createBunJang(BunjangItem item) {
-		Product product = Product.builder()
-			.sourceType(SourceType.BUNJANG)
-			.pid(item.getPid())
-			.title(item.getName())
-			.link(convertBunjangLink(item.getPid()))
-			.price(Long.parseLong(item.getPrice().replaceAll("[^0-9]", "")))
-			.imgSrc(item.getProductImage())
-			.region(item.getLocation())
-			.etc(item.getTag())
-			.uploadDate(convertLocalDate(item.getUpdateTime()))
-			.build();
-		return Mono.just(product);
-	}
+  public static Mono<Product> createBunJang(BunjangItem item) {
+    Product product = Product.builder()
+        .sourceType(SourceType.BUNJANG)
+        .pid(item.getPid())
+        .title(item.getName())
+        .link(convertBunjangLink(item.getPid()))
+        .price(Long.parseLong(item.getPrice().replaceAll("[^0-9]", "")))
+        .imgSrc(item.getProductImage())
+        .region(item.getLocation())
+        .etc(item.getTag())
+        .uploadDate(convertLocalDate(item.getUpdateTime()))
+        .build();
+    return Mono.just(product);
+  }
 
-	public static Mono<Product> createJunggo(JunggonaraItem item) {
-		Product product = Product.builder()
-			.sourceType(SourceType.JUNGGO)
-			.pid(item.getSeq().toString())
-			.title(item.getTitle())
-			.link(convertJunggoLink(item.getSeq().toString()))
-			.price(item.getPrice())
-			.imgSrc(item.getUrl())
-			.region(Arrays.toString(item.getLocationNames()))
-			.uploadDate(changeLocalDate(item.getSortDate()))
-			.build();
-		return Mono.just(product);
-	}
+  public static Mono<Product> createJunggo(JunggonaraItem item) {
+    Product product = Product.builder()
+        .sourceType(SourceType.JUNGGO)
+        .pid(item.getSeq().toString())
+        .title(item.getTitle())
+        .link(convertJunggoLink(item.getSeq().toString()))
+        .price(item.getPrice())
+        .imgSrc(item.getUrl())
+        .region(item.getLocation())
+        .uploadDate(changeLocalDate(item.getSortDate()))
+        .build();
+    return Mono.just(product);
+  }
 
   public static Product createHelloMarket(String pid, String title, String link, String price,
       String imgSrc, String uploadTime) {
@@ -132,59 +132,60 @@ public class Product extends BaseTimeEntity {
         .build();
   }
 
-	public static Product createCarrot(String title, String price, String region, String link, String imgSrc, String content, String uploadTime) {
-		return Product.builder()
-			.sourceType(SourceType.CARROT)
-			.pid(convertSimplePid(link, "/"))
-			.title(title)
-			.price(convertPrice(price))
-			.region(region)
-			.link(link)
-			.imgSrc(imgSrc)
-			.content(content)
-			.uploadDate(changeLocalDate(convertToTimeFormat(uploadTime)))
-			.build();
-	}
+  public static Product createCarrot(String title, String price, String region, String link,
+      String imgSrc, String content, String uploadTime) {
+    return Product.builder()
+        .sourceType(SourceType.CARROT)
+        .pid(convertSimplePid(link, "/"))
+        .title(title)
+        .price(convertPrice(price))
+        .region(region)
+        .link(link)
+        .imgSrc(imgSrc)
+        .content(content)
+        .uploadDate(changeLocalDate(convertToTimeFormat(uploadTime)))
+        .build();
+  }
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) {
-			return true;
-		}
-		if (o == null || getClass() != o.getClass()) {
-			return false;
-		}
-		Product product = (Product) o;
-		return releaseYear == product.releaseYear && sourceType == product.sourceType
-				&& Objects.equals(pid, product.pid) && Objects.equals(title, product.title)
-				&& Objects.equals(price, product.price) && Objects.equals(link, product.link)
-				&& Objects.equals(imgSrc, product.imgSrc) && Objects.equals(etc, product.etc)
-				&& Objects.equals(uploadDate, product.uploadDate)
-				&& Objects.equals(region, product.region) && Objects.equals(content, product.content);
-	}
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    Product product = (Product) o;
+    return releaseYear == product.releaseYear && sourceType == product.sourceType
+        && Objects.equals(pid, product.pid) && Objects.equals(title, product.title)
+        && Objects.equals(price, product.price) && Objects.equals(link, product.link)
+        && Objects.equals(imgSrc, product.imgSrc) && Objects.equals(etc, product.etc)
+        && Objects.equals(uploadDate, product.uploadDate)
+        && Objects.equals(region, product.region) && Objects.equals(content, product.content);
+  }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(sourceType, pid, title, price, link, imgSrc, releaseYear, etc,
-				uploadDate, region, content);
-	}
+  @Override
+  public int hashCode() {
+    return Objects.hash(sourceType, pid, title, price, link, imgSrc, releaseYear, etc,
+        uploadDate, region, content);
+  }
 
-	public void update(Product newProduct) {
-		super.updateData(newProduct);
-		this.sourceType = newProduct.getSourceType();
-		this.pid = newProduct.getPid();
-		this.title = newProduct.getTitle();
-		this.link = newProduct.getLink();
-		this.price = newProduct.getPrice();
-		this.imgSrc = newProduct.getImgSrc();
-		this.releaseYear = newProduct.getReleaseYear();
-		this.etc = newProduct.getEtc();
-		this.uploadDate = newProduct.getUploadDate();
-		this.region = newProduct.getRegion();
-		this.content = newProduct.getContent();
-	}
+  public void update(Product newProduct) {
+    super.updateData(newProduct);
+    this.sourceType = newProduct.getSourceType();
+    this.pid = newProduct.getPid();
+    this.title = newProduct.getTitle();
+    this.link = newProduct.getLink();
+    this.price = newProduct.getPrice();
+    this.imgSrc = newProduct.getImgSrc();
+    this.releaseYear = newProduct.getReleaseYear();
+    this.etc = newProduct.getEtc();
+    this.uploadDate = newProduct.getUploadDate();
+    this.region = newProduct.getRegion();
+    this.content = newProduct.getContent();
+  }
 
-	public void updateDate() {
-		super.updateDate();
-	}
+  public void updateDate() {
+    super.updateDate();
+  }
 }
