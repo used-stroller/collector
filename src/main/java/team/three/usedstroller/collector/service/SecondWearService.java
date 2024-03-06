@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StopWatch;
@@ -22,11 +23,21 @@ import team.three.usedstroller.collector.repository.ProductRepository;
 @Slf4j
 public class SecondWearService extends CommonService {
 
-  public SecondWearService(ProductRepository productRepository) {
-    super(productRepository);
+  private final String URL_PATTERN = "https://hellomarket.com/api/search/items?q=유모차&page=%d&limit=%d";
+
+  public SecondWearService(ProductRepository productRepository,
+      ApplicationEventPublisher eventPublisher) {
+    super(productRepository, eventPublisher);
   }
 
-  private final String URL_PATTERN = "https://hellomarket.com/api/search/items?q=유모차&page=%d&limit=%d";
+  private static String callApi(String url) {
+    return WebClient.create()
+        .get()
+        .uri(url)
+        .retrieve()
+        .bodyToMono(String.class)
+        .block();
+  }
 
   public void start() {
     StopWatch stopWatch = new StopWatch();
@@ -49,7 +60,8 @@ public class SecondWearService extends CommonService {
       }
       int finalPage = page;
       saveProducts(products)
-          .subscribe(count -> log.info("Secondwear market page: [{}], saved item: [{}], total update: [{}]",
+          .subscribe(count -> log.info(
+              "Secondwear market page: [{}], saved item: [{}], total update: [{}]",
               finalPage, count, updateCount.addAndGet(count)));
     }
 
@@ -99,15 +111,6 @@ public class SecondWearService extends CommonService {
     return productList;
   }
 
-  private static String callApi(String url) {
-    return WebClient.create()
-        .get()
-        .uri(url)
-        .retrieve()
-        .bodyToMono(String.class)
-        .block();
-  }
-
   private Product covertJSONObjectToProduct(JSONObject element) throws JSONException {
     String pid = element.getString("itemIdx");
     String title = element.getString("title");
@@ -121,7 +124,7 @@ public class SecondWearService extends CommonService {
     Date date = new Date(Long.parseLong(timestamp));
     String uploadTime = sdf.format(date);
 
-    return Product.createHelloMarket(pid, title, link, price, img, uploadTime);
+    return Product.createSecondwear(pid, title, link, price, img, uploadTime);
   }
 
 }

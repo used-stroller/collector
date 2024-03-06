@@ -18,6 +18,9 @@ public class JunggonaraItem {
   private String sortDate; // 업로드 일시
 
   public String getLocation() {
+    if (this.locationNames == null || this.locationNames.length == 0) {
+      return null;
+    }
     return this.locationNames[0];
   }
 

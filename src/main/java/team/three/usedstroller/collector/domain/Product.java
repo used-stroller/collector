@@ -119,7 +119,7 @@ public class Product extends BaseTimeEntity {
     return Mono.just(product);
   }
 
-  public static Product createHelloMarket(String pid, String title, String link, String price,
+  public static Product createSecondwear(String pid, String title, String link, String price,
       String imgSrc, String uploadTime) {
     return Product.builder()
         .sourceType(SourceType.SECOND)

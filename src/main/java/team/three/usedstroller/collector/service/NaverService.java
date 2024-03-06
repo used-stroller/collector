@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -34,8 +35,9 @@ public class NaverService extends CommonService {
   @Value("${naver.url}")
   private String url;
 
-  public NaverService(ProductRepository productRepository, ApiService apiService) {
-    super(productRepository);
+  public NaverService(ProductRepository productRepository,
+      ApplicationEventPublisher eventPublisher, ApiService apiService) {
+    super(productRepository, eventPublisher);
     this.apiService = apiService;
   }
 
@@ -47,6 +49,7 @@ public class NaverService extends CommonService {
           stopWatch.stop();
           log.info("네이버쇼핑 완료: {}건, 수집 시간: {}s", count, stopWatch.getTotalTimeSeconds());
         })
+        .onErrorStop()
         .publishOn(Schedulers.boundedElastic())
         .doFinally(f -> super.deleteOldData(SourceType.NAVER))
         .subscribe();

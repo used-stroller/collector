@@ -1,12 +1,11 @@
 package team.three.usedstroller.collector.service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -21,6 +20,7 @@ import team.three.usedstroller.collector.repository.ProductRepository;
 public abstract class CommonService {
 
   private final ProductRepository productRepository;
+  private final ApplicationEventPublisher eventPublisher;
 
   public Mono<Integer> saveItem(Product newProduct) {
     Optional<Product> dbProduct = productRepository.findByPidAndSourceType(
@@ -48,10 +48,7 @@ public abstract class CommonService {
         .reduce(Integer::sum);
   }
 
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void deleteOldData(SourceType sourceType) {
-    LocalDateTime today = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0);
-    productRepository.deleteAllBySourceTypeAndUpdatedAtIsBefore(sourceType, today);
-    log.info("삭제 완료: [{}], 기준 일시: [{}]", sourceType, today);
+    eventPublisher.publishEvent(sourceType);
   }
 }
