@@ -58,7 +58,7 @@ public class JunggonaraService extends CommonService {
         .flatMap(totalPage -> {
           log.info("junggonara total page: {}", totalPage);
 
-          return Flux.range(0, 3)
+          return Flux.range(0, totalPage)
               .flatMap(page -> {
                 JunggonaraApiRequest request = JunggonaraApiRequest.builder()
                     .page(page)
