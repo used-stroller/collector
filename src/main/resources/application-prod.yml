@@ -3,9 +3,9 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://34.47.91.202:5432/
+    url: jdbc:postgresql://localhost:5432/
     username: postgres
-    password: stroller
+    password: stroller3jo
     driver-class-name: org.postgresql.Driver
 
 logging:
