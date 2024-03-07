@@ -78,11 +78,12 @@ public class CarrotService extends CommonService {
           String region = element.select("p.article-region-name").text();
           String price = element.select("p.article-price").text();
           String imgSrc = element.select("div.card-photo > img").attr("src");
-          String link = element.select("a.flea-market-article-link").attr("href");
+          String article = element.select("a.flea-market-article-link").attr("href");
+          String link = "https://www.daangn.com/" + article;
           Document detailDoc = null;
           String uploadTime = "";
           try {
-            detailDoc = Jsoup.connect("https://www.daangn.com" + link).get();
+            detailDoc = Jsoup.connect("https://www.daangn.com" + article).get();
             Element time = detailDoc.getElementsByTag("time").stream().findFirst()
                 .orElseGet(() -> null);
             uploadTime = ObjectUtils.isEmpty(time) ? "" : time.text().replace("끌올", "");
