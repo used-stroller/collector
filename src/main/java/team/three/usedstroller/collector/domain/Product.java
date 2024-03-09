@@ -81,7 +81,7 @@ public class Product extends BaseTimeEntity {
     Product product = Product.builder()
         .sourceType(SourceType.NAVER)
         .pid(item.getProductId())
-        .title(item.getTitle())
+        .title(item.getTitle().replaceAll("<[^>]*>", ""))
         .link(item.getLink())
         .price(item.getPrice())
         .imgSrc(item.getImage())
