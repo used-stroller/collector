@@ -66,7 +66,7 @@ public class NaverService extends CommonService {
       headers.add("X-Naver-Client-Secret", secret);
     };
 
-    return Flux.range(1, 9)
+    return Flux.range(0, 10)
         .map(start -> start * 100 + 1)
         .delayElements(Duration.ofMillis(500))
         .flatMap(start -> {
