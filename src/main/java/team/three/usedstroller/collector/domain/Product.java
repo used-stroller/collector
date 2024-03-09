@@ -2,6 +2,7 @@ package team.three.usedstroller.collector.domain;
 
 import static team.three.usedstroller.collector.util.UnitConversionUtils.changeLocalDate;
 import static team.three.usedstroller.collector.util.UnitConversionUtils.convertBunjangLink;
+import static team.three.usedstroller.collector.util.UnitConversionUtils.convertCarrotLink;
 import static team.three.usedstroller.collector.util.UnitConversionUtils.convertJunggoLink;
 import static team.three.usedstroller.collector.util.UnitConversionUtils.convertLocalDate;
 import static team.three.usedstroller.collector.util.UnitConversionUtils.convertPrice;
@@ -140,7 +141,7 @@ public class Product extends BaseTimeEntity {
         .title(title)
         .price(convertPrice(price))
         .region(region)
-        .link(link)
+        .link(convertCarrotLink(link))
         .imgSrc(imgSrc)
         .content(content)
         .uploadDate(changeLocalDate(convertToTimeFormat(uploadTime)))
