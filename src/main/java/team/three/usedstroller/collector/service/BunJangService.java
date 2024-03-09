@@ -15,9 +15,9 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import team.three.usedstroller.collector.domain.Product;
 import team.three.usedstroller.collector.domain.SourceType;
+import team.three.usedstroller.collector.domain.dto.BunjangApiResponse;
+import team.three.usedstroller.collector.domain.dto.BunjangItem;
 import team.three.usedstroller.collector.repository.ProductRepository;
-import team.three.usedstroller.collector.service.dto.BunjangApiResponse;
-import team.three.usedstroller.collector.service.dto.BunjangItem;
 import team.three.usedstroller.collector.util.ApiService;
 
 @Slf4j
@@ -29,6 +29,7 @@ public class BunJangService extends CommonService {
   };
   Consumer<HttpHeaders> headerConsumer = headers -> headers.add("Accept",
       MediaType.APPLICATION_JSON_VALUE);
+
   public BunJangService(ProductRepository productRepository,
       ApplicationEventPublisher eventPublisher, ApiService apiService) {
     super(productRepository, eventPublisher);

@@ -24,9 +24,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import reactor.core.publisher.Mono;
-import team.three.usedstroller.collector.service.dto.BunjangItem;
-import team.three.usedstroller.collector.service.dto.JunggonaraItem;
-import team.three.usedstroller.collector.service.dto.NaverApiResponse;
+import team.three.usedstroller.collector.domain.dto.BunjangItem;
+import team.three.usedstroller.collector.domain.dto.JunggonaraItem;
+import team.three.usedstroller.collector.domain.dto.NaverApiResponse;
 
 @Entity
 @Getter

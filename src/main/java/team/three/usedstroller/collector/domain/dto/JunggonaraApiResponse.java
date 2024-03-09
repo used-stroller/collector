@@ -1,4 +1,4 @@
-package team.three.usedstroller.collector.service.dto;
+package team.three.usedstroller.collector.domain.dto;
 
 import java.util.List;
 import lombok.AccessLevel;
@@ -17,6 +17,7 @@ public class JunggonaraApiResponse {
   @NoArgsConstructor(access = AccessLevel.PROTECTED)
   @AllArgsConstructor
   public static class Data {
+
     private List<JunggonaraItem> items;
     private Integer totalSize;
   }

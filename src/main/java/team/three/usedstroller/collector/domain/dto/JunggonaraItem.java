@@ -1,4 +1,4 @@
-package team.three.usedstroller.collector.service.dto;
+package team.three.usedstroller.collector.domain.dto;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

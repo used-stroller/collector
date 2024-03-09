@@ -22,7 +22,7 @@ public class ProductEventHandler {
   @Transactional
   public void deleteProductBySourceType(SourceType sourceType) {
     log.info("이벤트 구독 {}", sourceType);
-    LocalDateTime today = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0);
+    LocalDateTime today = LocalDateTime.now().minusHours(3);
     productRepository.deleteAllBySourceTypeAndUpdatedAtIsBefore(sourceType, today);
     log.info("[{}] 과거 데이터 삭제 완료. 기준 일시: [{}]", sourceType, today);
   }

@@ -13,10 +13,10 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import team.three.usedstroller.collector.domain.Product;
 import team.three.usedstroller.collector.domain.SourceType;
+import team.three.usedstroller.collector.domain.dto.JunggonaraApiRequest;
+import team.three.usedstroller.collector.domain.dto.JunggonaraApiResponse;
+import team.three.usedstroller.collector.domain.dto.JunggonaraItem;
 import team.three.usedstroller.collector.repository.ProductRepository;
-import team.three.usedstroller.collector.service.dto.JunggonaraApiRequest;
-import team.three.usedstroller.collector.service.dto.JunggonaraApiResponse;
-import team.three.usedstroller.collector.service.dto.JunggonaraItem;
 import team.three.usedstroller.collector.util.ApiService;
 
 @Service

@@ -1,4 +1,4 @@
-package team.three.usedstroller.collector.service.dto;
+package team.three.usedstroller.collector.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;

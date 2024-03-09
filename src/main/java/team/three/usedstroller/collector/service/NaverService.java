@@ -17,8 +17,8 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import team.three.usedstroller.collector.domain.Product;
 import team.three.usedstroller.collector.domain.SourceType;
+import team.three.usedstroller.collector.domain.dto.NaverApiResponse;
 import team.three.usedstroller.collector.repository.ProductRepository;
-import team.three.usedstroller.collector.service.dto.NaverApiResponse;
 import team.three.usedstroller.collector.util.ApiService;
 
 @Slf4j
