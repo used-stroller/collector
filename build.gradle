@@ -70,9 +70,9 @@ jar {
     enabled = false
 }
 
-bootJar {
-    destinationDirectory = file("../docker-setting/jar-path")
-}
+//bootJar {
+//    destinationDirectory = file("../docker-setting/jar-path")
+//}
 
 clean {
     delete file('src/main/generated')
