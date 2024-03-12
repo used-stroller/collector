@@ -4,15 +4,15 @@ server:
 spring:
   application:
     name: used-stroller
-  datasource:
-    url: jdbc:postgresql://${db.hostname}:${db.port}/${db.name}
-    username: ${db.username}
-    password: ${db.password}
-    driver-class-name: org.postgresql.Driver
+  #  datasource:
+  #    url: jdbc:postgresql://${db.hostname}:${db.port}/${db.name}
+  #    username: ${db.username}
+  #    password: ${db.password}
+  #    driver-class-name: org.postgresql.Driver
 
-#  mvc:
-#    pathmatch:
-#      matching-strategy: ant_path_matcher
+  #  mvc:
+  #    pathmatch:
+  #      matching-strategy: ant_path_matcher
   jpa:
     hibernate:
       ddl-auto: none
@@ -40,3 +40,5 @@ naver:
   id: Vyg0atzW6yZeGd_V7R_c
   secret: smu6p56tiV
   url: https://openapi.naver.com/v1/search/shop.json?query=%EC%9C%A0%EB%AA%A8%EC%B0%A8&display=100&sort=sim&filter=&exclude=rental:cbshop&start=
+
+#collector 웹훅테스트
