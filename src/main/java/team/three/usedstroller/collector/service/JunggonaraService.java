@@ -18,12 +18,14 @@ import team.three.usedstroller.collector.domain.dto.JunggonaraApiResponse;
 import team.three.usedstroller.collector.domain.dto.JunggonaraItem;
 import team.three.usedstroller.collector.repository.ProductRepository;
 import team.three.usedstroller.collector.util.ApiService;
+import team.three.usedstroller.collector.util.SlackHook;
 
 @Service
 @Slf4j
 public class JunggonaraService extends CommonService {
 
   private final ApiService apiService;
+  private final SlackHook slackHook;
   private final String URL = "https://search-api.joongna.com/v3/search/all";
   private final String SORT = "RECENT_SORT";
   private final String KEYWORD = "유모차";
@@ -32,9 +34,10 @@ public class JunggonaraService extends CommonService {
   };
 
   public JunggonaraService(ProductRepository productRepository,
-      ApplicationEventPublisher eventPublisher, ApiService apiService) {
+      ApplicationEventPublisher eventPublisher, ApiService apiService, SlackHook slackHook) {
     super(productRepository, eventPublisher);
     this.apiService = apiService;
+    this.slackHook = slackHook;
   }
 
   public void start() {
@@ -44,6 +47,7 @@ public class JunggonaraService extends CommonService {
         .doOnSuccess(count -> {
           stopWatch.stop();
           log.info("중고나라 완료: {}건, 수집 시간: {}s", count, stopWatch.getTotalTimeSeconds());
+          slackHook.sendMessage("중고나라", count, stopWatch.getTotalTimeSeconds());
         })
         .publishOn(Schedulers.boundedElastic())
         .doFinally(f -> super.deleteOldData(SourceType.JUNGGO))

@@ -16,6 +16,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import team.three.usedstroller.collector.domain.Product;
 import team.three.usedstroller.collector.domain.SourceType;
 import team.three.usedstroller.collector.repository.ProductRepository;
+import team.three.usedstroller.collector.util.SlackHook;
 
 @Slf4j
 @Service
@@ -27,10 +28,12 @@ public class CarrotService extends CommonService {
       .path("/search/%EC%9C%A0%EB%AA%A8%EC%B0%A8/more/flea_market")
       .queryParam("next_page", "")
       .build().toUriString();
+  private final SlackHook slackHook;
 
   public CarrotService(ProductRepository productRepository,
-      ApplicationEventPublisher eventPublisher) {
+      ApplicationEventPublisher eventPublisher, SlackHook slackHook) {
     super(productRepository, eventPublisher);
+    this.slackHook = slackHook;
   }
 
   public void start(Integer startPage, Integer endPage) {
@@ -39,7 +42,8 @@ public class CarrotService extends CommonService {
     stopWatch.start();
     Integer count = collecting(startPage, endPage);
     stopWatch.stop();
-    log.info("댱근 완료: {}건, 수집 시간: {}s", count, stopWatch.getTotalTimeSeconds());
+    log.info("당근 완료: {}건, 수집 시간: {}s", count, stopWatch.getTotalTimeSeconds());
+    slackHook.sendMessage("당근", count, stopWatch.getTotalTimeSeconds());
     super.deleteOldData(SourceType.CARROT);
   }
 

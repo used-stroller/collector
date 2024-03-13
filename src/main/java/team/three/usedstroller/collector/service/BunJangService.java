@@ -19,21 +19,24 @@ import team.three.usedstroller.collector.domain.dto.BunjangApiResponse;
 import team.three.usedstroller.collector.domain.dto.BunjangItem;
 import team.three.usedstroller.collector.repository.ProductRepository;
 import team.three.usedstroller.collector.util.ApiService;
+import team.three.usedstroller.collector.util.SlackHook;
 
 @Slf4j
 @Service
 public class BunJangService extends CommonService {
 
   private final ApiService apiService;
+  private final SlackHook slackHook;
   ParameterizedTypeReference<BunjangApiResponse> typeReference = new ParameterizedTypeReference<>() {
   };
   Consumer<HttpHeaders> headerConsumer = headers -> headers.add("Accept",
       MediaType.APPLICATION_JSON_VALUE);
 
   public BunJangService(ProductRepository productRepository,
-      ApplicationEventPublisher eventPublisher, ApiService apiService) {
+      ApplicationEventPublisher eventPublisher, ApiService apiService, SlackHook slackHook) {
     super(productRepository, eventPublisher);
     this.apiService = apiService;
+    this.slackHook = slackHook;
   }
 
   public void start() {
@@ -43,6 +46,7 @@ public class BunJangService extends CommonService {
         .doOnSuccess(count -> {
           stopWatch.stop();
           log.info("번개장터 완료: {}건, 수집 시간: {}s", count, stopWatch.getTotalTimeSeconds());
+          slackHook.sendMessage("번개장터", count, stopWatch.getTotalTimeSeconds());
         })
         .publishOn(Schedulers.boundedElastic())
         .doFinally(f -> super.deleteOldData(SourceType.BUNJANG))

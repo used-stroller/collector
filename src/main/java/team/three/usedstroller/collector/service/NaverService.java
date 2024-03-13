@@ -20,12 +20,14 @@ import team.three.usedstroller.collector.domain.SourceType;
 import team.three.usedstroller.collector.domain.dto.NaverApiResponse;
 import team.three.usedstroller.collector.repository.ProductRepository;
 import team.three.usedstroller.collector.util.ApiService;
+import team.three.usedstroller.collector.util.SlackHook;
 
 @Slf4j
 @Service
 public class NaverService extends CommonService {
 
   private final ApiService apiService;
+  private final SlackHook slackHook;
   ParameterizedTypeReference<NaverApiResponse> typeReference = new ParameterizedTypeReference<>() {
   };
   @Value("${naver.id}")
@@ -36,9 +38,10 @@ public class NaverService extends CommonService {
   private String url;
 
   public NaverService(ProductRepository productRepository,
-      ApplicationEventPublisher eventPublisher, ApiService apiService) {
+      ApplicationEventPublisher eventPublisher, ApiService apiService, SlackHook slackHook) {
     super(productRepository, eventPublisher);
     this.apiService = apiService;
+    this.slackHook = slackHook;
   }
 
   public void start() {
@@ -48,6 +51,7 @@ public class NaverService extends CommonService {
         .doOnSuccess(count -> {
           stopWatch.stop();
           log.info("네이버쇼핑 완료: {}건, 수집 시간: {}s", count, stopWatch.getTotalTimeSeconds());
+          slackHook.sendMessage("네이버쇼핑", count, stopWatch.getTotalTimeSeconds());
         })
         .onErrorStop()
         .publishOn(Schedulers.boundedElastic())
