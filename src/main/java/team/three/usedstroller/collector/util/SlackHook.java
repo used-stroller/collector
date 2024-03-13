@@ -10,7 +10,7 @@ public class SlackHook {
   public void sendMessage(String channel, int count, double time) {
     String message = String.format("%s 완료: {%s}건, 수집 시간: {%s}s", channel, count, time);
     SlackApi api = new SlackApi(
-        "https://hooks.slack.com/services/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");
+        "https://hooks.slack.com/services/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");
     api.call(new SlackMessage(message));
   }
 }

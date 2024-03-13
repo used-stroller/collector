@@ -18,16 +18,19 @@ import org.springframework.web.reactive.function.client.WebClient;
 import team.three.usedstroller.collector.domain.Product;
 import team.three.usedstroller.collector.domain.SourceType;
 import team.three.usedstroller.collector.repository.ProductRepository;
+import team.three.usedstroller.collector.util.SlackHook;
 
 @Service
 @Slf4j
 public class SecondWearService extends CommonService {
 
   private final String URL_PATTERN = "https://hellomarket.com/api/search/items?q=유모차&page=%d&limit=%d";
+  private final SlackHook slackHook;
 
   public SecondWearService(ProductRepository productRepository,
-      ApplicationEventPublisher eventPublisher) {
+      ApplicationEventPublisher eventPublisher, SlackHook slackHook) {
     super(productRepository, eventPublisher);
+    this.slackHook = slackHook;
   }
 
   private static String callApi(String url) {
@@ -45,6 +48,7 @@ public class SecondWearService extends CommonService {
     Integer count = collecting();
     stopWatch.stop();
     log.info("세컨웨어 완료: {}건, 수집 시간: {}s", count, stopWatch.getTotalTimeSeconds());
+    slackHook.sendMessage("세컨웨어", count, stopWatch.getTotalTimeSeconds());
     super.deleteOldData(SourceType.SECOND);
   }
 
