@@ -42,4 +42,4 @@ naver:
   url: https://openapi.naver.com/v1/search/shop.json?query=%EC%9C%A0%EB%AA%A8%EC%B0%A8&display=100&sort=sim&filter=&exclude=rental:cbshop&start=
 #slack
 slack:
-  url: https://hooks.slack.com/services/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
+  url: https://hooks.slack.com/services/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
