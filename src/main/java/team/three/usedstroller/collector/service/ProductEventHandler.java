@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import team.three.usedstroller.collector.domain.SourceType;
 import team.three.usedstroller.collector.repository.ProductRepository;
 import team.three.usedstroller.collector.util.SlackHook;
@@ -18,6 +19,7 @@ public class ProductEventHandler {
   private final SlackHook slackHook;
 
   @EventListener
+  @Transactional
   public void deleteProductBySourceType(SourceType sourceType) {
     log.info("이벤트 구독 {}", sourceType);
     LocalDateTime today = LocalDateTime.now().minusHours(3);

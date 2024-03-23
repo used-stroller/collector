@@ -15,6 +15,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StopWatch;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -79,7 +80,7 @@ public class BunJangServiceMvc implements ProductCollector {
           ResponseEntity<BunjangApiResponse> response = restTemplate.exchange(uri, HttpMethod.GET,
               new HttpEntity<>(headerConsumer), BunjangApiResponse.class);
 
-          if (Objects.isNull(response.getBody())) {
+          if (ObjectUtils.isEmpty(response.getBody())) {
             log.info("bunjang api response is null. page: {}", page);
             return;
           }

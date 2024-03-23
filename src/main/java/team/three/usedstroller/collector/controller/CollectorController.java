@@ -6,14 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import team.three.usedstroller.collector.service.CarrotService;
-import team.three.usedstroller.collector.service.JunggonaraService;
 import team.three.usedstroller.collector.service.NaverService;
 import team.three.usedstroller.collector.service.SecondWearService;
 import team.three.usedstroller.collector.service.mvc.BunJangServiceMvc;
+import team.three.usedstroller.collector.service.mvc.CarrotServiceMvc;
+import team.three.usedstroller.collector.service.mvc.JunggonaraServiceMvc;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,11 +22,10 @@ import team.three.usedstroller.collector.service.mvc.BunJangServiceMvc;
 public class CollectorController {
 
   private final NaverService naverService;
-  private final CarrotService carrotService;
+  private final CarrotServiceMvc carrotService;
   private final SecondWearService secondWearService;
-  //  private final BunJangService bunJangService;
   private final BunJangServiceMvc bunJangService;
-  private final JunggonaraService junggonaraService;
+  private final JunggonaraServiceMvc junggonaraService;
 
   /**
    * 번개장터 '유모차' 검색 결과를 수집한다.
@@ -66,15 +64,12 @@ public class CollectorController {
    * 당근마켓 '유모차' 검색 결과를 수집한다.
    * "https://www.daangn.com/search/%EC%9C%A0%EB%AA%A8%EC%B0%A8/more/flea_market?page="
    *
-   * @param startPage 시작 페이지
    * @runningTime 500페이지에 약 30분 (약 3000건)
    */
   @PostMapping("/carrot-market")
   @ResponseStatus(HttpStatus.CREATED)
-  public void carrotMarket(
-      @RequestParam(required = true, defaultValue = "1") Integer startPage,
-      @RequestParam(required = true, defaultValue = "200") Integer endPage) {
-    carrotService.start(startPage, endPage);
+  public void carrotMarket() {
+    carrotService.start();
   }
 
   /**

@@ -105,8 +105,8 @@ public class Product extends BaseTimeEntity {
         .build();
   }
 
-  public static Mono<Product> createJunggo(JunggonaraItem item) {
-    Product product = Product.builder()
+  public static Product createJunggo(JunggonaraItem item) {
+    return Product.builder()
         .sourceType(SourceType.JUNGGO)
         .pid(item.getSeq().toString())
         .title(item.getTitle())
@@ -116,7 +116,6 @@ public class Product extends BaseTimeEntity {
         .region(item.getLocation())
         .uploadDate(changeLocalDate(item.getSortDate()))
         .build();
-    return Mono.just(product);
   }
 
   public static Product createSecondwear(String pid, String title, String link, String price,

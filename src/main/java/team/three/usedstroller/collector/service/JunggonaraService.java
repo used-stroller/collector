@@ -90,7 +90,7 @@ public class JunggonaraService extends CommonService {
 
   public Mono<Integer> saveItemList(List<JunggonaraItem> list) {
     return Flux.fromIterable(list)
-        .flatMap(Product::createJunggo)
+        .flatMap(item -> Mono.just(Product.createJunggo(item)))
         .collectList()
         .flatMap(this::saveProducts);
   }
