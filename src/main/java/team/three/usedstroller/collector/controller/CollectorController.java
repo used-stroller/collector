@@ -9,11 +9,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import team.three.usedstroller.collector.service.BunJangService;
 import team.three.usedstroller.collector.service.CarrotService;
 import team.three.usedstroller.collector.service.JunggonaraService;
 import team.three.usedstroller.collector.service.NaverService;
 import team.three.usedstroller.collector.service.SecondWearService;
+import team.three.usedstroller.collector.service.mvc.BunJangServiceMvc;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,7 +25,8 @@ public class CollectorController {
   private final NaverService naverService;
   private final CarrotService carrotService;
   private final SecondWearService secondWearService;
-  private final BunJangService bunJangService;
+  //  private final BunJangService bunJangService;
+  private final BunJangServiceMvc bunJangService;
   private final JunggonaraService junggonaraService;
 
   /**

@@ -89,7 +89,7 @@ public class BunJangService extends CommonService {
 
   public Mono<Integer> saveItemList(List<BunjangItem> list) {
     return Flux.fromIterable(list)
-        .flatMap(Product::createBunJang)
+        .flatMap(item -> Mono.just(Product.createBunJang(item)))
         .collectList()
         .flatMap(this::saveProducts);
   }

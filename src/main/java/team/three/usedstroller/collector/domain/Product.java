@@ -91,8 +91,8 @@ public class Product extends BaseTimeEntity {
     return Mono.just(product);
   }
 
-  public static Mono<Product> createBunJang(BunjangItem item) {
-    Product product = Product.builder()
+  public static Product createBunJang(BunjangItem item) {
+    return Product.builder()
         .sourceType(SourceType.BUNJANG)
         .pid(item.getPid())
         .title(item.getName())
@@ -103,7 +103,6 @@ public class Product extends BaseTimeEntity {
         .etc(item.getTag())
         .uploadDate(convertLocalDate(item.getUpdateTime()))
         .build();
-    return Mono.just(product);
   }
 
   public static Mono<Product> createJunggo(JunggonaraItem item) {

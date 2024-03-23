@@ -4,11 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import team.three.usedstroller.collector.service.BunJangService;
 import team.three.usedstroller.collector.service.CarrotService;
 import team.three.usedstroller.collector.service.JunggonaraService;
 import team.three.usedstroller.collector.service.NaverService;
 import team.three.usedstroller.collector.service.SecondWearService;
+import team.three.usedstroller.collector.service.mvc.BunJangServiceMvc;
 
 /**
  * 매일 새벽 4시마다 정해진 가견으로 실행
@@ -18,7 +18,8 @@ import team.three.usedstroller.collector.service.SecondWearService;
 @RequiredArgsConstructor
 public class CollectorScheduler {
 
-  private final BunJangService bunJangService;
+  //  private final BunJangService bunJangService;
+  private final BunJangServiceMvc bunJangService;
   private final SecondWearService secondWearService;
   private final JunggonaraService junggonaraService;
   private final NaverService naverService;
@@ -53,7 +54,6 @@ public class CollectorScheduler {
     log.info("당근 예약 수집 시작");
     carrotService.start(1, 500);
   }
-
 
 
 }
