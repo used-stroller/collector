@@ -91,7 +91,7 @@ public class NaverService extends CommonService {
 
   public Mono<Integer> saveItemList(List<NaverApiResponse.Items> list) {
     return Flux.fromIterable(list)
-        .flatMap(Product::createNaver)
+        .flatMap(item -> Mono.just(Product.createNaver(item)))
         .collectList()
         .flatMap(this::saveProducts);
   }

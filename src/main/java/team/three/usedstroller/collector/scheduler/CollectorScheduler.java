@@ -4,11 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import team.three.usedstroller.collector.service.CarrotService;
-import team.three.usedstroller.collector.service.JunggonaraService;
-import team.three.usedstroller.collector.service.NaverService;
 import team.three.usedstroller.collector.service.SecondWearService;
 import team.three.usedstroller.collector.service.mvc.BunJangServiceMvc;
+import team.three.usedstroller.collector.service.mvc.CarrotServiceMvc;
+import team.three.usedstroller.collector.service.mvc.JunggonaraServiceMvc;
+import team.three.usedstroller.collector.service.mvc.NaverServiceMvc;
 
 /**
  * 매일 새벽 4시마다 정해진 가견으로 실행
@@ -18,12 +18,11 @@ import team.three.usedstroller.collector.service.mvc.BunJangServiceMvc;
 @RequiredArgsConstructor
 public class CollectorScheduler {
 
-  //  private final BunJangService bunJangService;
   private final BunJangServiceMvc bunJangService;
+  private final JunggonaraServiceMvc junggonaraService;
+  private final NaverServiceMvc naverService;
+  private final CarrotServiceMvc carrotService;
   private final SecondWearService secondWearService;
-  private final JunggonaraService junggonaraService;
-  private final NaverService naverService;
-  private final CarrotService carrotService;
 
   @Scheduled(cron = "0 0 3 * * *", zone = "Asia/Seoul")
   public void bunjang() {
@@ -52,7 +51,7 @@ public class CollectorScheduler {
   @Scheduled(cron = "0 20 3 * * *", zone = "Asia/Seoul")
   public void carrot() {
     log.info("당근 예약 수집 시작");
-    carrotService.start(1, 500);
+    carrotService.start();
   }
 
 

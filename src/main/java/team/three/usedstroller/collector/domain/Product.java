@@ -24,7 +24,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import reactor.core.publisher.Mono;
 import team.three.usedstroller.collector.domain.dto.BunjangItem;
 import team.three.usedstroller.collector.domain.dto.JunggonaraItem;
 import team.three.usedstroller.collector.domain.dto.NaverApiResponse;
@@ -78,8 +77,8 @@ public class Product extends BaseTimeEntity {
     this.content = content;
   }
 
-  public static Mono<Product> createNaver(NaverApiResponse.Items item) {
-    Product product = Product.builder()
+  public static Product createNaver(NaverApiResponse.Items item) {
+    return Product.builder()
         .sourceType(SourceType.NAVER)
         .pid(item.getProductId())
         .title(item.getTitle().replaceAll("<[^>]*>", ""))
@@ -88,7 +87,6 @@ public class Product extends BaseTimeEntity {
         .imgSrc(item.getImage())
         .etc(item.getBrand())
         .build();
-    return Mono.just(product);
   }
 
   public static Product createBunJang(BunjangItem item) {

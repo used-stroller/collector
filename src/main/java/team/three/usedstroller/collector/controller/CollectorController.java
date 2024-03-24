@@ -8,11 +8,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import team.three.usedstroller.collector.service.NaverService;
 import team.three.usedstroller.collector.service.SecondWearService;
 import team.three.usedstroller.collector.service.mvc.BunJangServiceMvc;
 import team.three.usedstroller.collector.service.mvc.CarrotServiceMvc;
 import team.three.usedstroller.collector.service.mvc.JunggonaraServiceMvc;
+import team.three.usedstroller.collector.service.mvc.NaverServiceMvc;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,11 +21,11 @@ import team.three.usedstroller.collector.service.mvc.JunggonaraServiceMvc;
 @Tag(name = "collector", description = "수집기")
 public class CollectorController {
 
-  private final NaverService naverService;
+  private final NaverServiceMvc naverService;
   private final CarrotServiceMvc carrotService;
-  private final SecondWearService secondWearService;
   private final BunJangServiceMvc bunJangService;
   private final JunggonaraServiceMvc junggonaraService;
+  private final SecondWearService secondWearService;
 
   /**
    * 번개장터 '유모차' 검색 결과를 수집한다.
