@@ -34,7 +34,7 @@ public class CarrotServiceMvc implements ProductCollector {
   private final UriComponentsBuilder uriBuilder = UriComponentsBuilder.newInstance()
       .scheme("https")
       .host("www.daangn.com")
-      .path("/search/%EC%9C%A0%EB%AA%A8%EC%B0%A8/more/flea_market")
+      .path("/search/유모차/more/flea_market")
       .queryParam("next_page", "")
       .encode();
 
