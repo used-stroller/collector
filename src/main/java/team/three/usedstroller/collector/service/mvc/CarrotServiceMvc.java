@@ -53,13 +53,14 @@ public class CarrotServiceMvc implements ProductCollector {
   public Integer collectProduct() {
     AtomicInteger updateCount = new AtomicInteger(0);
 
-    IntStream.rangeClosed(0, END_PAGE)
+    IntStream.rangeClosed(1, END_PAGE)
         .forEach(page -> {
           String url = uriBuilder
               .replaceQueryParam("next_page", page)
               .build()
               .toUriString();
 
+          log.info("carrot market page: [{}] start", page);
           List<Product> products = getProducts(url);
           if (ObjectUtils.isEmpty(products)) {
             log.info("carrot market page: [{}] is empty", page);

@@ -1,6 +1,7 @@
 package team.three.usedstroller.collector.service.mvc;
 
 import jakarta.annotation.PostConstruct;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,7 +9,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StopWatch;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 import team.three.usedstroller.collector.domain.Product;
 import team.three.usedstroller.collector.domain.SourceType;
 import team.three.usedstroller.collector.domain.dto.NaverApiResponse;
@@ -37,13 +38,21 @@ public class NaverServiceMvc implements ProductCollector {
   private final RestTemplate restTemplate;
   private final SlackHook slackHook;
   private final Environment environment;
-
+  private final UriComponentsBuilder uriBuilder = UriComponentsBuilder.newInstance()
+      .scheme("https")
+      .host("openapi.naver.com")
+      .path("/v1/search/shop.json")
+      .queryParam("query", "유모차")
+      .queryParam("display", 100)
+      .queryParam("sort", "sim")
+      .queryParam("filter", "")
+      .queryParam("exclude", "rental:cbshop")
+      .queryParam("start", "")
+      .encode();
   //  @Value("${naver.id}")
   private String id;
   //  @Value("${naver.secret}")
   private String secret;
-  @Value("${naver.url}")
-  private String url;
 
   @PostConstruct
   public void init() {
@@ -68,14 +77,17 @@ public class NaverServiceMvc implements ProductCollector {
 
     IntStream.rangeClosed(0, 9)
         .forEach(page -> {
-          String urlWithPage = url + (page * 100 + 1);
+          URI uri = uriBuilder
+              .replaceQueryParam("start", page * 100 + 1)
+              .build()
+              .toUri();
           Map<String, String> requestHeaders = new HashMap<>();
           requestHeaders.put("X-Naver-Client-Id", id);
           requestHeaders.put("X-Naver-Client-Secret", secret);
           HttpHeaders headers = new HttpHeaders();
           headers.setAll(requestHeaders);
 
-          ResponseEntity<NaverApiResponse> response = restTemplate.exchange(urlWithPage,
+          ResponseEntity<NaverApiResponse> response = restTemplate.exchange(uri,
               HttpMethod.GET, new HttpEntity<>(headers), NaverApiResponse.class);
           if (ObjectUtils.isEmpty(response.getBody())) {
             log.info("naver api response is empty. page: {}", page);
