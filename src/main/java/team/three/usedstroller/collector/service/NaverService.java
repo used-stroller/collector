@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -28,14 +28,23 @@ public class NaverService extends CommonService {
 
   private final ApiService apiService;
   private final SlackHook slackHook;
+  private final UriComponentsBuilder uriBuilder = UriComponentsBuilder.newInstance()
+      .scheme("https")
+      .host("openapi.naver.com")
+      .path("/v1/search/shop.json")
+      .queryParam("query", "유모차")
+      .queryParam("display", 100)
+      .queryParam("sort", "sim")
+      .queryParam("filter", "")
+      .queryParam("exclude", "rental:cbshop")
+      .queryParam("start", "")
+      .encode();
   ParameterizedTypeReference<NaverApiResponse> typeReference = new ParameterizedTypeReference<>() {
   };
   //  @Value("${naver.id}")
   private String id;
   //  @Value("${naver.secret}")
   private String secret;
-  @Value("${naver.url}")
-  private String url;
 
 
   public NaverService(ProductRepository productRepository,
@@ -75,7 +84,11 @@ public class NaverService extends CommonService {
         .map(start -> start * 100 + 1)
         .delayElements(Duration.ofMillis(500))
         .flatMap(start -> {
-          return apiService.apiCallGet(url + start, typeReference, headerConsumer,
+          String url = uriBuilder
+              .replaceQueryParam("start", start * 100 + 1)
+              .build()
+              .toUriString();
+          return apiService.apiCallGet(url, typeReference, headerConsumer,
                   MediaType.APPLICATION_JSON, true)
               .switchIfEmpty(Mono.defer(Mono::empty))
               .onErrorResume(e -> Mono.error(new RuntimeException("naver api connect error", e)))
