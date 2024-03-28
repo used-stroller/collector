@@ -30,12 +30,13 @@ public class NaverService extends CommonService {
   private final SlackHook slackHook;
   ParameterizedTypeReference<NaverApiResponse> typeReference = new ParameterizedTypeReference<>() {
   };
-  @Value("${naver.id}")
+  //  @Value("${naver.id}")
   private String id;
-  @Value("${naver.secret}")
+  //  @Value("${naver.secret}")
   private String secret;
   @Value("${naver.url}")
   private String url;
+
 
   public NaverService(ProductRepository productRepository,
       ApplicationEventPublisher eventPublisher, ApiService apiService, SlackHook slackHook) {

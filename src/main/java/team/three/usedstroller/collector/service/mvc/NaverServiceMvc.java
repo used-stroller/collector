@@ -1,5 +1,6 @@
 package team.three.usedstroller.collector.service.mvc;
 
+import jakarta.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -35,12 +37,18 @@ public class NaverServiceMvc implements ProductCollector {
   private final RestTemplate restTemplate;
   private final SlackHook slackHook;
 
-  @Value("${naver.id}")
+  //  @Value("${naver.id}")
   private String id;
-  @Value("${naver.secret}")
+  //  @Value("${naver.secret}")
   private String secret;
   @Value("${naver.url}")
   private String url;
+
+  @PostConstruct
+  public void init(Environment environment) {
+    this.id = environment.getProperty("naver.id");
+    this.secret = environment.getProperty("naver.secret");
+  }
 
   @Override
   public void start() {

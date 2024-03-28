@@ -15,6 +15,3 @@ spring:
 logging:
   level:
     ROOT: info
-
-slack:
-  url: https://hooks.slack.com/services/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
