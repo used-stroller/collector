@@ -16,11 +16,12 @@ import team.three.usedstroller.collector.util.dto.SlackMessage;
 public class SlackHook {
 
   private final RestTemplate restTemplate;
+  private final Environment environment;
   //  @Value("${slack.url}")
   private String slackToken;
 
   @PostConstruct
-  public void init(Environment environment) {
+  public void init() {
     this.slackToken = environment.getProperty("slack.url");
   }
 

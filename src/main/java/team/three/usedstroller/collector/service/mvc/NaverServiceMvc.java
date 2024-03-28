@@ -36,6 +36,7 @@ public class NaverServiceMvc implements ProductCollector {
   private final ApplicationEventPublisher eventPublisher;
   private final RestTemplate restTemplate;
   private final SlackHook slackHook;
+  private final Environment environment;
 
   //  @Value("${naver.id}")
   private String id;
@@ -45,7 +46,7 @@ public class NaverServiceMvc implements ProductCollector {
   private String url;
 
   @PostConstruct
-  public void init(Environment environment) {
+  public void init() {
     this.id = environment.getProperty("naver.id");
     this.secret = environment.getProperty("naver.secret");
   }
