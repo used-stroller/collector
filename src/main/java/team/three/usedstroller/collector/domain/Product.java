@@ -27,6 +27,7 @@ import lombok.ToString;
 import team.three.usedstroller.collector.domain.dto.BunjangItem;
 import team.three.usedstroller.collector.domain.dto.JunggonaraItem;
 import team.three.usedstroller.collector.domain.dto.NaverApiResponse;
+import team.three.usedstroller.collector.domain.dto.SecondWearItem;
 
 @Entity
 @Getter
@@ -116,16 +117,15 @@ public class Product extends BaseTimeEntity {
         .build();
   }
 
-  public static Product createSecondwear(String pid, String title, String link, String price,
-      String imgSrc, String uploadTime) {
+  public static Product createSecondwear(SecondWearItem item) {
     return Product.builder()
         .sourceType(SourceType.SECOND)
-        .pid(pid)
-        .title(title)
-        .link(link)
-        .price(convertPrice(price))
-        .imgSrc(imgSrc)
-        .uploadDate(changeLocalDate(uploadTime))
+        .pid(item.getPid())
+        .title(item.getTitle())
+        .link(item.getLink())
+        .price(convertPrice(item.getPrice()))
+        .imgSrc(item.getImgSrc())
+        .uploadDate(convertLocalDate(item.getUploadTime()))
         .build();
   }
 

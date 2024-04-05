@@ -4,11 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import team.three.usedstroller.collector.service.SecondWearService;
 import team.three.usedstroller.collector.service.mvc.BunJangServiceMvc;
 import team.three.usedstroller.collector.service.mvc.CarrotServiceMvc;
 import team.three.usedstroller.collector.service.mvc.JunggonaraServiceMvc;
 import team.three.usedstroller.collector.service.mvc.NaverServiceMvc;
+import team.three.usedstroller.collector.service.mvc.SecondWearServiceMvc;
 
 /**
  * 매일 새벽 4시마다 정해진 가견으로 실행
@@ -22,7 +22,7 @@ public class CollectorScheduler {
   private final JunggonaraServiceMvc junggonaraService;
   private final NaverServiceMvc naverService;
   private final CarrotServiceMvc carrotService;
-  private final SecondWearService secondWearService;
+  private final SecondWearServiceMvc secondWearService;
 
   @Scheduled(cron = "0 0 3 * * *", zone = "Asia/Seoul")
   public void bunjang() {

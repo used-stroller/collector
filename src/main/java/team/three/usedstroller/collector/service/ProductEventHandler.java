@@ -18,6 +18,7 @@ public class ProductEventHandler {
   private final ProductRepository productRepository;
   private final SlackHook slackHook;
 
+  //@Async 비동기시 어노테이션 추가
   @EventListener
   @Transactional
   public void deleteProductBySourceType(SourceType sourceType) {
