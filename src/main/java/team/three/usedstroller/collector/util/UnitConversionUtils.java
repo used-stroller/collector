@@ -6,6 +6,8 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 import java.util.regex.Pattern;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -75,6 +77,11 @@ public class UnitConversionUtils {
     return Instant.ofEpochSecond(updateTime)
         .atZone(ZoneId.systemDefault())
         .toLocalDate();
+  }
+
+  public static LocalDate convertLocalDateWithTimeStamp(Long updateTime) {
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.KOREA);
+    return LocalDate.parse(sdf.format(new Date(updateTime)));
   }
 
   public static LocalDate changeLocalDate(String uploadDate) {

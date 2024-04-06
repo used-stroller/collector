@@ -5,6 +5,7 @@ import static team.three.usedstroller.collector.util.UnitConversionUtils.convert
 import static team.three.usedstroller.collector.util.UnitConversionUtils.convertCarrotLink;
 import static team.three.usedstroller.collector.util.UnitConversionUtils.convertJunggoLink;
 import static team.three.usedstroller.collector.util.UnitConversionUtils.convertLocalDate;
+import static team.three.usedstroller.collector.util.UnitConversionUtils.convertLocalDateWithTimeStamp;
 import static team.three.usedstroller.collector.util.UnitConversionUtils.convertPrice;
 import static team.three.usedstroller.collector.util.UnitConversionUtils.convertSimplePid;
 import static team.three.usedstroller.collector.util.UnitConversionUtils.convertToTimeFormat;
@@ -125,7 +126,7 @@ public class Product extends BaseTimeEntity {
         .link(item.getLink())
         .price(convertPrice(item.getPrice()))
         .imgSrc(item.getImgSrc())
-        .uploadDate(convertLocalDate(item.getUploadTime()))
+        .uploadDate(convertLocalDateWithTimeStamp(item.getUploadTime()))
         .build();
   }
 
