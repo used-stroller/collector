@@ -29,7 +29,7 @@ public class CarrotServiceMvc implements ProductCollector {
   private final ProductRepository repository;
   private final ApplicationEventPublisher eventPublisher;
   private final SlackHook slackHook;
-  private final Integer END_PAGE = 500;
+  private final Integer END_PAGE = 1500;
 
   private final UriComponentsBuilder uriBuilder = UriComponentsBuilder.newInstance()
       .scheme("https")
@@ -37,6 +37,7 @@ public class CarrotServiceMvc implements ProductCollector {
       .path("/search/유모차/more/flea_market")
       .queryParam("next_page", "")
       .encode();
+  //https://www.daangn.com/search/%EC%9C%A0%EB%AA%A8%EC%B0%A8/more/flea_market?next_page=1500
 
   @Override
   public void start() {
