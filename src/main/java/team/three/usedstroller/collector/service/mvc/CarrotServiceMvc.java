@@ -102,7 +102,8 @@ public class CarrotServiceMvc implements ProductCollector {
                 .orElseGet(() -> null);
             uploadTime = ObjectUtils.isEmpty(time) ? "" : time.text().replace("끌올", "");
           } catch (IOException e) {
-            throw new IllegalArgumentException("당근마켓 상세정보 가져오기 실패", e);
+            e.printStackTrace();
+            System.out.println("당근마켓 상세정보 가져오기 실패");
           }
           Product product = Product.createCarrot(title, price, region, link, imgSrc, content,
               uploadTime);

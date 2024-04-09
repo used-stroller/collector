@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 class UnitTest {
@@ -117,6 +118,46 @@ class UnitTest {
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.KOREA);
     LocalDate str = LocalDate.parse(sdf.format(new Date(updateTime)));
     System.out.println("str = " + str);
+  }
+
+  @Test
+  @DisplayName("throw 에러")
+  void exceptionTest() {
+    for (int i = 0; i < 10; i++) {
+      method(i);
+    }
+  }
+
+  @Test
+  @DisplayName("throws 에러")
+  void exceptionTest1() {
+    for (int i = 0; i < 10; i++) {
+      try {
+        method(i);
+      } catch (RuntimeException e) {
+        throw new IllegalArgumentException("메인 Exception");
+      }
+    }
+  }
+
+  @Test
+  @DisplayName("걍 진행")
+  void exceptionTest2() {
+    for (int i = 0; i < 10; i++) {
+      try {
+        method(i);
+      } catch (IllegalArgumentException e) {
+        e.printStackTrace();
+        System.out.println("에러떳지만 걍 진행 고고");
+      }
+    }
+  }
+
+  void method(int i) {
+    if (i == 8) {
+      throw new IllegalArgumentException("메서드 exception");
+    }
+    System.out.println("i = " + i);
   }
 
 }
