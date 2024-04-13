@@ -45,9 +45,14 @@ public class BunJangServiceMvc implements ProductCollector {
       .queryParam("page", 0)
       .encode();
 
-  Consumer<HttpHeaders> headerConsumer = headers -> headers.add("Accept",
-      MediaType.APPLICATION_JSON_VALUE);
-  HttpHeaders headers = new HttpHeaders();
+  Consumer<HttpHeaders> headerConsumer = headers -> {
+    headers.add("Accept", MediaType.APPLICATION_JSON_VALUE);
+    headers.add("Content-Type", "application/json");
+    headers.add("Accept", MediaType.APPLICATION_JSON_VALUE);
+    headers.set("User-Agent",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36");
+  };
+
 
   @Override
   public void start() {
@@ -79,13 +84,8 @@ public class BunJangServiceMvc implements ProductCollector {
               .build()
               .toUri();
 
-          headers.add("Content-Type", "application/json");
-          headers.add("Accept", MediaType.APPLICATION_JSON_VALUE);
-          headers.set("User-Agent",
-              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36");
-
           ResponseEntity<BunjangApiResponse> response = restTemplate.exchange(uri, HttpMethod.GET,
-              new HttpEntity<>(headers), BunjangApiResponse.class);
+              new HttpEntity<>(headerConsumer), BunjangApiResponse.class);
 
           if (ObjectUtils.isEmpty(response.getBody())) {
             log.info("bunjang api response is null. page: {}", page);
@@ -113,11 +113,6 @@ public class BunJangServiceMvc implements ProductCollector {
     URI uri = uriBuilder
         .build()
         .toUri();
-
-    headers.add("Content-Type", "application/json");
-    headers.add("Accept", MediaType.APPLICATION_JSON_VALUE);
-    headers.set("User-Agent",
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36");
 
     ResponseEntity<BunjangApiResponse> response = restTemplate.exchange(uri, HttpMethod.GET,
         new HttpEntity<>(headerConsumer),

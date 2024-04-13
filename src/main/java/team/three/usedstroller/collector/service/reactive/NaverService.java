@@ -1,4 +1,4 @@
-package team.three.usedstroller.collector.service;
+package team.three.usedstroller.collector.service.reactive;
 
 import java.time.Duration;
 import java.util.List;
