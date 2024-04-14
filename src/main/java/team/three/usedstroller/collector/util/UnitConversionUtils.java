@@ -30,6 +30,10 @@ public class UnitConversionUtils {
     return "https://www.daangn.com" + article;
   }
 
+  public static String convertSecondwear(String pid) {
+    return "https://www.hellomarket.com/item/" + pid;
+  }
+
   public static String convertSimplePid(String link, String str) {
     if (!link.contains(str)) {
       return "";

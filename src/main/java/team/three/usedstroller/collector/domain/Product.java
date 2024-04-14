@@ -7,6 +7,7 @@ import static team.three.usedstroller.collector.util.UnitConversionUtils.convert
 import static team.three.usedstroller.collector.util.UnitConversionUtils.convertLocalDate;
 import static team.three.usedstroller.collector.util.UnitConversionUtils.convertLocalDateWithTimeStamp;
 import static team.three.usedstroller.collector.util.UnitConversionUtils.convertPrice;
+import static team.three.usedstroller.collector.util.UnitConversionUtils.convertSecondwear;
 import static team.three.usedstroller.collector.util.UnitConversionUtils.convertSimplePid;
 import static team.three.usedstroller.collector.util.UnitConversionUtils.convertToTimeFormat;
 
@@ -123,7 +124,7 @@ public class Product extends BaseTimeEntity {
         .sourceType(SourceType.SECOND)
         .pid(item.getPid())
         .title(item.getTitle())
-        .link(item.getLink())
+        .link(convertSecondwear(item.getPid()))
         .price(convertPrice(item.getPrice()))
         .imgSrc(item.getImgSrc())
         .uploadDate(convertLocalDateWithTimeStamp(item.getUploadTime()))
