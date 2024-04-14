@@ -29,7 +29,7 @@ public class CarrotServiceMvc implements ProductCollector {
   private final ProductRepository repository;
   private final ApplicationEventPublisher eventPublisher;
   private final SlackHook slackHook;
-  private final Integer END_PAGE = 1500;
+  private final Integer END_PAGE = 3000;
 
   private final UriComponentsBuilder uriBuilder = UriComponentsBuilder.newInstance()
       .scheme("https")
