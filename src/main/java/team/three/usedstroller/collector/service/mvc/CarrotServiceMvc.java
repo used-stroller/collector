@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
@@ -29,7 +28,7 @@ public class CarrotServiceMvc implements ProductCollector {
   private final ProductRepository repository;
   private final ApplicationEventPublisher eventPublisher;
   private final SlackHook slackHook;
-  private final Integer END_PAGE = 1000;
+  private final Integer END_PAGE = 850;
 
   private final UriComponentsBuilder uriBuilder = UriComponentsBuilder.newInstance()
       .scheme("https")
@@ -54,21 +53,36 @@ public class CarrotServiceMvc implements ProductCollector {
   public Integer collectProduct() {
     AtomicInteger updateCount = new AtomicInteger(0);
 
-    IntStream.rangeClosed(1, END_PAGE)
-        .forEach(page -> {
-          String url = uriBuilder
-              .replaceQueryParam("next_page", page)
-              .build()
-              .toUriString();
+    //Stream 사용시, break 불가함으로 for문 사용
+    for (int i = 840; i <= END_PAGE; i++) {
+      String url = uriBuilder
+          .replaceQueryParam("next_page", i)
+          .build()
+          .toUriString();
+      log.info("carrot market page: [{}] start", i);
+      List<Product> products = getProducts(url);
+      updateCount.addAndGet(saveProducts(repository, products));
+      if (ObjectUtils.isEmpty(products)) {
+        log.info("carrot market page: [{}] is empty", i);
+        break;
+      }
 
-          log.info("carrot market page: [{}] start", page);
-          List<Product> products = getProducts(url);
-          if (ObjectUtils.isEmpty(products)) {
-            log.info("carrot market page: [{}] is empty", page);
-            return;
-          }
-          updateCount.addAndGet(saveProducts(repository, products));
-        });
+    }
+//    IntStream.rangeClosed(847, END_PAGE)
+//        .forEach(page -> {
+//          String url = uriBuilder
+//              .replaceQueryParam("next_page", page)
+//              .build()
+//              .toUriString();
+//
+//          log.info("carrot market page: [{}] start", page);
+//          List<Product> products = getProducts(url);
+//          if (ObjectUtils.isEmpty(products)) {
+//            log.info("carrot market page: [{}] is empty", page);
+//            return;
+//          }
+//          updateCount.addAndGet(saveProducts(repository, products));
+//        });
 
     return updateCount.get();
   }
