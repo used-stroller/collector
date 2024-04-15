@@ -29,12 +29,12 @@ public class CarrotServiceMvc implements ProductCollector {
   private final ProductRepository repository;
   private final ApplicationEventPublisher eventPublisher;
   private final SlackHook slackHook;
-  private final Integer END_PAGE = 3000;
+  private final Integer END_PAGE = 1000;
 
   private final UriComponentsBuilder uriBuilder = UriComponentsBuilder.newInstance()
       .scheme("https")
       .host("www.daangn.com")
-      .path("/search/유모차/more/flea_market")
+      .path("/search/부가부/more/flea_market")
       .queryParam("next_page", "")
       .encode();
   //https://www.daangn.com/search/%EC%9C%A0%EB%AA%A8%EC%B0%A8/more/flea_market?next_page=1500
