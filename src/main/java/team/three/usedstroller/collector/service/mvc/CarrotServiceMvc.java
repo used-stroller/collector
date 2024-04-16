@@ -56,7 +56,7 @@ public class CarrotServiceMvc implements ProductCollector {
 
   //https://www.daangn.com/search/%EC%9C%A0%EB%AA%A8%EC%B0%A8/more/flea_market?next_page=1500
   private void scrapingProduct(AtomicInteger updateCount, String brand) {
-    for (int i = 849; i <= END_PAGE; i++) {
+    for (int i = 1; i <= END_PAGE; i++) {
       UriComponentsBuilder uriBuilder = UriComponentsBuilder.newInstance();
       String url = uriBuilder
           .scheme("https")
