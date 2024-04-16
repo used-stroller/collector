@@ -23,7 +23,7 @@ public class ProductEventHandler {
   @Transactional
   public void deleteProductBySourceType(SourceType sourceType) {
     log.info("이벤트 구독 {}", sourceType);
-    LocalDateTime today = LocalDateTime.now().minusHours(3);
+    LocalDateTime today = LocalDateTime.now().minusHours(12);
     productRepository.deleteAllBySourceTypeAndUpdatedAtIsBefore(sourceType, today);
     String logMessage = String.format("[%s] 과거 데이터 삭제 완료. 삭제 기준 일시: [%s]", sourceType, today);
     log.info(logMessage);

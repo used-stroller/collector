@@ -30,14 +30,6 @@ public class CarrotServiceMvc implements ProductCollector {
   private final SlackHook slackHook;
   private final Integer END_PAGE = 1000;
 
-  private final UriComponentsBuilder uriBuilder = UriComponentsBuilder.newInstance()
-      .scheme("https")
-      .host("www.daangn.com")
-      .path("/search/부가부/more/flea_market")
-      .queryParam("next_page", "")
-      .encode();
-  //https://www.daangn.com/search/%EC%9C%A0%EB%AA%A8%EC%B0%A8/more/flea_market?next_page=1500
-
   @Override
   public void start() {
     StopWatch stopWatch = new StopWatch();
@@ -52,12 +44,27 @@ public class CarrotServiceMvc implements ProductCollector {
   @Override
   public Integer collectProduct() {
     AtomicInteger updateCount = new AtomicInteger(0);
+    List<String> brandList = new ArrayList<>();
+    brandList.add("부가부");
+    brandList.add("스토케 유모차");
+    brandList.add("유모차");
+    for (String brand : brandList) {
+      scrapingProduct(updateCount, brand);
+    }
+    return updateCount.get();
+  }
 
-    //Stream 사용시, break 불가함으로 for문 사용
-    for (int i = 1; i <= END_PAGE; i++) {
+  //https://www.daangn.com/search/%EC%9C%A0%EB%AA%A8%EC%B0%A8/more/flea_market?next_page=1500
+  private void scrapingProduct(AtomicInteger updateCount, String brand) {
+    for (int i = 849; i <= END_PAGE; i++) {
+      UriComponentsBuilder uriBuilder = UriComponentsBuilder.newInstance();
       String url = uriBuilder
+          .scheme("https")
+          .host("www.daangn.com")
+          .queryParam("next_page", "")
+          .path("/search/" + brand + "/more/flea_market")
+          .encode()
           .replaceQueryParam("next_page", i)
-          .build()
           .toUriString();
       log.info("carrot market page: [{}] start", i);
       List<Product> products = getProducts(url);
@@ -67,7 +74,6 @@ public class CarrotServiceMvc implements ProductCollector {
         break;
       }
     }
-    return updateCount.get();
   }
 
   @Override
