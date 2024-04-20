@@ -1,5 +1,7 @@
 package team.three.usedstroller.collector.service.mvc;
 
+import static team.three.usedstroller.collector.util.DefaultHttpHeaders.getDefaultHeaders;
+
 import java.net.URI;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -8,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -119,11 +120,7 @@ public class JunggonaraServiceMvc implements ProductCollector {
   }
 
   private ResponseEntity<JunggonaraApiResponse> callApi(JunggonaraApiRequest request) {
-    HttpHeaders headers = new HttpHeaders();
-    headers.add("Content-Type", "application/json");
-    headers.set("User-Agent",
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36");
-    HttpEntity<JunggonaraApiRequest> entity = new HttpEntity<>(request, headers);
+    HttpEntity<JunggonaraApiRequest> entity = new HttpEntity<>(request, getDefaultHeaders());
     return restTemplate.exchange(uri, HttpMethod.POST, entity, JunggonaraApiResponse.class);
   }
 }

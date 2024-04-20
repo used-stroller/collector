@@ -1,17 +1,17 @@
 package team.three.usedstroller.collector.service.mvc;
 
+import static team.three.usedstroller.collector.util.DefaultHttpHeaders.getDefaultHeaders;
+
 import java.net.URI;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -43,8 +43,6 @@ public class SecondWearServiceMvc implements ProductCollector {
       .queryParam("page", 1)
       .queryParam("limit", 20)
       .encode();
-  Consumer<HttpHeaders> headerConsumer = headers -> headers.add("Accept",
-      MediaType.APPLICATION_JSON_VALUE);
 
   @Override
   public void start() {
@@ -77,7 +75,7 @@ public class SecondWearServiceMvc implements ProductCollector {
 
           ResponseEntity<SecondWearApiResponse> response = restTemplate.exchange(uri,
               HttpMethod.GET,
-              new HttpEntity<>(headerConsumer), SecondWearApiResponse.class);
+              new HttpEntity<>(getDefaultHeaders()), SecondWearApiResponse.class);
 
           if (ObjectUtils.isEmpty(response.getBody())) {
             log.info("secondWear api response is null. page: {}", page);
@@ -107,10 +105,10 @@ public class SecondWearServiceMvc implements ProductCollector {
         .toUri();
 
     ResponseEntity<SecondWearApiResponse> response = restTemplate.exchange(uri, HttpMethod.GET,
-        new HttpEntity<>(headerConsumer),
+        new HttpEntity<>(getDefaultHeaders()),
         SecondWearApiResponse.class);
-    Integer totalCount = response.getBody().getResult().getTotalCount();
-    return totalCount;
+
+    return Objects.requireNonNull(response.getBody()).getResult().getTotalCount();
   }
 
 }
