@@ -3,6 +3,7 @@ package team.three.usedstroller.collector.service.mvc;
 import static team.three.usedstroller.collector.util.DefaultHttpHeaders.getDefaultHeaders;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
@@ -51,7 +52,14 @@ public class JunggonaraServiceMvc implements ProductCollector {
   public void start() {
     StopWatch stopWatch = new StopWatch();
     stopWatch.start();
-    Integer newProductsCount = collectProduct();
+    Integer newProductsCount = 0;
+    List<String> brandList = new ArrayList<>();
+    brandList.add("부가부");
+    brandList.add("스토케 유모차");
+    brandList.add("유모차");
+    for (String brand : brandList) {
+      newProductsCount += collectProductMultipleKeywords(brand);
+    }
     stopWatch.stop();
     log.info("중고나라 완료: {}건, 수집 시간: {}s", newProductsCount, stopWatch.getTotalTimeSeconds());
     slackHook.sendMessage("중고나라", newProductsCount, stopWatch.getTotalTimeSeconds());
@@ -60,7 +68,12 @@ public class JunggonaraServiceMvc implements ProductCollector {
 
   @Override
   public Integer collectProduct() {
+    return null;
+  }
+
+  public Integer collectProductMultipleKeywords(String brand) {
     AtomicInteger updateCount = new AtomicInteger(0);
+
     Integer totalPage = getTotalPage();
     log.info("junggonara total page: {}", totalPage);
 
@@ -70,7 +83,7 @@ public class JunggonaraServiceMvc implements ProductCollector {
               .page(page)
               .quantity(QUANTITY)
               .sort(SORT)
-              .searchWord(KEYWORD)
+              .searchWord(brand)
               .build();
 
           ResponseEntity<JunggonaraApiResponse> response = callApi(request);
