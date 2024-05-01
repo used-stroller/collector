@@ -18,10 +18,12 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StopWatch;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import team.three.usedstroller.collector.domain.Keyword;
 import team.three.usedstroller.collector.domain.Product;
 import team.three.usedstroller.collector.domain.SourceType;
 import team.three.usedstroller.collector.domain.dto.SecondWearApiResponse;
 import team.three.usedstroller.collector.domain.dto.SecondWearItem;
+import team.three.usedstroller.collector.repository.KeywordRepository;
 import team.three.usedstroller.collector.repository.ProductRepository;
 import team.three.usedstroller.collector.service.ProductCollector;
 import team.three.usedstroller.collector.util.SlackHook;
@@ -31,6 +33,7 @@ import team.three.usedstroller.collector.util.SlackHook;
 @RequiredArgsConstructor
 public class SecondWearServiceMvc implements ProductCollector {
 
+  private final KeywordRepository keywordRepository;
   private final ProductRepository repository;
   private final ApplicationEventPublisher eventPublisher;
   private final RestTemplate restTemplate;
@@ -39,7 +42,6 @@ public class SecondWearServiceMvc implements ProductCollector {
       .scheme("https")
       .host("hellomarket.com")
       .path("api/search/items")
-      .queryParam("q", "유모차")
       .queryParam("page", 1)
       .queryParam("limit", 20)
       .encode();
@@ -62,29 +64,33 @@ public class SecondWearServiceMvc implements ProductCollector {
   @Override
   public Integer collectProduct() {
     AtomicInteger updateCount = new AtomicInteger(0);
-    Integer totalCount = getTotalCount();
-    int totalPage = totalCount / 20;
-    log.info("second total page: {}", totalPage);
+    List<Keyword> keywordList = keywordRepository.findAll();
+    for (Keyword keyword : keywordList) {
+      log.info("keyword : {}", keyword.getKeyword());
+      uriBuilder.queryParam("q", keyword.getKeyword());
+      Integer totalCount = getTotalCount();
+      int totalPage = totalCount / 20;
+      log.info("second total page: {}", totalPage);
 
-    IntStream.rangeClosed(1, totalPage) // 0 부터 totalPage 까지 반복
-        .forEach(page -> {
-          URI uri = uriBuilder
-              .replaceQueryParam("page", page)
-              .build()
-              .toUri();
+      IntStream.rangeClosed(1, totalPage) // 0 부터 totalPage 까지 반복
+          .forEach(page -> {
+            URI uri = uriBuilder
+                .replaceQueryParam("page", page)
+                .build()
+                .toUri();
 
-          ResponseEntity<SecondWearApiResponse> response = restTemplate.exchange(uri,
-              HttpMethod.GET,
-              new HttpEntity<>(getDefaultHeaders()), SecondWearApiResponse.class);
+            ResponseEntity<SecondWearApiResponse> response = restTemplate.exchange(uri,
+                HttpMethod.GET,
+                new HttpEntity<>(getDefaultHeaders()), SecondWearApiResponse.class);
 
-          if (ObjectUtils.isEmpty(response.getBody())) {
-            log.info("secondWear api response is null. page: {}", page);
-            return;
-          }
-          List<Product> products = convertProducts(response.getBody().getList());
-          updateCount.addAndGet(saveProducts(repository, products));
-        });
-
+            if (ObjectUtils.isEmpty(response.getBody())) {
+              log.info("secondWear api response is null. page: {}", page);
+              return;
+            }
+            List<Product> products = convertProducts(response.getBody().getList());
+            updateCount.addAndGet(saveProducts(repository, products));
+          });
+    }
     return updateCount.get();
   }
 

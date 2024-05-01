@@ -14,8 +14,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StopWatch;
 import org.springframework.web.util.UriComponentsBuilder;
+import team.three.usedstroller.collector.domain.Keyword;
 import team.three.usedstroller.collector.domain.Product;
 import team.three.usedstroller.collector.domain.SourceType;
+import team.three.usedstroller.collector.repository.KeywordRepository;
 import team.three.usedstroller.collector.repository.ProductRepository;
 import team.three.usedstroller.collector.service.ProductCollector;
 import team.three.usedstroller.collector.util.SlackHook;
@@ -26,6 +28,7 @@ import team.three.usedstroller.collector.util.SlackHook;
 public class CarrotServiceMvc implements ProductCollector {
 
   private final ProductRepository repository;
+  private final KeywordRepository keywordRepository;
   private final ApplicationEventPublisher eventPublisher;
   private final SlackHook slackHook;
   private final Integer END_PAGE = 1000;
@@ -44,12 +47,10 @@ public class CarrotServiceMvc implements ProductCollector {
   @Override
   public Integer collectProduct() {
     AtomicInteger updateCount = new AtomicInteger(0);
-    List<String> brandList = new ArrayList<>();
-    brandList.add("부가부");
-    brandList.add("스토케 유모차");
-    brandList.add("유모차");
-    for (String brand : brandList) {
-      scrapingProduct(updateCount, brand);
+    List<Keyword> keywordList = keywordRepository.findAll();
+    for (Keyword keyword : keywordList) {
+      log.info("keyword : {}", keyword.getKeyword());
+      scrapingProduct(updateCount, keyword.getKeyword());
     }
     return updateCount.get();
   }

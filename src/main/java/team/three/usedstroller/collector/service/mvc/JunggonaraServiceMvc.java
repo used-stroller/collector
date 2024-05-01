@@ -3,7 +3,6 @@ package team.three.usedstroller.collector.service.mvc;
 import static team.three.usedstroller.collector.util.DefaultHttpHeaders.getDefaultHeaders;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
@@ -18,11 +17,13 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StopWatch;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import team.three.usedstroller.collector.domain.Keyword;
 import team.three.usedstroller.collector.domain.Product;
 import team.three.usedstroller.collector.domain.SourceType;
 import team.three.usedstroller.collector.domain.dto.JunggonaraApiRequest;
 import team.three.usedstroller.collector.domain.dto.JunggonaraApiResponse;
 import team.three.usedstroller.collector.domain.dto.JunggonaraItem;
+import team.three.usedstroller.collector.repository.KeywordRepository;
 import team.three.usedstroller.collector.repository.ProductRepository;
 import team.three.usedstroller.collector.service.ProductCollector;
 import team.three.usedstroller.collector.util.SlackHook;
@@ -33,6 +34,7 @@ import team.three.usedstroller.collector.util.SlackHook;
 public class JunggonaraServiceMvc implements ProductCollector {
 
   private final ProductRepository repository;
+  private final KeywordRepository keywordRepository;
   private final ApplicationEventPublisher eventPublisher;
   private final RestTemplate restTemplate;
   private final SlackHook slackHook;
@@ -53,13 +55,12 @@ public class JunggonaraServiceMvc implements ProductCollector {
     StopWatch stopWatch = new StopWatch();
     stopWatch.start();
     Integer newProductsCount = 0;
-    List<String> brandList = new ArrayList<>();
-    brandList.add("부가부");
-    brandList.add("스토케 유모차");
-    brandList.add("유모차");
-    for (String brand : brandList) {
-      newProductsCount += collectProductMultipleKeywords(brand);
+    List<Keyword> keywordList = keywordRepository.findAll();
+    for (Keyword keyword : keywordList) {
+      log.info("keyword : {}", keyword.getKeyword());
+      newProductsCount += collectProductMultipleKeywords(keyword.getKeyword());
     }
+
     stopWatch.stop();
     log.info("중고나라 완료: {}건, 수집 시간: {}s", newProductsCount, stopWatch.getTotalTimeSeconds());
     slackHook.sendMessage("중고나라", newProductsCount, stopWatch.getTotalTimeSeconds());
