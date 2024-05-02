@@ -23,11 +23,13 @@ public class Model extends BaseTimeEntity {
   private Long id;
   private String model;
   private String brand;
+  private int price;
 
 
   @Builder
-  private Model(Long id, String model, String brand) {
+  private Model(Long id, String model, String brand, int price) {
     this.model = model;
     this.brand = brand;
+    this.price = price;
   }
 }
