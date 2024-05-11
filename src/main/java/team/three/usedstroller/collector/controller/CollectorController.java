@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import team.three.usedstroller.collector.service.mvc.BunJangServiceMvc;
 import team.three.usedstroller.collector.service.mvc.CarrotServiceMvc;
+import team.three.usedstroller.collector.service.mvc.CommonService;
 import team.three.usedstroller.collector.service.mvc.JunggonaraServiceMvc;
 import team.three.usedstroller.collector.service.mvc.NaverServiceMvc;
 import team.three.usedstroller.collector.service.mvc.SecondWearServiceMvc;
@@ -26,6 +27,7 @@ public class CollectorController {
   private final BunJangServiceMvc bunJangService;
   private final JunggonaraServiceMvc junggonaraService;
   private final SecondWearServiceMvc secondWearService;
+  private final CommonService commonService;
 
   /**
    * 번개장터 '유모차' 검색 결과를 수집한다.
@@ -81,6 +83,12 @@ public class CollectorController {
   @ResponseStatus(HttpStatus.CREATED)
   public void naverShopping() {
     naverService.start();
+  }
+
+  @PostMapping("/collect/all")
+  @ResponseStatus(HttpStatus.CREATED)
+  public void collectAll() {
+    commonService.collectAll();
   }
 
 }

@@ -34,7 +34,7 @@ public class CarrotServiceMvc implements ProductCollector {
   private final Integer END_PAGE = 1000;
 
   @Override
-  public void start() {
+  public Integer start() {
     StopWatch stopWatch = new StopWatch();
     stopWatch.start();
     Integer newProductsCount = collectProduct();
@@ -42,6 +42,7 @@ public class CarrotServiceMvc implements ProductCollector {
     log.info("당근 완료: {}건, 수집 시간: {}s", newProductsCount, stopWatch.getTotalTimeSeconds());
     slackHook.sendMessage("당근", newProductsCount, stopWatch.getTotalTimeSeconds());
     deleteOldProducts(SourceType.CARROT);
+    return newProductsCount;
   }
 
   @Override

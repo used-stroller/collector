@@ -1,0 +1,14 @@
+###
+POST {{host}}/collector/bunjang
+
+###
+POST {{host}}/collector/junggonara
+
+###
+POST {{host}}/collector/secondwear
+
+###
+POST {{host}}/collector/carrot-market
+
+###
+POST {{host}}/collector/naver-shopping

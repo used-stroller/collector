@@ -51,7 +51,7 @@ public class JunggonaraServiceMvc implements ProductCollector {
       .toUri();
 
   @Override
-  public void start() {
+  public Integer start() {
     StopWatch stopWatch = new StopWatch();
     stopWatch.start();
     Integer newProductsCount = 0;
@@ -65,6 +65,7 @@ public class JunggonaraServiceMvc implements ProductCollector {
     log.info("중고나라 완료: {}건, 수집 시간: {}s", newProductsCount, stopWatch.getTotalTimeSeconds());
     slackHook.sendMessage("중고나라", newProductsCount, stopWatch.getTotalTimeSeconds());
     deleteOldProducts(SourceType.JUNGGO);
+    return newProductsCount;
   }
 
   @Override

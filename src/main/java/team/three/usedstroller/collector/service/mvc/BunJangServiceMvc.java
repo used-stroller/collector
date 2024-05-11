@@ -47,7 +47,7 @@ public class BunJangServiceMvc implements ProductCollector {
       .encode();
 
   @Override
-  public void start() {
+  public Integer start() {
     StopWatch stopWatch = new StopWatch();
     stopWatch.start();
     Integer newProductsCount = collectProduct();
@@ -55,6 +55,7 @@ public class BunJangServiceMvc implements ProductCollector {
     log.info("번개장터 완료: {}건, 수집 시간: {}s", newProductsCount, stopWatch.getTotalTimeSeconds());
     slackHook.sendMessage("번개장터", newProductsCount, stopWatch.getTotalTimeSeconds());
     deleteOldProducts(SourceType.BUNJANG);
+    return newProductsCount;
   }
 
   /**

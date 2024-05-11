@@ -8,7 +8,7 @@ import team.three.usedstroller.collector.repository.ProductRepository;
 
 public interface ProductCollector {
 
-  void start();
+  Integer start();
 
   Integer collectProduct();
 
