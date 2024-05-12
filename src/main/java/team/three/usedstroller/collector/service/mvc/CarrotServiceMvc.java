@@ -58,6 +58,7 @@ public class CarrotServiceMvc implements ProductCollector {
 
   //https://www.daangn.com/search/%EC%9C%A0%EB%AA%A8%EC%B0%A8/more/flea_market?next_page=1500
   private void scrapingProduct(AtomicInteger updateCount, String brand) {
+    int emptyPage = 0;
     for (int i = 1; i <= END_PAGE; i++) {
       UriComponentsBuilder uriBuilder = UriComponentsBuilder.newInstance();
       String url = uriBuilder
@@ -73,7 +74,10 @@ public class CarrotServiceMvc implements ProductCollector {
       updateCount.addAndGet(saveProducts(repository, products));
       if (ObjectUtils.isEmpty(products)) {
         log.info("carrot market page: [{}] is empty", i);
-        break;
+        emptyPage++;
+        if (emptyPage >= 2) {
+          break;
+        }
       }
     }
   }
