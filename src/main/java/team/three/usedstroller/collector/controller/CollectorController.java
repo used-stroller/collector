@@ -91,4 +91,10 @@ public class CollectorController {
     commonService.collectAll();
   }
 
+  @PostMapping("/update/model")
+
+  @ResponseStatus(HttpStatus.CREATED)
+  public void updateModel() {
+    commonService.updateModel();
+  }
 }

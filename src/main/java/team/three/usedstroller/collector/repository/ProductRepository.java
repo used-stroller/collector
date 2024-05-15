@@ -7,9 +7,10 @@ import org.springframework.data.jpa.repository.Modifying;
 import team.three.usedstroller.collector.domain.Product;
 import team.three.usedstroller.collector.domain.SourceType;
 
-public interface ProductRepository extends JpaRepository<Product, Long> {
+public interface ProductRepository extends JpaRepository<Product, Long>, CustomProductRepository {
 
   boolean existsByPidAndSourceType(String pid, SourceType sourceType);
+
   Optional<Product> findByPidAndSourceType(String pid, SourceType sourceType);
 
   @Modifying

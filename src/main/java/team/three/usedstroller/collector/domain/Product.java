@@ -18,6 +18,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -25,6 +27,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import team.three.usedstroller.collector.domain.dto.BunjangItem;
 import team.three.usedstroller.collector.domain.dto.JunggonaraItem;
@@ -33,6 +36,7 @@ import team.three.usedstroller.collector.domain.dto.SecondWearItem;
 
 @Entity
 @Getter
+@Setter
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "products")
@@ -40,6 +44,7 @@ public class Product extends BaseTimeEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id")
   private Long id;
   @Enumerated(EnumType.STRING)
   private SourceType sourceType;
@@ -57,11 +62,26 @@ public class Product extends BaseTimeEntity {
   @Column(length = 1000)
   private String etc;
   private LocalDate uploadDate;
+  private String address;
 
   //carrot
   private String region;
   @Column(columnDefinition = "text")
   private String content;
+
+  @ManyToOne
+  @JoinColumn(name = "model_id")
+  private Model model;
+
+//  public void setModel(Model model) {
+//    this.model = model;
+//
+//    // 무한루프 방지
+//    if (!model.getProducts().contains(this)) {
+//      model.getProducts().add(this);
+//    }
+//  }
+
 
   @Builder
   private Product(SourceType sourceType, String pid, String title, String link, Long price,

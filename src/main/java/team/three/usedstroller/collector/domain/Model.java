@@ -1,5 +1,6 @@
 package team.three.usedstroller.collector.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,15 +20,29 @@ import lombok.ToString;
 public class Model extends BaseTimeEntity {
 
   @Id
+  @Column(name = "id")
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-  private String model;
-  private String brand;
 
+  private String name;
+  private String brand;
+  private String price;
+
+//  @OneToMany(mappedBy = "model")
+//  private List<Product> products = new ArrayList<>();
+//
+//  public void addProduct(Product product) {
+//    this.products.add(product);
+//    // 무한루프 방지
+//    if (product.getModel() != this) {
+//      product.setModel(this);
+//    }
+//  }
 
   @Builder
-  private Model(Long id, String model, String brand) {
-    this.model = model;
+  private Model(Long id, String name, String brand, String price) {
+    this.name = name;
     this.brand = brand;
+    this.price = price;
   }
 }
