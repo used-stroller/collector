@@ -1,6 +1,7 @@
 package team.three.usedstroller.collector.service.mvc;
 
 import java.nio.channels.CompletionHandler;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -8,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import team.three.usedstroller.collector.domain.Model;
+import team.three.usedstroller.collector.domain.Product;
+import team.three.usedstroller.collector.domain.dto.FilterReq;
 import team.three.usedstroller.collector.repository.ModelRepository;
 import team.three.usedstroller.collector.repository.ProductRepository;
 
@@ -84,12 +87,35 @@ public class CommonService {
   };
 
   public void updateModel() {
-    //브랜드와 모델명 가져오기
-    List<Model> allModels = modelRepository.findAll();
-    //모델리스트 가져오기
-    //List<ProductRes> productsOnly = productRepository.getProductsOnly();
 
-    //모델키워드 넣어서 조회하고 조회한 값들에 대해서 모델명 넣기
+    //1. 모델리스트 가져오기
+    List<Model> allModels = modelRepository.findAll();
+
+    //2. 모델명 반복하면서 상품과 맵핑
+    for (int i = 0; i < allModels.size(); i++) {
+
+      //2-1 브랜드와 모델명 filter에 set
+      List<String> brand = new ArrayList<>();
+      brand.add(allModels.get(i).getBrand());
+      FilterReq filter = new FilterReq(allModels.get(i).getName(), null, null, null, null, null,
+          null, brand);
+
+      //2-2 상품 리스트 출력 by filter
+      List<Product> filteredProduct = productRepository.getProductsOnly(filter);
+
+      //2-3 모델객체 검색
+      Model obj = modelRepository.findByName(filter.getKeyword());
+
+      //2-4 상품리스트에 모델 객체 set
+      updateModelIdColumnProductTable(filteredProduct, obj);
+    }
+  }
+
+  private void updateModelIdColumnProductTable(List<Product> filteredProduct, Model obj) {
+    for (Product product : filteredProduct) {
+      product.setModel(obj);
+      productRepository.save(product);
+    }
   }
 }
 
