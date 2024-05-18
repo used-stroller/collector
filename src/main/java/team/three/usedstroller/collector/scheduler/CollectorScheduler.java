@@ -6,6 +6,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import team.three.usedstroller.collector.service.mvc.BunJangServiceMvc;
 import team.three.usedstroller.collector.service.mvc.CarrotServiceMvc;
+import team.three.usedstroller.collector.service.mvc.CommonService;
 import team.three.usedstroller.collector.service.mvc.JunggonaraServiceMvc;
 import team.three.usedstroller.collector.service.mvc.NaverServiceMvc;
 import team.three.usedstroller.collector.service.mvc.SecondWearServiceMvc;
@@ -23,6 +24,7 @@ public class CollectorScheduler {
   private final NaverServiceMvc naverService;
   private final CarrotServiceMvc carrotService;
   private final SecondWearServiceMvc secondWearService;
+  private final CommonService commonService;
 
   @Scheduled(cron = "0 0 3 * * *", zone = "Asia/Seoul")
   public void bunjang() {
@@ -52,6 +54,7 @@ public class CollectorScheduler {
   public void carrot() {
     log.info("당근 예약 수집 시작");
     carrotService.start();
+    commonService.updateModel();
   }
 
 
