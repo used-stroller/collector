@@ -2,6 +2,7 @@ package team.three.usedstroller;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +20,7 @@ import team.three.usedstroller.collector.domain.dto.FilterReq;
 import team.three.usedstroller.collector.repository.KeywordRepository;
 import team.three.usedstroller.collector.repository.ModelRepository;
 import team.three.usedstroller.collector.repository.ProductRepository;
+import team.three.usedstroller.collector.util.UnitConversionUtils;
 
 @SpringBootTest
 @ActiveProfiles("local")
@@ -33,6 +35,7 @@ class UsedStrollerApplicationTests {
   ModelRepository modelRepository;
   @Autowired
   ProductRepository productRepository;
+  UnitConversionUtils unitConversionUtils;
 
   @BeforeEach
   public void init() {
@@ -108,6 +111,22 @@ class UsedStrollerApplicationTests {
         productRepository.save(filteredList.get(i));
       }
     }
+  }
+
+  @Test
+  void conversionDate() {
+    String testStr = "\n"
+        + "            끌올 2일 전\n"
+        + "          ";
+
+    String testStr2 = "\n"
+        + "             6분 전\n"
+        + "          ";
+
+    String s = unitConversionUtils.convertToTimeFormat(testStr);
+    System.out.println("s = " + s);
+    LocalDate localDate = unitConversionUtils.changeLocalDate(s);
+    System.out.println("localDate = " + localDate);
   }
 
 //  @Test

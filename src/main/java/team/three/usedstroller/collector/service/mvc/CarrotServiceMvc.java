@@ -87,7 +87,7 @@ public class CarrotServiceMvc implements ProductCollector {
     eventPublisher.publishEvent(sourceType);
   }
 
-  private List<Product> getProducts(String url) {
+  public List<Product> getProducts(String url) {
     List<Product> items = new ArrayList<>();
     Document doc = null;
     try {

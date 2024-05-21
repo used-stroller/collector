@@ -8,4 +8,6 @@ import team.three.usedstroller.collector.domain.dto.FilterReq;
 public interface CustomProductRepository {
 
   List<Product> getProductsOnly(FilterReq filter);
+
+  List<Product> getNullDateList();
 }

@@ -117,5 +117,19 @@ public class CommonService {
       productRepository.save(product);
     }
   }
+
+  public void updateNullDate() {
+
+    /**
+     * null인 product url 링크값을 넣으면서
+     */
+    List<Product> nullDateList = productRepository.getNullDateList();
+    for (Product product : nullDateList) {
+      List<Product> products = carrotServiceMvc.getProducts(product.getLink());
+      carrotServiceMvc.saveProducts(productRepository, products);
+    }
+
+
+  }
 }
 

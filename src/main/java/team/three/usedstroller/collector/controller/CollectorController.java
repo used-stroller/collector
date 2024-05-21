@@ -92,9 +92,14 @@ public class CollectorController {
   }
 
   @PostMapping("/update/model")
-
   @ResponseStatus(HttpStatus.CREATED)
   public void updateModel() {
     commonService.updateModel();
+  }
+
+  @PostMapping("/update/null-date")
+  @ResponseStatus(HttpStatus.CREATED)
+  public void updateNullDate() {
+    commonService.updateNullDate();
   }
 }

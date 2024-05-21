@@ -1,14 +1,17 @@
-###
+### 번개장터 수집
 POST {{host}}/collector/bunjang
 
-###
+### 중고나라 수집
 POST {{host}}/collector/junggonara
 
-###
+### 세컨웨어 수집
 POST {{host}}/collector/secondwear
 
-###
+### 당근마켓 수집
 POST {{host}}/collector/carrot-market
 
-###
+### 네이버 수집
 POST {{host}}/collector/naver-shopping
+
+### 모델명 업데이트
+POST {{host}}/collector/update/model

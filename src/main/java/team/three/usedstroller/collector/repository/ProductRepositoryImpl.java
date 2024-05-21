@@ -33,6 +33,19 @@ public class ProductRepositoryImpl implements CustomProductRepository {
     return products;
   }
 
+  @Override
+  public List<Product> getNullDateList() {
+    JPAQuery<Product> jpaQuery = query.selectFrom(product)
+        .where(
+            product.uploadDate.isNull()
+        );
+    List<Product> products = jpaQuery
+        .fetch()
+        .stream()
+        .toList();
+    return products;
+  }
+
   private BooleanExpression applyBrand(List<String> brand) {
     if (!CollectionUtils.isEmpty(brand)) {
       return brand.stream()
