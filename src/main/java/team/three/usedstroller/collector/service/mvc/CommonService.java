@@ -1,13 +1,22 @@
 package team.three.usedstroller.collector.service.mvc;
 
+import static team.three.usedstroller.collector.util.UnitConversionUtils.changeLocalDate;
+import static team.three.usedstroller.collector.util.UnitConversionUtils.convertToTimeFormat;
+
+import java.io.IOException;
 import java.nio.channels.CompletionHandler;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 import team.three.usedstroller.collector.domain.Model;
 import team.three.usedstroller.collector.domain.Product;
 import team.three.usedstroller.collector.domain.dto.FilterReq;
@@ -119,17 +128,30 @@ public class CommonService {
   }
 
   public void updateNullDate() {
-
-    /**
-     * null인 product url 링크값을 넣으면서
-     */
-    List<Product> nullDateList = productRepository.getNullDateList();
-    for (Product product : nullDateList) {
-      List<Product> products = carrotServiceMvc.getProducts(product.getLink());
-      carrotServiceMvc.saveProducts(productRepository, products);
+    List<Product> list = productRepository.getNullDateList();
+    for (Product product : list) {
+      try {
+        LocalDate uploadDate = getUploadDate(product);
+        product.setUploadDate(uploadDate);
+        productRepository.save(product);
+      } catch (IOException e) {
+        // 페이지 요청 실패 시 건너뜀
+        log.error("당근마켓 상세정보 가져오기 실패 URL: {}", product.getLink(), e);
+      }
     }
 
 
+  }
+
+  private static LocalDate getUploadDate(Product product) throws IOException {
+    String uploadTime;
+    Document detailDoc;
+    detailDoc = Jsoup.connect(product.getLink()).get();
+    Element time = detailDoc.getElementsByTag("time").stream().findFirst()
+        .orElseGet(() -> null);
+    uploadTime = ObjectUtils.isEmpty(time) ? "" : time.text().replace("끌올", "").replace("\\D", "");
+    LocalDate uploadDate = changeLocalDate(convertToTimeFormat(uploadTime));
+    return uploadDate;
   }
 }
 

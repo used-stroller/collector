@@ -130,6 +130,12 @@ public class UnitConversionUtils {
       cal.add(Calendar.MONTH, -i);
       exactTime = simpleDateFormat.format(cal.getTime());
     }
+    if (time.contains("달")) {
+      String intStr = time.replaceAll(NOT_NUMBER, "");
+      int i = Integer.parseInt(intStr);
+      cal.add(Calendar.MONTH, -i);
+      exactTime = simpleDateFormat.format(cal.getTime());
+    }
     if (time.contains("년")) {
       String intStr = time.replaceAll(NOT_NUMBER, "");
       int i = Integer.parseInt(intStr);

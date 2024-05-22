@@ -15,3 +15,6 @@ POST {{host}}/collector/naver-shopping
 
 ### 모델명 업데이트
 POST {{host}}/collector/update/model
+
+### 업로드 데이트 업데이트
+POST {{host}}/collector/update/null-date

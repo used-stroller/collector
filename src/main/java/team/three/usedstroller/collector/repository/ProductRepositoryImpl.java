@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import team.three.usedstroller.collector.domain.Product;
+import team.three.usedstroller.collector.domain.SourceType;
 import team.three.usedstroller.collector.domain.dto.FilterReq;
 
 @Repository
@@ -37,7 +38,8 @@ public class ProductRepositoryImpl implements CustomProductRepository {
   public List<Product> getNullDateList() {
     JPAQuery<Product> jpaQuery = query.selectFrom(product)
         .where(
-            product.uploadDate.isNull()
+            product.uploadDate.isNull(),
+            applySourceType(SourceType.CARROT)
         );
     List<Product> products = jpaQuery
         .fetch()
@@ -64,4 +66,12 @@ public class ProductRepositoryImpl implements CustomProductRepository {
     }
     return null;
   }
+
+  private BooleanExpression applySourceType(SourceType src) {
+    if (StringUtils.hasText(String.valueOf(src))) {
+      return product.sourceType.eq(src);
+    }
+    return null;
+  }
+
 }

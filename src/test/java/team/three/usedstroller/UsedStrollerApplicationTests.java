@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.util.ObjectUtils;
 import team.three.usedstroller.collector.domain.Keyword;
 import team.three.usedstroller.collector.domain.Model;
 import team.three.usedstroller.collector.domain.Product;
@@ -116,14 +117,17 @@ class UsedStrollerApplicationTests {
   @Test
   void conversionDate() {
     String testStr = "\n"
-        + "            끌올 2일 전\n"
+        + "            끌올 1달 전\n"
         + "          ";
 
     String testStr2 = "\n"
         + "             6분 전\n"
         + "          ";
 
-    String s = unitConversionUtils.convertToTimeFormat(testStr);
+    String uploadTime =
+        ObjectUtils.isEmpty(testStr) ? "" : testStr.replace("끌올", "").replaceAll("\\D", "");
+    System.out.println("uploadTime = " + uploadTime);
+    String s = unitConversionUtils.convertToTimeFormat(uploadTime);
     System.out.println("s = " + s);
     LocalDate localDate = unitConversionUtils.changeLocalDate(s);
     System.out.println("localDate = " + localDate);

@@ -13,8 +13,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.util.ObjectUtils;
+import team.three.usedstroller.collector.util.UnitConversionUtils;
 
 class UnitTest {
+
+  UnitConversionUtils unitConversionUtils;
 
   @Test
   void convert_date() {
@@ -158,6 +162,25 @@ class UnitTest {
       throw new IllegalArgumentException("메서드 exception");
     }
     System.out.println("i = " + i);
+  }
+
+  @Test
+  void conversionDate() {
+    String testStr = "\n"
+        + "            끌올 2달 전\n"
+        + "          ";
+
+    String testStr2 = "\n"
+        + "             6분 전\n"
+        + "          ";
+
+    String uploadTime =
+        ObjectUtils.isEmpty(testStr) ? "" : testStr.replace("끌올", "");
+    System.out.println("uploadTime = " + uploadTime);
+    String s = unitConversionUtils.convertToTimeFormat(uploadTime);
+    System.out.println("s = " + s);
+    LocalDate localDate = unitConversionUtils.changeLocalDate(s);
+    System.out.println("localDate = " + localDate);
   }
 
 }
