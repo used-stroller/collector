@@ -13,6 +13,10 @@ POST {{host}}/collector/carrot-market
 ### 네이버 수집
 POST {{host}}/collector/naver-shopping
 
+### 한번에 수집
+POST {{host}}/collector/collect/all
+
+
 ### 모델명 업데이트
 POST {{host}}/collector/update/model
 

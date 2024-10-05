@@ -57,6 +57,13 @@ public class CollectorScheduler {
     commonService.updateModel();
   }
 
+  @Scheduled(cron = "0 30 15 * * *", zone = "Asia/Seoul")
+  public void collectAll() {
+    log.info("collectAll start");
+    carrotService.start();
+    commonService.collectAll();
+  }
+
 //  @Scheduled(cron = "0 00 6 * * *", zone = "Asia/Seoul")
 //  public void nullDate() {
 //    log.info("업로드 데이트 업데이트 ");
