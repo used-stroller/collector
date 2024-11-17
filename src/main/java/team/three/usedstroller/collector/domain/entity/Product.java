@@ -158,7 +158,7 @@ public class Product extends BaseTimeEntity {
         .sourceType(SourceType.CARROT)
         .pid(pid)
         .title(title)
-        .price(convertPrice(price))
+        .price(convertPrice(removeDecimal(price)))
         .region(region)
         .link(link)
         .imgSrc(imgSrc)
@@ -166,6 +166,15 @@ public class Product extends BaseTimeEntity {
         .uploadDate(LocalDate.now())
         .pid(pid)
         .build();
+  }
+
+  private static String removeDecimal(String price) {
+    String[] priceArray = {};
+    if (price != null) {
+      priceArray = price.split("\\.");
+      return priceArray[0];
+    }
+    return "";
   }
 
   @Override
