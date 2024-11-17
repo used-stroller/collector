@@ -3,7 +3,7 @@ package team.three.usedstroller.collector.validation;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import team.three.usedstroller.collector.domain.Product;
+import team.three.usedstroller.collector.domain.entity.Product;
 import team.three.usedstroller.collector.domain.SourceType;
 import team.three.usedstroller.collector.repository.ProductRepository;
 
@@ -20,7 +20,8 @@ public class PidDuplicationValidator {
     }
   }
 
-  public static boolean isExistPid(ProductRepository productRepository, String pid, SourceType sourceType) {
+  public static boolean isExistPid(ProductRepository productRepository, String pid,
+      SourceType sourceType) {
     if (productRepository.existsByPidAndSourceType(pid, sourceType)) {
       log.info("{} [{}] is already exist", sourceType, pid);
       return true;

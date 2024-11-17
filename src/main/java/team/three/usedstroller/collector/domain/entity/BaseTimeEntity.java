@@ -1,4 +1,4 @@
-package team.three.usedstroller.collector.domain;
+package team.three.usedstroller.collector.domain.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
@@ -15,18 +15,18 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 public class BaseTimeEntity {
 
-	@CreatedDate
-	@Column(updatable = false)
-	private LocalDateTime createdAt;
+  @CreatedDate
+  @Column(updatable = false)
+  private LocalDateTime createdAt;
 
-	@LastModifiedDate
-	private LocalDateTime updatedAt;
+  @LastModifiedDate
+  private LocalDateTime updatedAt;
 
-	protected void updateData(BaseTimeEntity data) {
-		this.updatedAt = data.getUpdatedAt();
-	}
+  protected void updateData(BaseTimeEntity data) {
+    this.updatedAt = data.getUpdatedAt();
+  }
 
-	protected void updateDate() {
-		this.updatedAt = LocalDateTime.now();
-	}
+  protected void updateDate() {
+    this.updatedAt = LocalDateTime.now();
+  }
 }

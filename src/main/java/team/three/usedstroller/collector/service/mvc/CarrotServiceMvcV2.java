@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
@@ -15,28 +14,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StopWatch;
 import org.springframework.web.util.UriComponentsBuilder;
-import team.three.usedstroller.collector.domain.SourceType;
-import team.three.usedstroller.collector.domain.dto.carrot.CarrotDto;
 import team.three.usedstroller.collector.domain.entity.Keyword;
-import team.three.usedstroller.collector.domain.entity.Location;
 import team.three.usedstroller.collector.domain.entity.Product;
+import team.three.usedstroller.collector.domain.SourceType;
 import team.three.usedstroller.collector.repository.KeywordRepository;
-import team.three.usedstroller.collector.repository.LocationRepository;
 import team.three.usedstroller.collector.repository.ProductRepository;
 import team.three.usedstroller.collector.service.ProductCollector;
-import team.three.usedstroller.collector.util.CarrotParser;
 import team.three.usedstroller.collector.util.SlackHook;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class CarrotServiceMvc implements ProductCollector {
+public class CarrotServiceMvcV2 implements ProductCollector {
 
   private final ProductRepository repository;
   private final KeywordRepository keywordRepository;
   private final ApplicationEventPublisher eventPublisher;
-  private final LocationRepository locationRepository;
-  private final CarrotParser carrotParser;
   private final SlackHook slackHook;
   private final Integer END_PAGE = 1000;
 
@@ -47,8 +40,8 @@ public class CarrotServiceMvc implements ProductCollector {
     Integer newProductsCount = collectProduct();
     stopWatch.stop();
     log.info("당근 완료: {}건, 수집 시간: {}s", newProductsCount, stopWatch.getTotalTimeSeconds());
-    //slackHook.sendMessage("당근", newProductsCount, stopWatch.getTotalTimeSeconds());
-    //deleteOldProducts(SourceType.CARROT);
+    slackHook.sendMessage("당근", newProductsCount, stopWatch.getTotalTimeSeconds());
+    deleteOldProducts(SourceType.CARROT);
     return newProductsCount;
   }
 
@@ -58,7 +51,7 @@ public class CarrotServiceMvc implements ProductCollector {
     List<Keyword> keywordList = keywordRepository.findAll();
     for (Keyword keyword : keywordList) {
       log.info("keyword : {}", keyword.getKeyword());
-      scrapingProductV2(updateCount, keyword.getKeyword());
+      scrapingProduct(updateCount, keyword.getKeyword());
     }
     return updateCount.get();
   }
@@ -87,69 +80,6 @@ public class CarrotServiceMvc implements ProductCollector {
         }
       }
     }
-  }
-
-
-  // 키워드대로 전국 검색
-  private void scrapingProductV2(AtomicInteger updateCount, String keyword) {
-    int i = 0;
-    List<Location> locationList = locationRepository.findAll();
-
-    for (Location location : locationList) {
-      String url = buildUrl(location, keyword);
-      List<CarrotDto> dtoList = carrotParser.parseScript(url);
-      List<Product> products = convertDtoToProduct(dtoList);
-      updateCount.addAndGet(saveProducts(repository, products));
-      if (ObjectUtils.isEmpty(products)) {
-        log.info("carrot market page: [{}] is empty", i);
-        if (i >= 2) {
-          break;
-        }
-      }
-      i++;
-      try {
-        Thread.sleep(1000);
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-      log.info("carrot market page: [{}] start", i);
-    }
-  }
-
-  private List<Product> convertDtoToProduct(List<CarrotDto> dtoList) {
-    return dtoList.stream()
-        .map(source -> Product.createCarrotV2(source.getTitle(), source.getPrice(),
-            source.getRegionId().getName(), source.getHref(),
-            source.getThumbnail() == null ? "" : source.getThumbnail(), source.getContent(), "",
-            parseId(source.getId())))
-        .collect(Collectors.toList());
-  }
-
-  public String getRegionKorean(Long dbId) {
-    Location location = locationRepository.findByCode(dbId);
-    return location == null ? null
-        : location.getOneDepth() + " " + location.getTwoDepth() + " " + location.getThreeDepth();
-  }
-
-  public static String parseId(String id) {
-    String[] segments = id.split("/");
-    String segment = segments[segments.length - 1];
-    String[] pid = segment.split("-");
-    return pid[pid.length - 1];
-  }
-
-  //"https://www.daangn.com/kr/buy-sell/?in=역삼동-6035&search=부가부";
-  private String buildUrl(Location location, String keyword) {
-    UriComponentsBuilder uriBuilder = UriComponentsBuilder.newInstance();
-    return uriBuilder
-        .scheme("https")
-        .host("www.daangn.com")
-        .path("/kr/buy-sell/")
-        .queryParam("in", location.getThreeDepth() + "-" + location.getCode())
-        .queryParam("search", keyword)
-        .encode()
-        .build()
-        .toUriString();
   }
 
   @Override

@@ -1,4 +1,4 @@
-package team.three.usedstroller.collector.domain;
+package team.three.usedstroller.collector.domain.entity;
 
 import static team.three.usedstroller.collector.util.UnitConversionUtils.changeLocalDate;
 import static team.three.usedstroller.collector.util.UnitConversionUtils.convertBunjangLink;
@@ -24,11 +24,13 @@ import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.util.Objects;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import team.three.usedstroller.collector.domain.SourceType;
 import team.three.usedstroller.collector.domain.dto.BunjangItem;
 import team.three.usedstroller.collector.domain.dto.JunggonaraItem;
 import team.three.usedstroller.collector.domain.dto.NaverApiResponse;
@@ -38,6 +40,8 @@ import team.three.usedstroller.collector.domain.dto.SecondWearItem;
 @Getter
 @Setter
 @ToString
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "products")
 public class Product extends BaseTimeEntity {
@@ -81,24 +85,6 @@ public class Product extends BaseTimeEntity {
 //      model.getProducts().add(this);
 //    }
 //  }
-
-
-  @Builder
-  private Product(SourceType sourceType, String pid, String title, String link, Long price,
-      String imgSrc,
-      int releaseYear, String etc, LocalDate uploadDate, String region, String content) {
-    this.sourceType = sourceType;
-    this.pid = pid;
-    this.title = title;
-    this.link = link;
-    this.price = price;
-    this.imgSrc = imgSrc;
-    this.releaseYear = releaseYear;
-    this.etc = etc;
-    this.uploadDate = uploadDate;
-    this.region = region;
-    this.content = content;
-  }
 
   public static Product createNaver(NaverApiResponse.Items item) {
     return Product.builder()
@@ -163,6 +149,22 @@ public class Product extends BaseTimeEntity {
         .imgSrc(imgSrc)
         .content(content)
         .uploadDate(changeLocalDate(convertToTimeFormat(uploadTime)))
+        .build();
+  }
+
+  public static Product createCarrotV2(String title, String price, String region, String link,
+      String imgSrc, String content, String uploadTime, String pid) {
+    return Product.builder()
+        .sourceType(SourceType.CARROT)
+        .pid(pid)
+        .title(title)
+        .price(convertPrice(price))
+        .region(region)
+        .link(link)
+        .imgSrc(imgSrc)
+        .content(content)
+        .uploadDate(changeLocalDate(convertToTimeFormat(uploadTime)))
+        .pid(pid)
         .build();
   }
 

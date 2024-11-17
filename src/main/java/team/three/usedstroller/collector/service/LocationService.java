@@ -12,7 +12,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
-import team.three.usedstroller.collector.domain.Location;
+import team.three.usedstroller.collector.domain.entity.Location;
 import team.three.usedstroller.collector.domain.dto.Locations;
 import team.three.usedstroller.collector.repository.LocationRepository;
 

@@ -14,7 +14,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import team.three.usedstroller.collector.domain.Product;
+import team.three.usedstroller.collector.domain.entity.Product;
 import team.three.usedstroller.collector.domain.SourceType;
 
 @Getter

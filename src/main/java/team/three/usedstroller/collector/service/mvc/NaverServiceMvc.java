@@ -20,7 +20,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StopWatch;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import team.three.usedstroller.collector.domain.Product;
+import team.three.usedstroller.collector.domain.entity.Product;
 import team.three.usedstroller.collector.domain.SourceType;
 import team.three.usedstroller.collector.domain.dto.NaverApiResponse;
 import team.three.usedstroller.collector.domain.dto.NaverApiResponse.Items;

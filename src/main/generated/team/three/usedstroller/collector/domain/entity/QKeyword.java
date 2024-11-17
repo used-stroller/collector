@@ -1,4 +1,4 @@
-package team.three.usedstroller.collector.domain;
+package team.three.usedstroller.collector.domain.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -15,7 +15,7 @@ import com.querydsl.core.types.Path;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QKeyword extends EntityPathBase<Keyword> {
 
-    private static final long serialVersionUID = 1784498341L;
+    private static final long serialVersionUID = 275240034L;
 
     public static final QKeyword keyword1 = new QKeyword("keyword1");
 

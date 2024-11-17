@@ -1,4 +1,4 @@
-package team.three.usedstroller.collector.domain;
+package team.three.usedstroller.collector.domain.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -15,7 +15,7 @@ import com.querydsl.core.types.Path;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QLocation extends EntityPathBase<Location> {
 
-    private static final long serialVersionUID = 862768249L;
+    private static final long serialVersionUID = 1320400988L;
 
     public static final QLocation location = new QLocation("location");
 

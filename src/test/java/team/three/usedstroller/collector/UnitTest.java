@@ -8,12 +8,15 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.ObjectUtils;
+import team.three.usedstroller.collector.domain.dto.carrot.CarrotDto;
+import team.three.usedstroller.collector.util.CarrotParser;
 import team.three.usedstroller.collector.util.UnitConversionUtils;
 
 class UnitTest {
@@ -181,6 +184,27 @@ class UnitTest {
     System.out.println("s = " + s);
     LocalDate localDate = unitConversionUtils.changeLocalDate(s);
     System.out.println("localDate = " + localDate);
+  }
+
+  @Test
+  void scriptParser() {
+    String url = "https://www.daangn.com/kr/buy-sell/?in=역삼동-6035&search=부가부";
+    CarrotParser carrotParser = new CarrotParser();
+    List<CarrotDto> s = carrotParser.parseScript(url);
+    for (CarrotDto carrotDto : s) {
+      System.out.println("carrotDto = " + carrotDto);
+    }
+  }
+
+
+  @Test
+  void parseString() {
+    String id = "\"/kr/buy-sell/%EB%B2%A0%EC%9D%B4%EB%B9%84%EC%A0%A0-%EC%9A%94%EC%9A%94-6-%EC%9C%A0%EB%AA%A8%EC%B0%A8-%EB%B0%B1-%EB%AA%A8%EA%B8%B0%EC%9E%A5-%EC%83%88%EC%83%81%ED%92%88-t2fm3t3ptoyi/";
+    String[] segments = id.split("/");
+    String segment = segments[segments.length - 1];
+    String[] pid = segment.split("-");
+    String newId = pid[pid.length - 1];
+    System.out.println("newId = " + newId);
   }
 
 }

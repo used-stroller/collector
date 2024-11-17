@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StopWatch;
 import org.springframework.web.util.UriComponentsBuilder;
-import team.three.usedstroller.collector.domain.Product;
+import team.three.usedstroller.collector.domain.entity.Product;
 import team.three.usedstroller.collector.domain.SourceType;
 import team.three.usedstroller.collector.repository.ProductRepository;
 import team.three.usedstroller.collector.util.SlackHook;

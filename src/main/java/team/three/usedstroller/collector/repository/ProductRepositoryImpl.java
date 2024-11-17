@@ -1,6 +1,6 @@
 package team.three.usedstroller.collector.repository;
 
-import static team.three.usedstroller.collector.domain.QProduct.product;
+import static team.three.usedstroller.collector.domain.entity.QProduct.product;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -10,9 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-import team.three.usedstroller.collector.domain.Product;
 import team.three.usedstroller.collector.domain.SourceType;
 import team.three.usedstroller.collector.domain.dto.FilterReq;
+import team.three.usedstroller.collector.domain.entity.Product;
 
 @Repository
 @RequiredArgsConstructor

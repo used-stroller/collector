@@ -15,7 +15,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
-import team.three.usedstroller.collector.domain.Product;
+import team.three.usedstroller.collector.domain.entity.Product;
 import team.three.usedstroller.collector.domain.SourceType;
 import team.three.usedstroller.collector.domain.dto.NaverApiResponse;
 import team.three.usedstroller.collector.repository.ProductRepository;

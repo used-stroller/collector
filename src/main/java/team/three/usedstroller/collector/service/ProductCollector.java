@@ -2,8 +2,8 @@ package team.three.usedstroller.collector.service;
 
 import java.util.List;
 import java.util.Optional;
-import team.three.usedstroller.collector.domain.Product;
 import team.three.usedstroller.collector.domain.SourceType;
+import team.three.usedstroller.collector.domain.entity.Product;
 import team.three.usedstroller.collector.repository.ProductRepository;
 
 public interface ProductCollector {
@@ -19,7 +19,7 @@ public interface ProductCollector {
    */
   default Integer saveProducts(ProductRepository repository, List<Product> products) {
     return products.stream()
-        .map(product -> saveProduct(repository, product))
+        .map(product -> saveProductV2(repository, product))
         .reduce(Integer::sum)
         .orElse(0);
   }
@@ -29,6 +29,25 @@ public interface ProductCollector {
    * 저장 후 1을 반환.
    */
   default Integer saveProduct(ProductRepository repository, Product newProduct) {
+    Optional<Product> dbProduct = repository.findByPidAndSourceType(newProduct.getPid(),
+        newProduct.getSourceType());
+    if (dbProduct.isPresent()) {
+      Product oldProduct = dbProduct.get();
+      boolean isEquals = oldProduct.equals(newProduct);
+      if (isEquals) {
+        oldProduct.updateDate();
+        repository.save(oldProduct);
+        return 0;
+      }
+      oldProduct.update(newProduct);
+      repository.save(oldProduct);
+    } else {
+      repository.save(newProduct);
+    }
+    return 1;
+  }
+
+  default Integer saveProductV2(ProductRepository repository, Product newProduct) {
     Optional<Product> dbProduct = repository.findByPidAndSourceType(newProduct.getPid(),
         newProduct.getSourceType());
     if (dbProduct.isPresent()) {

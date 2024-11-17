@@ -1,4 +1,4 @@
-package team.three.usedstroller.collector.domain;
+package team.three.usedstroller.collector.domain.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -16,7 +16,7 @@ import com.querydsl.core.types.dsl.PathInits;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QProduct extends EntityPathBase<Product> {
 
-    private static final long serialVersionUID = -2005534805L;
+    private static final long serialVersionUID = 780174184L;
 
     private static final PathInits INITS = PathInits.DIRECT2;
 
@@ -49,7 +49,7 @@ public class QProduct extends EntityPathBase<Product> {
 
     public final NumberPath<Integer> releaseYear = createNumber("releaseYear", Integer.class);
 
-    public final EnumPath<SourceType> sourceType = createEnum("sourceType", SourceType.class);
+    public final EnumPath<team.three.usedstroller.collector.domain.SourceType> sourceType = createEnum("sourceType", team.three.usedstroller.collector.domain.SourceType.class);
 
     public final StringPath title = createString("title");
 
