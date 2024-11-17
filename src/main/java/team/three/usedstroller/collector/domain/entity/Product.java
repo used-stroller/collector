@@ -163,7 +163,7 @@ public class Product extends BaseTimeEntity {
         .link(link)
         .imgSrc(imgSrc)
         .content(content)
-        .uploadDate(changeLocalDate(convertToTimeFormat(uploadTime)))
+        .uploadDate(LocalDate.now())
         .pid(pid)
         .build();
   }
