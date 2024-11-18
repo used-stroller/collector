@@ -1,6 +1,7 @@
 package team.three.usedstroller.collector.service.mvc;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -12,6 +13,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StopWatch;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -45,11 +47,34 @@ public class CarrotServiceMvc implements ProductCollector {
     StopWatch stopWatch = new StopWatch();
     stopWatch.start();
     Integer newProductsCount = collectProduct();
+    updateUploadTime();
     stopWatch.stop();
     log.info("당근 완료: {}건, 수집 시간: {}s", newProductsCount, stopWatch.getTotalTimeSeconds());
     //slackHook.sendMessage("당근", newProductsCount, stopWatch.getTotalTimeSeconds());
     //deleteOldProducts(SourceType.CARROT);
     return newProductsCount;
+  }
+
+  public void updateUploadTime() {
+    List<Product> products = repository.findBySourceType(SourceType.CARROT);
+    for (Product product : products) {
+      String url = product.getLink();
+      try {
+        saveUploadDate(product, url);
+      } catch (Exception e) {
+        log.info("업로드데이트 실패");
+      }
+    }
+  }
+
+  @Transactional
+  public void saveUploadDate(Product product, String url)
+      throws IOException, InterruptedException {
+    Document doc = Jsoup.connect(url).get();
+    String[] timeArray = doc.selectFirst("time").toString().split("=");
+    String time = timeArray[1].substring(1, 11);
+    product.setUploadDate(LocalDate.parse(time));
+    repository.save(product);
   }
 
   @Override
