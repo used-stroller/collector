@@ -14,7 +14,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, CustomP
 
   Optional<Product> findByPidAndSourceType(String pid, SourceType sourceType);
 
-  List<Product> findBySourceType(SourceType sourceType);
+  List<Product> findBySourceTypeAndUploadDateIsNull(SourceType sourceType);
 
   @Modifying
   void deleteAllBySourceTypeAndUpdatedAtIsBefore(SourceType sourceType, LocalDateTime updatedAt);

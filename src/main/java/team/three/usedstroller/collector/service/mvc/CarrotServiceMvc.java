@@ -56,7 +56,7 @@ public class CarrotServiceMvc implements ProductCollector {
   }
 
   public void updateUploadTime() {
-    List<Product> products = repository.findBySourceType(SourceType.CARROT);
+    List<Product> products = repository.findBySourceTypeAndUploadDateIsNull(SourceType.CARROT);
     for (Product product : products) {
       String url = product.getLink();
       try {
@@ -122,8 +122,7 @@ public class CarrotServiceMvc implements ProductCollector {
 
     for (Location location : locationList) {
       String url = buildUrl(location, keyword);
-      List<CarrotDto> dtoList = carrotParser.parseScript(url);
-      List<Product> products = convertDtoToProduct(dtoList);
+      List<Product> products = getProductList(url);
       updateCount.addAndGet(saveProducts(repository, products));
       if (ObjectUtils.isEmpty(products)) {
         log.info("carrot market page: [{}] is empty", i);
@@ -141,12 +140,20 @@ public class CarrotServiceMvc implements ProductCollector {
     }
   }
 
+  private List<Product> getProductList(String url) {
+    List<CarrotDto> dtoList = carrotParser.parseScript(url);
+    List<Product> products = convertDtoToProduct(dtoList);
+    return products;
+  }
+
   private List<Product> convertDtoToProduct(List<CarrotDto> dtoList) {
     return dtoList.stream()
-        .map(source -> Product.createCarrotV2(source.getTitle(), source.getPrice(),
+        .map(source -> Product.createCarrotV2(
+            source.getTitle(), source.getPrice(),
             source.getRegionId().getName(), source.getHref(),
             source.getThumbnail() == null ? "" : source.getThumbnail(), source.getContent(), "",
-            parseId(source.getId())))
+            parseId(source.getId()), source.getStatus()
+        ))
         .collect(Collectors.toList());
   }
 

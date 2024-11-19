@@ -73,6 +73,9 @@ public class Product extends BaseTimeEntity {
   @Column(columnDefinition = "text")
   private String content;
 
+  @Column
+  private String status;
+
   @ManyToOne
   @JoinColumn(name = "model_id")
   private Model model;
@@ -153,7 +156,7 @@ public class Product extends BaseTimeEntity {
   }
 
   public static Product createCarrotV2(String title, String price, String region, String link,
-      String imgSrc, String content, String uploadTime, String pid) {
+      String imgSrc, String content, String uploadTime, String pid, String status) {
     return Product.builder()
         .sourceType(SourceType.CARROT)
         .pid(pid)
@@ -163,8 +166,9 @@ public class Product extends BaseTimeEntity {
         .link(link)
         .imgSrc(imgSrc)
         .content(content)
-        .uploadDate(LocalDate.now())
+        .uploadDate(null)
         .pid(pid)
+        .status(status)
         .build();
   }
 
