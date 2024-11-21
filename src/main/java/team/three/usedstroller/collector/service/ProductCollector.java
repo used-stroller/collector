@@ -19,6 +19,13 @@ public interface ProductCollector {
    */
   default Integer saveProducts(ProductRepository repository, List<Product> products) {
     return products.stream()
+        .map(product -> saveProduct(repository, product))
+        .reduce(Integer::sum)
+        .orElse(0);
+  }
+
+  default Integer saveProductsV2(ProductRepository repository, List<Product> products) {
+    return products.stream()
         .map(product -> saveProductV2(repository, product))
         .reduce(Integer::sum)
         .orElse(0);
@@ -50,9 +57,10 @@ public interface ProductCollector {
   default Integer saveProductV2(ProductRepository repository, Product newProduct) {
     Optional<Product> dbProduct = repository.findByPidAndSourceType(newProduct.getPid(),
         newProduct.getSourceType());
-    if (dbProduct.isPresent()) {
+    if (dbProduct.isPresent()) { // pid 값이 있을때
       Product oldProduct = dbProduct.get();
       boolean isEquals = oldProduct.equals(newProduct);
+
       if (isEquals) {
         oldProduct.updateDate();
         repository.save(oldProduct);

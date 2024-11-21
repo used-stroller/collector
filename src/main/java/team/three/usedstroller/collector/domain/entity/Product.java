@@ -26,10 +26,9 @@ import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 import team.three.usedstroller.collector.domain.SourceType;
 import team.three.usedstroller.collector.domain.dto.BunjangItem;
 import team.three.usedstroller.collector.domain.dto.JunggonaraItem;
@@ -37,12 +36,11 @@ import team.three.usedstroller.collector.domain.dto.NaverApiResponse;
 import team.three.usedstroller.collector.domain.dto.SecondWearItem;
 
 @Entity
-@Getter
-@Setter
-@ToString
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Data
+@EqualsAndHashCode(exclude = {"uploadDate"}) //equals와 hashcode에서 uploadDate 제외
 @Table(name = "products")
 public class Product extends BaseTimeEntity {
 

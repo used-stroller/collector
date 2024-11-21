@@ -123,7 +123,7 @@ public class CarrotServiceMvc implements ProductCollector {
     for (Location location : locationList) {
       String url = buildUrl(location, keyword);
       List<Product> products = getProductList(url);
-      updateCount.addAndGet(saveProducts(repository, products));
+      updateCount.addAndGet(saveProductsV2(repository, products));
       if (ObjectUtils.isEmpty(products)) {
         log.info("carrot market page: [{}] is empty", i);
         if (i >= 2) {
