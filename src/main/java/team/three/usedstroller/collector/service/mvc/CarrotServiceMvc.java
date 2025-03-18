@@ -118,6 +118,7 @@ public class CarrotServiceMvc implements ProductCollector {
   // 키워드대로 전국 검색
   private void scrapingProductV2(AtomicInteger updateCount, String keyword) {
     int i = 0;
+    int emptyCount = 0;
     List<Location> locationList = locationRepository.findAll();
 
     for (Location location : locationList) {
@@ -126,7 +127,8 @@ public class CarrotServiceMvc implements ProductCollector {
       updateCount.addAndGet(saveProductsV2(repository, products));
       if (ObjectUtils.isEmpty(products)) {
         log.info("carrot market page: [{}] is empty", i);
-        if (i >= 2) {
+        emptyCount++;
+        if (emptyCount == 10) {
           break;
         }
       }
