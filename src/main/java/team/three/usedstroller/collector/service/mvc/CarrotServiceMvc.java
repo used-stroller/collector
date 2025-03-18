@@ -136,6 +136,7 @@ public class CarrotServiceMvc implements ProductCollector {
       } catch (Exception e) {
         e.printStackTrace();
       }
+      log.info("location={}", location);
       log.info("carrot market page: [{}] start", i);
     }
   }
